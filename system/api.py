@@ -13,8 +13,7 @@ class API:
 
         self.app = Flask(__name__)
 
-        self.thread = threading.Thread(target=self.app.run, kwargs={"host": "0.0.0.0", "port": self.port,
-                                                                    "debug": self.debug, "use_reloader": False})
+        self.thread = None
         # 通过设置use_reloader防止出现signal报错
 
         self.gets = {}
@@ -80,5 +79,7 @@ class API:
 
     def start(self, port=5050):
         self.port = port
+        self.thread = threading.Thread(target=self.app.run, kwargs={"host": "0.0.0.0", "port": self.port,
+                                                                    "debug": self.debug, "use_reloader": False})
         print(f"flask_token:{self.token}")
         self.thread.start()
