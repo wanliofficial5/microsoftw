@@ -340,3 +340,6 @@ class Env:
     @staticmethod
     def clean_logs():
         _os.system("rm -f logs/*")
+
+    def screenshot(self):
+        return self.Now.Book.render()
