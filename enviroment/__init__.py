@@ -21,8 +21,7 @@ from framework.struct import Base as _Base
 from framework import lib as _lib
 from system import configurator
 
-from enviroment.drivers import epd2in9_V2 as _epd2in9_V2, icnt86 as _icnt86, taptic as _taptic, \
-    bluetooth_server as _bluetooth
+from enviroment.drivers import taptic as _taptic, bluetooth_server as _bluetooth
 
 example_config = {
     "theme": "默认（黑）",
