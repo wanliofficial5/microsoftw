@@ -220,8 +220,8 @@ class Env:
         self._bluetooth_service_status = False
 
         # flask
-        self.API = _api.API(True)
-        self.API.run()
+        self.API = _api.API(self, True)
+        # self.API.run()
 
         # themes
         self.themes = {}
