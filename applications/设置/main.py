@@ -81,10 +81,10 @@ class GeneralSettingsPage(lib.Pages.ListPage):
 class TapticSettingsPage(lib.Pages.ListPage):
     def __init__(self, book):
         self.env = book.base.env
-        style1 = "ON" if self.env.Config.read("shock") else "OFF"
-        style2 = "ON" if self.env.Config.read("feedback_shock") else "OFF"
-        style3 = "ON" if self.env.Config.read("notice_shock") else "OFF"
-        style4 = "ON" if self.env.Config.read("other_shock") else "OFF"
+        style1 = "ON" if self.env.Config.read("vibrate") else "OFF"
+        style2 = "ON" if self.env.Config.read("feedback_vibrate") else "OFF"
+        style3 = "ON" if self.env.Config.read("notice_vibrate") else "OFF"
+        style4 = "ON" if self.env.Config.read("other_vibrate") else "OFF"
         super().__init__(book, "震动",
                          ["总开关",
                           "反馈震动",
@@ -92,45 +92,45 @@ class TapticSettingsPage(lib.Pages.ListPage):
                           "其他震动"
                           ],
                          funcs=[
-                             self.set_shock,
-                             self.set_feedback_shock,
-                             self.set_notice_shock,
-                             self.set_other_shock
+                             self.set_vibrate,
+                             self.set_feedback_vibrate,
+                             self.set_notice_vibrate,
+                             self.set_other_vibrate
                          ],
                          styles=[
                              style1, style2, style3, style4
                          ])
 
-    def set_shock(self):
-        if self.env.Config.read("shock"):
-            self.env.Config.set("shock", False)
+    def set_vibrate(self):
+        if self.env.Config.read("vibrate"):
+            self.env.Config.set("vibrate", False)
             self.set_style(0, "OFF")
         else:
-            self.env.Config.set("shock", True)
+            self.env.Config.set("vibrate", True)
             self.set_style(0, "ON")
 
-    def set_feedback_shock(self):
-        if self.env.Config.read("feedback_shock"):
-            self.env.Config.set("feedback_shock", False)
+    def set_feedback_vibrate(self):
+        if self.env.Config.read("feedback_vibrate"):
+            self.env.Config.set("feedback_vibrate", False)
             self.set_style(1, "OFF")
         else:
-            self.env.Config.set("feedback_shock", True)
+            self.env.Config.set("feedback_vibrate", True)
             self.set_style(1, "ON")
 
-    def set_notice_shock(self):
-        if self.env.Config.read("notice_shock"):
-            self.env.Config.set("notice_shock", False)
+    def set_notice_vibrate(self):
+        if self.env.Config.read("notice_vibrate"):
+            self.env.Config.set("notice_vibrate", False)
             self.set_style(2, "OFF")
         else:
-            self.env.Config.set("notice_shock", True)
+            self.env.Config.set("notice_vibrate", True)
             self.set_style(2, "ON")
 
-    def set_other_shock(self):
-        if self.env.Config.read("other_shock"):
-            self.env.Config.set("other_shock", False)
+    def set_other_vibrate(self):
+        if self.env.Config.read("other_vibrate"):
+            self.env.Config.set("other_vibrate", False)
             self.set_style(3, "OFF")
         else:
-            self.env.Config.set("other_shock", True)
+            self.env.Config.set("other_vibrate", True)
             self.set_style(3, "ON")
 
 
