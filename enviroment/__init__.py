@@ -21,7 +21,7 @@ from system import configurator
 
 
 example_config = {
-    "theme": "default",
+    "theme": "默认（黑）",
     "docker": ["天气"]
 }
 
@@ -317,7 +317,12 @@ class Env:
 
     def start(self):
         self.now_theme = self.config.read("theme")
-        self.Now = self.themes[self.now_theme]
+        try:
+            self.Now = self.themes[self.now_theme]
+        except KeyError:
+            self.now_theme = "默认（黑）"
+            self.Now = self.themes["默认（黑）"]
+            self.config.set("theme", "默认（黑）")
         self.Now.active()
 
     def poweroff(self):

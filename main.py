@@ -8,7 +8,6 @@ from pathlib import Path
 from PIL import Image
 
 import enviroment
-from system import configurator
 
 '''
 Theme and App
