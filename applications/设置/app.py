@@ -19,8 +19,8 @@ class BluetoothSettingPage(lib.Pages.PageWithTitle):
         self.env = book.base.env
         super().__init__(book, "蓝牙配网")
         self.qr_img = self.add_element(lib.Elements.Image(self, (15, 44)))
-        self.add_element(lib.Elements.TextElement(self, (100, 48), "当前未连接到WI-FI", font_size=16))
-        self.add_element(lib.Elements.MultipleLinesLabel(self, (84, 64), (212, 68),
+        self.add_element(lib.Elements.TextElement(self, (100, 46), "当前未连接到WI-FI", font_size=16))
+        self.add_element(lib.Elements.MultipleLinesLabel(self, (84, 65), (212, 70),
                                                          "-使用简单水墨扫描左侧二维码\n"
                                                          "-暂不支持iOS设备，敬请谅解",
                                                          border=(18, 5)))
@@ -38,8 +38,8 @@ class FlaskSettingPage(lib.Pages.PageWithTitle):
         super().__init__(book, "连接APP")
 
         self.qr_img = self.add_element(lib.Elements.Image(self, (15, 44)))
-        self.add_element(lib.Elements.TextElement(self, (100, 48), "扫描左侧二维码", font_size=16))
-        self.add_element(lib.Elements.MultipleLinesLabel(self, (84, 64), (212, 68),
+        self.add_element(lib.Elements.TextElement(self, (100, 46), "扫描左侧二维码", font_size=16))
+        self.add_element(lib.Elements.MultipleLinesLabel(self, (84, 65), (212, 70),
                                                          "-当前已连接至WI-FI\n"
                                                          "-请确保您的手机和树莓派在统一局域网下",
                                                          border=(18, 5)))
