@@ -289,7 +289,7 @@ class SystemSettingsPage(lib.Pages.ListPage):
                           "切换分支",
                           "清空日志"],
                          funcs=[
-                             self.env.poweroff,
+                             self.poweroff,
                              self.reboot,
                              self.change_branch,
                              self.env.clean_logs
@@ -309,7 +309,7 @@ class SystemSettingsPage(lib.Pages.ListPage):
             self.env.clean_logs()
 
     def change_branch(self):
-        if self.env.choice("切换分支", "即将重启到@xuanzhi33编写的web分支\n预计耗时10秒，期间屏幕可能未响应。"):
+        if self.env.choice("切换分支", "即将重启到@xuanzhi33编写的web分支"):
             self.book.base.env.Screen.display(Image.open("resources/images/raspberry.jpg"))
             self.book.base.env.quit()
             os.system("sudo python3 change_branch.py &")
