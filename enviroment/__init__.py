@@ -497,7 +497,7 @@ class Env:
             i = self.back_stack.get()
             if callable(i):
                 i()
-                if self._update_temp:
+                if not self._update_temp:
                     self.display()
                 return True
             elif isinstance(i, _struct.Base):
@@ -507,11 +507,11 @@ class Env:
                     self.Now.pause()
                     self.Now = i
                     self.Now.active()
-                if self._update_temp:
+                if not self._update_temp:
                     self.display()
                 return True
             else:
-                if self._update_temp:
+                if not self._update_temp:
                     self.display()
                 return False
 
