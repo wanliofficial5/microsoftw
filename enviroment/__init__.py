@@ -179,7 +179,7 @@ class BluetoothApp:
 
 class Env:
     def __init__(self, simulator):
-        self.config = configurator.Configurator(example=example_config)
+        self.Config = configurator.Configurator(example=example_config)
 
         # locks
         self.display_lock = _threading.Lock()
