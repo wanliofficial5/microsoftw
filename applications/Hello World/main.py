@@ -50,6 +50,7 @@ class Application(lib.AppBase):
         # self.icon = Image.open(...) 不设置，使用默认图标（none18px.jpg）
 
         self.add_book("main", MainBook(self))  # 添加主书页并命名为 "main"
+        self.show_in_drawer = False
 
     def active(self, refresh="a"):
         self.Book.Page.active()
