@@ -121,9 +121,6 @@ class TouchHandler:
         app_slide_y = self.env.Now.touch_records_slide_y
         app_clicked = self.env.Now.touch_records_clicked
 
-        if ICNT_Dev.TouchCount >= 2:
-            self.double_clicked_flag = _time.time()
-
         if d_t and not o_t:  # Start touching
             print(f"Start Touch: [{d_x}, {d_y}]")
             if ICNT_Dev.X[0] <= 20:
@@ -147,7 +144,7 @@ class TouchHandler:
                     i.temp_location = (d_x, d_y)
 
         elif not d_t and o_t:  # Stop touching
-            if time.time() - self.double_clicked_flag < 0.5:
+            if time.time() - self.double_clicked_flag < 0.4:
                 self.pool.add(self.env.display, refresh="t")
                 self.double_clicked_flag = 0
 
@@ -243,6 +240,10 @@ class TouchHandler:
                                 break
 
         elif d_t and o_t:  # Keep touching
+
+            if ICNT_Dev.TouchCount >= 2:
+                self.double_clicked_flag = _time.time()
+
             if not (ICNT_Dev.X[0] == ICNT_Old.X[0] and ICNT_Dev.Y[0] == ICNT_Old.Y[0]):
                 if self.back_left.active and not self.back_left.showed:
                     if d_x - self.back_left.temp_location[0] >= 20:
