@@ -109,7 +109,6 @@ class DockerSettingPage(lib.Pages.ListPage):
         self.env = book.base.env
         self.emulator = DockerEmulator(self)
         self.add_element(self.emulator)
-        self.docker_list = []
         self.inited = False
 
     def select(self, index):
