@@ -148,8 +148,14 @@ class TouchHandler:
                 self.pool.add(self.env.display, refresh="t")
                 self.double_clicked_flag = 0
 
-                self.back_left.active = False
-                self.back_right.active = False
+                if self.back_left.active:
+                    if self.back_left.showed:
+                        self.pool.add(self.env.back_left, False)
+                    self.back_left.active = False
+                if self.back_right.active:
+                    if self.back_right.showed:
+                        self.pool.add(self.env.back_right, False)
+                    self.back_right.active = False
                 self.home_bar.active = False
                 for i in self.clicked:
                     i.active = False
