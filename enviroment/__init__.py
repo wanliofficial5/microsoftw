@@ -34,7 +34,9 @@ class Simulator:
         self.touch_recoder_old = _TouchRecoder()
         self.app = _wx.App()
         # 创建窗口(296x128)
-        self.frame = _wx.Frame(None, title="水墨屏模拟器 v2.0 by xuanzhi33", size=(296, 160))
+        self.frame = _wx.Frame(None, title="水墨屏模拟器 v2.0 by xuanzhi33", size=(296, 155))
+        self.frame.SetMaxSize((296, 155))
+        self.frame.SetMinSize((296, 155))
 
         self.static_bit = None
 
