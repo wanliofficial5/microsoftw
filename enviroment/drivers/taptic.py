@@ -31,7 +31,7 @@ class TapticEngine:
             p.stop()
             del p
 
-    def shock(self, frequency=180, duty=15, length=0.02):
+    def vibrate(self, frequency=180, duty=15, length=0.02):
         self.stop_event.set()
         self.frequency = frequency
         self.duty = duty
@@ -49,7 +49,7 @@ class TapticEngine:
 if __name__ == "__main__":
     epdconfig.module_init()
     t = TapticEngine()
-    t.shock()
+    t.vibrate()
     time.sleep(1)
-    t.shock()
+    t.vibrate()
     epdconfig.module_exit()

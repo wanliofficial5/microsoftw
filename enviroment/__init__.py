@@ -24,10 +24,10 @@ from system import configurator
 example_config = {
     "theme": "默认（黑）",
     "docker": ["天气"],
-    "shock": True,
-    "feedback_shock": True,
-    "notice_shock": True,
-    "other_shock": True
+    "vibrate": True,
+    "feedback_vibrate": True,
+    "notice_vibrate": True,
+    "other_vibrate": True
 }
 
 
@@ -422,7 +422,7 @@ class Env:
     def home_bar(self):
         if self._home_bar:
             self._home_bar = False
-            self.feedback_shock_async()
+            self.feedback_vibrate_async()
             if not self.back_home():
                 self.display()
         else:
@@ -544,25 +544,25 @@ class Env:
         self._touch_setter()
         self.display()
 
-    def feedback_shock(self):
-        if self.Config.read("shock") and self.Config.read("feedback_shock"):
-            self.Taptic.shock()
+    def feedback_vibrate(self):
+        if self.Config.read("vibrate") and self.Config.read("feedback_vibrate"):
+            self.Taptic.vibrate()
 
-    def feedback_shock_async(self):
-        self.Pool.add(self.feedback_shock)
+    def feedback_vibrate_async(self):
+        self.Pool.add(self.feedback_vibrate)
 
-    def notice_shock(self):
-        if self.Config.read("shock") and self.Config.read("notice_shock"):
-            self.Taptic.shock(221, 20, 0.5)
+    def notice_vibrate(self):
+        if self.Config.read("vibrate") and self.Config.read("notice_vibrate"):
+            self.Taptic.vibrate(221, 20, 0.5)
             _time.sleep(0.5)
-            self.Taptic.shock(221, 20, 0.5)
+            self.Taptic.vibrate(221, 20, 0.5)
 
-    def notice_shock_async(self):
-        self.Pool.add(self.notice_shock)
+    def notice_vibrate_async(self):
+        self.Pool.add(self.notice_vibrate)
 
-    def custom_shock(self, frequency, duty, length):
-        if self.Config.read("shock") and self.Config.read("other_shock"):
-            self.Taptic.shock(frequency, duty, length)
+    def custom_vibrate(self, frequency, duty, length):
+        if self.Config.read("vibrate") and self.Config.read("other_vibrate"):
+            self.Taptic.vibrate(frequency, duty, length)
 
-    def custom_shock_async(self, frequency, duty, length):
-        self.Pool.add(self.custom_shock, frequency, duty, length)
+    def custom_vibrate_async(self, frequency, duty, length):
+        self.Pool.add(self.custom_vibrate, frequency, duty, length)

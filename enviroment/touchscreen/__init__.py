@@ -147,7 +147,7 @@ class TouchHandler:
         elif not d_t and o_t:  # Stop touching
             if time.time() - self.double_clicked_flag < 0.4:
                 self.pool.add(self.env.display, refresh="t")
-                self.env.feedback_shock_async()
+                self.env.feedback_vibrate_async()
                 self.double_clicked_flag = 0
 
                 self.env.show_left_back = False
@@ -175,7 +175,7 @@ class TouchHandler:
             if self.back_left.active:
                 if d_x - self.back_left.temp_location[0] > 20:
                     self.pool.add(self.env.back)
-                    self.env.feedback_shock_async()
+                    self.env.feedback_vibrate_async()
                     slided = True
                 elif self.back_left.showed:
                     self.pool.add(self.env.back_left, False)
@@ -183,7 +183,7 @@ class TouchHandler:
             elif self.back_right.active:
                 if self.back_right.temp_location[0] - d_x > 20:
                     self.pool.add(self.env.back)
-                    self.env.feedback_shock_async()
+                    self.env.feedback_vibrate_async()
                     slided = True
                 elif self.back_right.showed:
                     self.pool.add(self.env.back_right, False)
@@ -236,7 +236,7 @@ class TouchHandler:
                         i.active = False
                         if i.area[0] <= d_x <= i.area[1] and i.area[2] <= d_y <= i.area[3]:
                             self.pool.add(i.func, *i.args, **i.kwargs)
-                            self.env.feedback_shock_async()
+                            self.env.feedback_vibrate_async()
                             break
                 else:
                     for i in _ReIter(app_clicked):
@@ -244,7 +244,7 @@ class TouchHandler:
                             i.active = False
                             if i.area[0] <= d_x <= i.area[1] and i.area[2] <= d_y <= i.area[3]:
                                 self.pool.add(i.func, *i.args, **i.kwargs)
-                                self.env.feedback_shock_async()
+                                self.env.feedback_vibrate_async()
                                 break
 
         elif d_t and o_t:  # Keep touching
