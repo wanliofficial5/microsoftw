@@ -172,6 +172,7 @@ class Worker(threading.Thread):
             except queue.Empty:
                 pass
             except:
+                traceback.print_exc()
                 self.handler(traceback.format_exc())
                 self.finish_log(False)
             else:
