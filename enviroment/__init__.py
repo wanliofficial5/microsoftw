@@ -350,7 +350,7 @@ class Env:
                 if to_stack:  # TODO:在这里添加异常处理
                     self.back_stack.put(self.Now)
                 self.Now = self.apps[target]
-                self.Now.active("t")
+                self.Now.active()
         else:
             raise KeyError("The targeted application is not found.")
 
@@ -441,7 +441,7 @@ class Env:
             self.now_theme = "默认（黑）"
             self.Now = self.themes["默认（黑）"]
             self.config.set("theme", "默认（黑）")
-        self.Now.active()
+        self.Now.active("t")
 
     def poweroff(self):
         self.Logger.info("关机")
