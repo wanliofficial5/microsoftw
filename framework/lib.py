@@ -355,12 +355,13 @@ class Pages:
             self.update(display)
 
         def _handler(self, index):
-            if index >= len(self.items):
+            index_ = self.at * 3 + index
+            if index_ >= len(self.items):
                 return
             if self.func:
-                self.func(self.at * 3 + index)
+                self.func(index_)
             else:
-                self.funcs[self.at * 3 + index]()
+                self.funcs[index_]()
 
         def _slide(self, dis):
             if dis < 0:
