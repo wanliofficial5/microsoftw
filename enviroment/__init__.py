@@ -234,11 +234,12 @@ class Env:
 
     def open_app(self, target: str, to_stack=True):
         if target in self.apps:
-            self.Now.pause()
-            if to_stack:  # TODO:在这里添加异常处理
-                self.back_stack.put(self.Now)
-            self.Now = self.apps[target]
-            self.Now.active()
+            if self.apps[target] is not self.Now:
+                self.Now.pause()
+                if to_stack:  # TODO:在这里添加异常处理
+                    self.back_stack.put(self.Now)
+                self.Now = self.apps[target]
+                self.Now.active()
         else:
             raise KeyError("The targeted application is not found.")
 
