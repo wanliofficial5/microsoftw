@@ -342,8 +342,8 @@ class Base:
         self.Book.pause()
 
     def back(self) -> bool:
-        self.env._show_left_back = False
-        self.env._show_right_back = False
+        self.env.show_left_back = False
+        self.env.show_right_back = False
         if self.back_stack.empty():
             return self.Book.back()
         else:
