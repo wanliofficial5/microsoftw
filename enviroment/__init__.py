@@ -21,6 +21,9 @@ from framework.struct import Base as _Base
 from framework import lib as _lib
 from system import configurator
 
+from enviroment.drivers import epd2in9_V2 as _epd2in9_V2, icnt86 as _icnt86, taptic as _taptic, \
+    bluetooth_server as _bluetooth
+
 example_config = {
     "theme": "默认（黑）",
     "docker": ["天气"],
@@ -159,6 +162,22 @@ class FakePage:
         return self
 
 
+class BluetoothApp:
+    def __init__(self, name, func, env):
+        self.name = name
+        self._func = func
+        self._env = func
+
+    def __call__(self, *args, **kwargs):
+        return self._func(*args, **kwargs)
+
+    def send(self, data):
+        self._env.bluetooth_service.send(f"{self.name}:{data}")
+
+    def remove(self):
+        self._env.bluetooth_remove(self.name)
+
+
 class Env:
     def __init__(self, simulator):
         self.config = configurator.Configurator(example=example_config)
@@ -191,6 +210,14 @@ class Env:
         self.Taptic = _taptic.TapticEngine()
 
         self.TouchHandler = _TouchHandler(self)
+
+        # bluetooth
+        self.Bluetooth = _bluetooth.Bluetooth(self.Pool, self.Logger)
+        self.bluetooth_service = self.Bluetooth.new_service("eink-clock", "94f39d29-7d6d-437d-973b-fba39e49d4ee",
+                                                            self._bluetooth_handler,
+                                                            status_callback=self._bluetooth_status_handler)
+        self._bluetooth_service_status = False
+        self._bluetooth_apps = {}
 
         # themes
         self.themes = {}
@@ -566,3 +593,32 @@ class Env:
 
     def custom_vibrate_async(self, frequency, duty, length):
         self.Pool.add(self.custom_vibrate, frequency, duty, length)
+
+    def _bluetooth_handler(self, data: str):
+        index = data.find(":")
+        if index == -1:
+            return
+        try:
+            self.bluetooth_apps[data[:index]](data[index+1:])
+        except KeyError:
+            pass
+
+    def _bluetooth_status_handler(self, status):
+        self._bluetooth_service_status = status
+
+    @property
+    def bluetooth_service_status(self):
+        return self._bluetooth_service_status
+
+    def bluetooth_app(self, name):
+        if name in self._bluetooth_apps:
+            raise RuntimeError("蓝牙应用已存在")
+
+        def decorator(func):
+            self.bluetooth_apps[name] = func
+            return BluetoothApp(name, func, self)
+
+        return decorator
+
+    def bluetooth_remove(self, name):
+        del self._bluetooth_apps[name]
