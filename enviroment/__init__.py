@@ -186,6 +186,9 @@ class Env:
 
         self.Config = _configurator.Configurator(example=example_config)
 
+        # logger
+        self.Logger = _logger.Logger(0)
+
         # locks
         self.display_lock = _threading.Lock()
 
@@ -195,9 +198,6 @@ class Env:
         # screen
         self.Screen = simulator
         self.screen_reversed = self.Config.read("screen_reversed")
-
-        # logger
-        self.Logger = _logger.Logger(0)
 
         # threadpool
         self.Pool = _threadpool.ThreadPool(20, self.Logger.warn)
