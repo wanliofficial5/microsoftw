@@ -14,7 +14,7 @@ class MainPage(lib.Pages.PageWithTitle):
                                                               "   祝：在追逐热爱的路上越走越远！\n"
                                                               "             傅逸凡-2022-2-2 11:52"))
 
-        self.clock = lib.Elements.Label(self, size=(296, 30), border=(4, 8), font_size=16, align="R")
+        self.clock = lib.Elements.Label(self, (0, 0), size=(296, 30), border=(4, 8), font_size=16, align="R")
         self.add_element(self.clock)
 
         self.flag = False

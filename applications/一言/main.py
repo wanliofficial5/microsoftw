@@ -21,7 +21,7 @@ class MainPage(struct.Page):
         super().__init__(book)
         self._background = book.base.env.page_with_title_img
 
-        self.clock = lib.Elements.Label(self, size=(296, 30), border=(0, 8), font_size=16, align="C")
+        self.clock = lib.Elements.Label(self, (0, 0), size=(296, 30), border=(0, 8), font_size=16, align="C")
         self.add_element(self.clock)
 
         self.add_element(lib.Elements.TextElement(self, (10, 40), "一言说:", font_size=16))

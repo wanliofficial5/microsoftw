@@ -158,7 +158,7 @@ class ThemeSelectPage(struct.Page):
         self.now_theme = None
 
         # 界面
-        self.theme_show = lib.Elements.Image(self)
+        self.theme_show = lib.Elements.Image(self, (0, 0))
         self.add_element(self.theme_show)
 
         self.next_button = lib.Elements.ImageButton(self, (233, 100), (24, 24), self.go_next,
