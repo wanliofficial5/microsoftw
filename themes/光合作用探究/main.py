@@ -6,8 +6,11 @@ import random
 import json
 
 import websocket
+from objprint import objstr
 
-SERVER = "wss://zzzing.cn:7700"
+from traceback import format_exc
+
+SERVER = "wss://zzzing.cn/ebox"
 ID = "JOCKER"
 
 
@@ -34,10 +37,23 @@ class Data:
         }
 
 
+class EVAL_ENV:
+    def __init__(self, env):
+        self.env = env
+
+    def run(self, cmd):
+        env = self.env
+        try:
+            return eval(cmd)
+        except:
+            return format_exc()
+
+
 class Connector:
-    def __init__(self, pool, logger, uuid, address, status_callback, data_callback):
-        self.pool = pool  # 线程池
-        self.logger = logger  # 日志
+    def __init__(self, env, uuid, address, status_callback, data_callback):
+        self.eval_env = EVAL_ENV(env)
+        self.pool = env.Pool  # 线程池
+        self.logger = env.Logger  # 日志
         self.uuid = uuid
         self.address = address
         self.status_callback = status_callback
@@ -64,18 +80,24 @@ class Connector:
                     cmd = data["data"]
                     if cmd == "start":
                         if self.status:
-                            ws.send(json.dumps({"type": "status", "data": "already running"}))
+                            ws.send(json.dumps({"type": "cmd_result", "data": "already running"}))
                             return
                         self.data = {}
                         self.status = True
                         self.status_callback(Status(self.status, self.box, self.server))
+                        ws.send(json.dumps({"type": "cmd_result", "data": "started"}))
                     elif cmd == "stop":
                         if not self.status:
-                            ws.send(json.dumps({"type": "status", "data": "already stopped"}))
+                            ws.send(json.dumps({"type": "cmd_result", "data": "already stopped"}))
                             return
                         self.status = False
                         self.status_callback(Status(self.status, self.box, self.server))
-                    ws.send(json.dumps({"type": "cmd", "data": "ok"}))
+                        ws.send(json.dumps({"type": "cmd_result", "data": "stopped"}))
+                    elif cmd.startswith("eval:"):
+                        cmd = cmd[5:]
+                        self.pool.add(lambda : ws.send(json.dumps({"type": "cmd_result", "data": objstr(self.eval_env.run(cmd))})))
+                    else:
+                        ws.send(json.dumps({"type": "cmd_result", "data": "unknown command"}))
                 elif data["type"] == "get_data":
                     if not self.status:
                         ws.send(json.dumps({"type": "get_data", "data": "not running"}))
@@ -101,7 +123,7 @@ class Connector:
             if self.running:
                 self.server = False
                 self.status_callback(Status(self.status, self.box, self.server))
-                time.sleep(1)
+                time.sleep(4)
                 self.pool.add(self.socket_loop)
 
         def on_open(ws):
@@ -177,8 +199,7 @@ class MainPage(lib.Pages.PageWithTitle):
         self.add_element(lib.Elements.LabelButton(self, size=(45, 20), func=self.exit, location=(250, 7), text="退出",
                                                   font_size=16))
 
-        self.connector = Connector(book.base.env.Pool, book.base.env.Logger,
-                                   "uuid", "address", self.status_handler, self.data_handler)
+        self.connector = Connector(book.base.env, "uuid", "address", self.status_handler, self.data_handler)
 
     def active(self):
         super().active()
