@@ -606,7 +606,7 @@ class Env:
             handling.event_1.set()
             handling.event_2.wait()
             handling.event_1.set()
-        del self._events_stack[-1]
+        self._events_stack.pop()
         self._touch_setter()
         self.display()
 
@@ -616,10 +616,10 @@ class Env:
         handling.result = result
         handling.event_1.set()
         handling.event_2.wait()
-        del self._events_stack[-1]
+        self._events_stack.pop()
         handling.event_1.set()
         self._touch_setter()
-        if handling.display or not result:
+        if handling.display:
             self.display()
 
     def _notice_handler(self, result):
@@ -642,7 +642,7 @@ class Env:
         self._touch_setter()
         self.display()
         c.event_1.wait()
-        c.event_1.set()
+        c.event_1.clear()
         r = c.result
         c.event_2.set()
         c.event_1.wait()

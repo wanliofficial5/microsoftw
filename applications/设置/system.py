@@ -27,14 +27,20 @@ class SystemSettingsPage(lib.Pages.ListPage):
     def poweroff(self):
         if self.env.choice("关机", "确认关闭电源?"):
             self.env.poweroff()
+        else:
+            self.env.display()
 
     def reboot(self):
         if self.env.choice("重启", "是否重启？\n预计耗时30秒，期间屏幕会未响应。"):
             self.env.reboot()
+        else:
+            self.env.display()
 
     def clean_logs(self):
         if self.env.choice("清空日志", "是否清空日志？\nlogs文件夹内所有文件将被删除！", display=True):
             self.env.clean_logs()
+        else:
+            self.env.display()
 
     def change_branch(self):
         if self.env.choice("切换分支", "即将重启到@xuanzhi33编写的web分支"):
@@ -42,10 +48,14 @@ class SystemSettingsPage(lib.Pages.ListPage):
             self.book.base.env.quit()
             os.system("sudo python3 change_branch.py &")
             os.kill(os.getpid(), signal.SIGTERM)
+        else:
+            self.env.display()
 
     def screen_reverse(self):
         if self.env.choice("反转屏幕", "是否反转屏幕?\n该操作将立即生效"):
             self.env.screen_reverse()
+        else:
+            self.env.display()
 
 
 class SystemSettingsBook(struct.Book):

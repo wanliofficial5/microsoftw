@@ -38,6 +38,8 @@ class GeneralSettingsPage(lib.Pages.ListPage):
             self.book.base.env.quit()
             os.system("sudo python3 updater.py &")
             os.kill(os.getpid(), signal.SIGTERM)
+        else:
+            self.env.display()
 
 
 class TapticSettingsPage(lib.Pages.ListPage):
