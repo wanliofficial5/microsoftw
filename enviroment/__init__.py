@@ -182,6 +182,9 @@ class Env:
         self.Touch.icnt_init()
         """
 
+        # taptic
+        self.Taptic = _taptic.TapticEngine()
+
         self.TouchHandler = _TouchHandler(self)
 
         # themes
@@ -340,7 +343,7 @@ class Env:
         if self.Now is not self.themes[self.now_theme]:
             self.Now.pause()
             self.Now = self.themes[self.now_theme]
-            self.Now.active("t")
+            self.Now.active()
             return True
 
     def open_app(self, target: str, to_stack=True):
@@ -412,6 +415,7 @@ class Env:
     def home_bar(self):
         if self._home_bar:
             self._home_bar = False
+            self.Pool.add(self.Taptic.shock)
             if not self.back_home():
                 self.display()
         else:

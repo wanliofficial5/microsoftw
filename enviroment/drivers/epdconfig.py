@@ -44,11 +44,17 @@ EPD_BUSY_PIN = 24
 TRST = 22
 INT = 27
 
+# Taptic
+M = 5
+
+
 spi = spidev.SpiDev(0, 0)
 address = 0x0
 # address = 0x14
 # address = 0x48
 bus = SMBus(1)
+
+inited = False
 
 
 def digital_write(pin, value):
@@ -88,12 +94,14 @@ def i2c_readbyte(reg, __len):
 
 
 def module_init():
+    global inited
     GPIO.setmode(GPIO.BCM)
     GPIO.setwarnings(False)
     GPIO.setup(EPD_RST_PIN, GPIO.OUT)
     GPIO.setup(EPD_DC_PIN, GPIO.OUT)
     GPIO.setup(EPD_CS_PIN, GPIO.OUT)
     GPIO.setup(EPD_BUSY_PIN, GPIO.IN)
+    GPIO.setup(M, GPIO.IN)
 
     GPIO.setup(TRST, GPIO.OUT)
     GPIO.setup(INT, GPIO.IN)
@@ -101,6 +109,7 @@ def module_init():
     spi.max_speed_hz = 10000000
     spi.mode = 0b00
 
+    inited = True
     return 0
 
 
@@ -113,6 +122,7 @@ def module_exit():
     GPIO.output(EPD_RST_PIN, 0)
     GPIO.output(EPD_DC_PIN, 0)
     GPIO.output(EPD_CS_PIN, 0)
+    GPIO.setup(M, GPIO.IN)
 
     GPIO.output(TRST, 0)
 
