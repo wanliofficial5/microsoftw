@@ -1,4 +1,3 @@
-import threading
 import threading as _threading
 import time as _time
 from queue import LifoQueue as _LifoQueue
@@ -35,9 +34,9 @@ class Choice:
         self.text = text
         self.false_text = false_text
         self.true_text = true_text
-        self.event_1 = threading.Event()
+        self.event_1 = _threading.Event()
         self.result = None
-        self.event_2 = threading.Event()
+        self.event_2 = _threading.Event()
 
 
 class Prompt:
