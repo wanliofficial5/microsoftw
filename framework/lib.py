@@ -256,7 +256,7 @@ class Pages:
                 "OK": [self.env.ok_img, self.env.ok_alpha, 253, -2],
                 "ON": [self.env.on_img, self.env.on_alpha, 242, 0],
                 "OFF": [self.env.off_img, self.env.off_alpha, 242, 0],
-                "NEXT": [self.env.next_img, self.env.next_alpha, 254, -2]
+                "NEXT": [self.env.next_img, self.env.next_alpha, 258, -2]
             }
             self._background = book.base.env.list_img
             self.more_img = book.base.env.list_more_img
@@ -390,7 +390,7 @@ class Pages:
                 new_image = self.background.copy()
                 draw = _ImageDraw.ImageDraw(new_image)
                 draw.text((10, 7), self.title, "black", self.font)
-                draw.text((255, 7), f"{self.at + 1}/{_ceil(len(self.items) / 3)}", "black", self.font)
+                draw.text((256, 7), f"{self.at + 1}/{_ceil(len(self.items) / 3)}", "black", self.font)
                 for i in range(3):
                     index = self.at * 3 + i
                     if index + 1 > len(self.items):
