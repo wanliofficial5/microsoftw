@@ -1,11 +1,9 @@
 import os
 import time
 
-time.sleep(2)
+print("restart.py 已启动")
+time.sleep(3)
+print("restart.py 正在重新运行main.py")
+os.system("sudo python3 main.py &")
 
-print("开始更新")
-
-os.system("git checkout . && git clean -f")
-os.system("git pull")
-
-os.system("python3 main.py &")
+print("restart.py 已完成使命")

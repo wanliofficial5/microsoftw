@@ -242,7 +242,7 @@ class SystemSettingsPage(lib.Pages.ListPage):
         self.book.base.env.Screen.display(Image.open("resources/images/raspberry.jpg"))
         self.book.base.env.quit()
         os.system("sudo python3 change_branch.py &")
-        os.kill(os.getpid(), signal.SIGKILL)
+        os.kill(os.getpid(), signal.SIGTERM)
 
 
 class AboutPage(lib.Pages.PageWithTitle):
