@@ -19,7 +19,7 @@ from .touchscreen import Clicked as _Clicked, \
     TouchRecoder as _TouchRecoder
 from .touchscreen.events import SlideX as _SlideX, Clicked as _Clicked
 import os as _os
-from framework.struct import Base as _Base
+from framework import struct as _struct
 from framework import lib as _lib
 
 from enviroment.drivers import taptic as _taptic, bluetooth_server as _bluetooth
@@ -379,6 +379,7 @@ class Env:
 
     def display(self, image=None, refresh="a"):
         if not image:
+
             image = self.Now.Book.render()
         if self.display_lock.acquire(blocking=False):
             self.Screen.wait_busy()
@@ -499,7 +500,7 @@ class Env:
                 if self._update_temp:
                     self.display()
                 return True
-            elif isinstance(i, _Base):
+            elif isinstance(i, _struct.Base):
                 if self.Now.back():
                     self.back_stack.put(i)
                 else:

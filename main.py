@@ -21,6 +21,11 @@ import enviroment
 # 不见满街漂亮妹，哪个归得程序员？
 
 
+# TODO:
+# 1. 软键盘
+# 2. 菜单
+
+
 # 原来的主线程
 def main_thread():
     time.sleep(0.5)
