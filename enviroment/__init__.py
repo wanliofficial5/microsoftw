@@ -504,7 +504,7 @@ class Env:
         del self._events_stack[-1]
         handling.event_1.set()
         self._touch_setter()
-        if handling.display:
+        if handling.display or not result:
             self.display()
 
     def _notice_handler(self, result):
