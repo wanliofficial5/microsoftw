@@ -248,11 +248,10 @@ class SystemSettingsPage(lib.Pages.ListPage):
         os.kill(os.getpid(), signal.SIGKILL)
 
 
-class AboutPage(struct.Page):
+class AboutPage(lib.Pages.PageWithTitle):
     def __init__(self, book):
-        super().__init__(book)
-        self.add_element(lib.Elements.Label(self, (292, 24), (0, 0), (4, 4), "关于", font_size=16))
-        self.add_element(lib.Elements.MultipleLinesLabel(self, size=(266, 108), location=(15, 20),
+        super().__init__(book, "关于")
+        self.add_element(lib.Elements.MultipleLinesLabel(self, size=(266, 108), location=(15, 35),
                                                          text="欢迎使用:\n这是由@fu1fan和@xuanzhi33倾力打造的eInkUI\n仓库地址: "
                                                               "https://gitee.com/fu1fan/e-ink-ui"))
 
