@@ -439,9 +439,20 @@ class Pages:
             self.add_element(self.title)
 
 
+class ThemeBaseWithoutDocker(_Base):
+    def __init__(self, env):
+        super().__init__(env)
+        self.show_in_settings = True
+
+    @property
+    def preview(self):
+        return self.Book.render()
+
+
 class ThemeBase(_Base):
     def __init__(self, env):
         super().__init__(env)
+        self.show_in_settings = True
         self._docker_image = self.env.docker_img
         self._docker_status = False
         self._docker_temp = 0
