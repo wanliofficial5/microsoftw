@@ -216,7 +216,6 @@ class Env:
                                                             self._bluetooth_handler,
                                                             status_callback=self._bluetooth_status_handler)
         self._bluetooth_service_status = False
-        self._bluetooth_apps = {}
 
         # themes
         self.themes = {}
@@ -608,16 +607,3 @@ class Env:
     @property
     def bluetooth_service_status(self):
         return self._bluetooth_service_status
-
-    def bluetooth_app(self, name):
-        if name in self._bluetooth_apps:
-            raise RuntimeError("蓝牙应用已存在")
-
-        def decorator(func):
-            self.bluetooth_apps[name] = func
-            return BluetoothApp(name, func, self)
-
-        return decorator
-
-    def bluetooth_remove(self, name):
-        del self._bluetooth_apps[name]

@@ -9,7 +9,6 @@ from PIL import Image
 
 import enviroment
 
-# 允许Clicked设置不震动
 
 # 原来的主线程
 def main_thread():
