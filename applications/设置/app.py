@@ -20,10 +20,10 @@ class BluetoothSettingPage(lib.Pages.PageWithTitle):
         super().__init__(book, "蓝牙配网")
         self.qr_img = self.add_element(lib.Elements.Image(self, (15, 44)))
         self.add_element(lib.Elements.TextElement(self, (100, 46), "当前未连接到WI-FI", font_size=16))
-        self.add_element(lib.Elements.MultipleLinesLabel(self, (84, 65), (212, 70),
+        self.add_element(lib.Elements.MultipleLinesText(self, (84, 65), (212, 70),
                                                          "-使用简单水墨扫描左侧二维码\n"
                                                          "-暂不支持iOS设备，敬请谅解",
-                                                         border=(18, 5)))
+                                                        border=(18, 5)))
 
     def active(self):
         uuid = self.env.bluetooth_service.uuid
@@ -39,10 +39,10 @@ class FlaskSettingPage(lib.Pages.PageWithTitle):
 
         self.qr_img = self.add_element(lib.Elements.Image(self, (15, 44)))
         self.add_element(lib.Elements.TextElement(self, (100, 46), "扫描左侧二维码", font_size=16))
-        self.add_element(lib.Elements.MultipleLinesLabel(self, (84, 65), (212, 70),
+        self.add_element(lib.Elements.MultipleLinesText(self, (84, 65), (212, 70),
                                                          "-当前已连接至WI-FI\n"
                                                          "-请确保您的手机和树莓派在统一局域网下",
-                                                         border=(18, 5)))
+                                                        border=(18, 5)))
 
     def active(self):
         ip = get_host_ip()

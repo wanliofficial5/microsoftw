@@ -1,5 +1,6 @@
 import time as _time
 from math import ceil as _ceil
+from math import floor as _floor
 
 from PIL import ImageDraw as _ImageDraw, \
     Image as _Image
@@ -58,7 +59,7 @@ class Elements:
             self.image = self.background.copy()
             self._image_draw = _ImageDraw.ImageDraw(self.image)
             self._image_draw.text((0, 0), self.text, self.color, self._font)
-            self.page.update(display,  refresh)
+            self.page.update(display, refresh)
 
         def set_text(self, value, display=True, refresh="a"):
             self.text = value
@@ -149,7 +150,6 @@ class Elements:
                     self.touch_records = [self.clicked]
                 else:
                     self.touch_records = []
-                self.page.create_touch_record()
                 self.page.update(display, refresh)
 
     class TextElementButton(TextElement):
@@ -170,7 +170,6 @@ class Elements:
                     self.touch_records = [self.clicked]
                 else:
                     self.touch_records = []
-                self.page.create_touch_record()
                 self.page.update(display, refresh)
 
         def set_func(self, func):
@@ -184,8 +183,10 @@ class Elements:
 
     class LabelButton(Label):
         def __init__(self, page, size, func=lambda: None, location=(0, 0), border=(0, 0), text="",
-                     font_size=12, color="black", border_color="black", background=None, show=True, align="C"):
+                     font_size=12, color="black", border_color="black", border_width=0, background=None, show=True,
+                     align="C"):
             self.border_color = border_color
+            self.border_width = border_width
             self.func = func
             super().__init__(page, location, size, border, text, font_size, color, background, show, align)
             self.clicked = _Clicked((location[0], location[0] + size[0], location[1], location[1] + size[1]),
@@ -200,13 +201,44 @@ class Elements:
                     self.touch_records = [self.clicked]
                 else:
                     self.touch_records = []
-                self.page.create_touch_record()
                 self.page.update(display, refresh)
+
+        def update(self, display=True, refresh="a"):
+            self.image = self.background.copy()
+            self._image_draw = _ImageDraw.ImageDraw(self.image)
+            font_size = self._font.size
+            if self.align == "L":
+                x = self.border[0]
+            else:
+                length = 0
+                if font_size % 12 == 0:
+                    add = font_size * 2 / 3
+                else:
+                    add = font_size / 2
+                for i in self.text:
+                    if " " <= i <= "~":
+                        length += add
+                    else:
+                        length += font_size
+                if self.align == "C":
+                    x = _ceil((self.size[0] - length) / 2)
+                elif self.align == "R":
+                    x = self.size[0] - 2 * self.border[0] - length
+                else:
+                    raise ValueError
+
+            self._image_draw.text((x, _floor((self.size[1] - font_size) / 2)), self.text, self.color, self._font)
+
+            if self.border_width:
+                self._image_draw.rectangle((0, 0, self.size[0], self.size[1]),
+                                           outline=self.border_color, width=self.border_width)
+
+            self.page.update(display, refresh)
 
         def set_func(self, func):
             self.touch_records[0].func = func
 
-    class MultipleLinesLabel(Label):
+    class MultipleLinesText(Label):
         def __init__(self, page, location, size, text="", border=(0, 0), font_size=12, color="black", background=None,
                      space=0, show=True):
             self.space = space
@@ -228,7 +260,7 @@ class Elements:
             else:
                 add = font_size / 2
             for i in text:
-                length = 0
+                length = add
                 start = 0
                 end = 0
                 for j in i:
@@ -245,6 +277,127 @@ class Elements:
                 new_text += f"{i[start: end]}\n"
             self._image_draw.text(self.border, new_text, self.color, self._font, space=self.space)
             self.page.update(display, refresh)
+
+    # 实现一个多页文本element
+    class MultiplePagesText(MultipleLinesText):
+        def __init__(self, page, location, size, text="", border=(0, 0), font_size=12, color="black", background=None,
+                     space=0, show=True, guide_line_width=2, slide=True):
+            self.font_size = font_size
+            self.at = 0
+            self.slide = slide
+            self.content = self.text_split(text, (size[0] - 2 * border[0], size[1] - 2 * border[1]), font_size)
+            self.guide_line_height = max(10, _ceil(size[1] / len(self.content)))
+            self.guide_line_width = guide_line_width
+            super().__init__(page, location, size, text, border, font_size, color, background, space, show)
+
+            self.records = [_SlideY((self.location[0], self.location[0]+self.size[0],
+                                     self.location[1], self.location[1]+self.size[1]),
+                                    self._handler)]
+            if self.show and self.slide:
+                self.touch_records = self.records
+            else:
+                self.touch_records = []
+
+        def _handler(self, dis_y):
+            if dis_y < 0:
+                self.at = min(self.at + 1, len(self.content) - 1)
+            else:
+                self.at = max(self.at - 1, 0)
+            self.update()
+
+        @property
+        def page_num(self):
+            return len(self.content)
+
+        @staticmethod
+        def text_split(text, area_size, font_size) -> list:
+            if font_size % 12 == 0:
+                add = font_size * 2 / 3
+            else:
+                add = font_size / 2
+
+            length = add
+            height = font_size
+
+            result = []
+
+            start = 0
+            cur_text = ""
+            last_line = ""
+            for t in range(len(text)):
+                character = text[t]
+
+                if character == "\n":
+                    length = add
+                    last_line = text[start: t] + "\n"
+                    start = t + 1
+                    cur_text += last_line
+                    height += font_size
+                elif " " <= character <= "~":
+                    length += add
+                else:
+                    length += font_size
+
+                if length > area_size[0]:
+                    length = add
+                    last_line = text[start: t] + "\n"
+                    start = t
+                    cur_text += last_line
+                    height += font_size
+                if height > area_size[1]:
+                    height = font_size
+                    length = add
+                    result.append(cur_text)
+                    cur_text = last_line
+                    last_line = ""
+            cur_text += text[start:]
+            result.append(cur_text)
+            height += font_size
+            if height > area_size[1]:
+                result.append(last_line)
+            return result
+
+        def set_text(self, value, display=True, refresh="a"):
+            self.text = value
+            self.content = self.text_split(value, (self.size[0] - 2 * self.border[0], self.size[1] - 2 * self.border[1])
+                                           , self.font_size)
+            self.guide_line_height = max(10, _ceil(self.size[1] / len(self.content)))
+            self.at = 0
+            self.update(display, refresh)
+
+        def update(self, display=True, refresh="a"):
+            self.image = self.background.copy()
+            self._image_draw = _ImageDraw.ImageDraw(self.image)
+            self._image_draw.text(self.border, self.content[self.at], self.color, self._font, space=self.space)
+            if len(self.content) > 1:
+                y = (self.size[1] - self.guide_line_height)*self.at/len(self.content)
+                self._image_draw.line((self.size[0], y, self.size[0], y+self.guide_line_height), self.color,
+                                      width=self.guide_line_width)
+            self.page.update(display, refresh)
+
+        def next_page(self, display=True, refresh="a"):
+            if self.at + 1 < len(self.content):
+                self.at += 1
+                self.update(display, refresh)
+
+        def previous_page(self, display=True, refresh="a"):
+            if self.at > 0:
+                self.at -= 1
+                self.update(display, refresh)
+
+        def go_to_page(self, page, display=True, refresh="a"):
+            if page < len(self.content):
+                self.at = page
+                self.update(display, refresh)
+
+        def set_show(self, value, display=True, refresh="a"):
+            if value != self.show:
+                self.show = value
+                if value and self.slide:
+                    self.touch_records = self.records
+                else:
+                    self.touch_records = []
+                self.page.update(display, refresh)
 
 
 class Pages:

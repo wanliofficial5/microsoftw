@@ -26,8 +26,8 @@ class MainPage(struct.Page):
 
         self.add_element(lib.Elements.TextElement(self, (10, 40), "一言说:", font_size=16))
 
-        self.text = lib.Elements.MultipleLinesLabel(self, location=(0, 45), size=(296, 266), text="加载中",
-                                                    border=(20, 20))
+        self.text = lib.Elements.MultipleLinesText(self, location=(0, 45), size=(296, 266), text="加载中",
+                                                   border=(20, 20))
         self.add_element(self.text)
 
         self.touch_records_clicked = [events.Clicked((0, 128, 20, 128), self.next)]

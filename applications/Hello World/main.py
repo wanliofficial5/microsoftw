@@ -7,12 +7,12 @@ import time
 class MainPage(lib.Pages.PageWithTitle):
     def __init__(self, book):
         super().__init__(book, "Hello World")
-        self.add_element(lib.Elements.MultipleLinesLabel(self, location=(15, 35), size=(266, 108),
-                                                         text="   这个程序源自于我们对创造的热爱，源自于最初的梦想，"
-                                                              "其中必然有许多缺憾等待补全，但：\n"
-                                                              "   这世界上最美不过的景致，是那些最初的心动不为人知...\n"
-                                                              "   祝：在追逐热爱的路上越走越远！\n"
-                                                              "             傅逸凡-2022-2-2 11:52"))
+        self.add_element(lib.Elements.MultiplePagesText(self, location=(15, 35), size=(266, 108),
+                                                        text="   这个程序源自于我们对创造的热爱，源自于最初的梦想，"
+                                                             "其中必然有许多缺憾等待补全，但：\n"
+                                                             "   这世界上最美不过的景致，是那些最初的心动不为人知...\n"
+                                                             "   祝：在追逐热爱的路上越走越远！\n"
+                                                             "             傅逸凡-2022-2-2 11:52"+"2309fu1fan"*1000))
 
         self.clock = lib.Elements.Label(self, (0, 0), size=(296, 30), border=(4, 8), font_size=16, align="R")
         self.add_element(self.clock)
@@ -50,7 +50,7 @@ class Application(lib.AppBase):
         # self.icon = Image.open(...) 不设置，使用默认图标（none18px.jpg）
 
         self.add_book("main", MainBook(self))  # 添加主书页并命名为 "main"
-        self.show_in_drawer = False
+        # self.show_in_drawer = False
 
     def active(self, refresh="a"):
         self.Book.Page.active()
