@@ -199,8 +199,8 @@ class Env:
         self.back_stack = _LifoQueue()
 
         # show
-        self._show_left_back = False
-        self._show_right_back = False
+        self.show_left_back = False
+        self.show_right_back = False
         self._update_temp = False
         self._home_bar = False
         self._home_bar_temp = 0
@@ -301,9 +301,9 @@ class Env:
                 else:
                     draw.text((10, 10), handling.text, "black", font=self.get_font(16))
 
-            if self._show_left_back:
+            if self.show_left_back:
                 image.paste(self.left_img, mask=self.left_img_alpha)
-            if self._show_right_back:
+            if self.show_right_back:
                 image.paste(self.right_img, mask=self.right_img_alpha)
             if self._home_bar:
                 image.paste(self.bar_img, mask=self.bar_img_alpha)
@@ -355,9 +355,9 @@ class Env:
             raise KeyError("The targeted application is not found.")
 
     def back(self) -> bool:
-        self._update_temp = self._show_left_back or self._show_right_back
-        self._show_left_back = False
-        self._show_right_back = False
+        self._update_temp = self.show_left_back or self.show_right_back
+        self.show_left_back = False
+        self.show_right_back = False
         if self._notices:
             self._notice_handler(False)
             return True
@@ -395,18 +395,18 @@ class Env:
 
     def back_left(self, show: bool):
         if show:
-            self._show_left_back = True
+            self.show_left_back = True
             self.display(refresh="f")
         else:
-            self._show_left_back = False
+            self.show_left_back = False
             self.display(refresh="f")
 
     def back_right(self, show: bool):
         if show:
-            self._show_right_back = True
+            self.show_right_back = True
             self.display(refresh="f")
         else:
-            self._show_right_back = False
+            self.show_right_back = False
             self.display(refresh="f")
 
     def home_bar(self):
