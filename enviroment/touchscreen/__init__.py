@@ -124,7 +124,7 @@ class TouchHandler:
 
         if d_t and not o_t:  # Start touching
             print(f"Start Touch: [{d_x}, {d_y}]")
-            if ICNT_Dev.X[0] <= 20:
+            if d_x <= 20:
                 self.back_left.temp_location = (d_x, d_y)
             elif d_x >= 276:
                 self.back_right.temp_location = (d_x, d_y)
