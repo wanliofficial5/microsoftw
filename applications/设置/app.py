@@ -28,7 +28,7 @@ class FlaskSettingPage(lib.Pages.PageWithTitle):
         self.api = self.env.API
         super().__init__(book, "连接APP")
 
-        self.qr_img = self.add_element(lib.Elements.Image(self, (15, 42)))
+        self.qr_img = self.add_element(lib.Elements.Image(self, (15, 40)))
         self.add_element(lib.Elements.TextElement(self, (100, 46), "扫描左侧二维码", font_size=16))
         self.add_element(lib.Elements.MultipleLinesLabel(self, (84, 60), (212, 68),
                                                          "-请确保您的手机和树莓派在统一局域网下\n"
