@@ -331,3 +331,7 @@ class Env:
         self.Screen.display(_Image.open("resources/images/raspberry.jpg"))
         self.quit()
         _os.system("sudo reboot")
+
+    @staticmethod
+    def clean_logs():
+        _os.system("rm -f logs/*")

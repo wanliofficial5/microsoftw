@@ -22,9 +22,9 @@ class SettingsPage(lib.Pages.ListPage):
     def __init__(self, book):
         cb = book.base.change_book
         super().__init__(book, "设置",
-                         ["在线配置(beta)",
+                         ["在线配置(暂不开放)",
                           "通用",
-                          "设备选项",
+                          "系统选项",
                           "关于"],
                          funcs=[
                              lambda: cb("online"),
@@ -49,7 +49,7 @@ class OnlineSettingsPage(struct.Page):
 class GeneralSettingsPage(lib.Pages.ListPage):
     def __init__(self, book):
         super().__init__(book, "通用",
-                         ["主题（施工中）",
+                         ["主题",
                           "Docker",
                           "更新",
                           "恢复", ],
@@ -229,11 +229,13 @@ class SystemSettingsPage(lib.Pages.ListPage):
         super().__init__(book, "系统选项",
                          ["关机",
                           "重启",
-                          "切换分支"],
+                          "切换分支",
+                          "清空日志"],
                          funcs=[
                              env.poweroff,
                              env.reboot,
-                             self.change_branch
+                             self.change_branch,
+                             env.clean_logs
                          ]
                          )
 
