@@ -251,8 +251,6 @@ class SystemSettingsPage(lib.Pages.ListPage):
     def change_branch(self):
         self.book.base.env.Screen.display(Image.open("resources/images/raspberry.jpg"))
         self.book.base.env.quit()
-        os.popen("git checkout . && git clean -f")
-        os.popen("git checkout web")
         os.system("sudo python3 restart.py &")
         os.kill(os.getpid(), signal.SIGKILL)
 
