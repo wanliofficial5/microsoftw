@@ -206,7 +206,7 @@ class Book:
             self.Page.touch_records_rlock.release()
             self.now_page = target
             self.Page = self.Pages[target]
-            self.Page.active()
+            self.base.display()
         else:
             raise KeyError("The targeted page is not found.")
 
