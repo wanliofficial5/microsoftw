@@ -9,8 +9,7 @@ from PIL import Image
 
 import enviroment
 
-# 注意线程池容量！
-# 三指刷新
+# 允许Clicked设置不震动
 
 # 原来的主线程
 def main_thread():
