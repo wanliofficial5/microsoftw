@@ -188,6 +188,10 @@ class Book:
             self.now_page = name
             self.Page = page
 
+    def change_to(self, display=True):
+        if display:
+            self.base.display()
+
     def change_page(self, target: str, to_stack=True, display=True):
         if target in self.Pages:
             if to_stack:
@@ -202,8 +206,7 @@ class Book:
             self.Page.touch_records_rlock.release()
             self.now_page = target
             self.Page = self.Pages[target]
-            if display:
-                self.base.display()
+            self.Page.active()
         else:
             raise KeyError("The targeted page is not found.")
 
@@ -281,8 +284,7 @@ class Base:
             self._now_book = target
             self.Book = self.Books[target]
             self.Book.is_active = True
-            if display:
-                self.display()
+            self.Book.change_to(display)
         else:
             raise KeyError("The targeted book is not found.")
 
