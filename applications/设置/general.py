@@ -238,9 +238,9 @@ class ThemeSelectPage(struct.Page):
 
     def select(self):
         if self.themes[self.at] != self.now_theme:
-            self.env.now_theme = self.now_theme = self.themes[self.at]
+            self.now_theme = self.themes[self.at]
+            self.env.change_theme(self.now_theme)
             self.tick.set_show(True, True)
-            self.env.Config.set("theme", self.now_theme)
 
 
 class GeneralSettingsBook(struct.Book):

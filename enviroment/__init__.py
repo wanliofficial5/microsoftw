@@ -22,7 +22,6 @@ import os as _os
 from framework.struct import Base as _Base
 from framework import lib as _lib
 
-
 from enviroment.drivers import taptic as _taptic, bluetooth_server as _bluetooth
 
 example_config = {
@@ -287,13 +286,51 @@ class Env:
         self._event_close_clicked = _Clicked((210, 235, 28, 53), self._close_event)
         self._false_clicked = _Clicked((59, 147, 82, 102), self._choice_handler, False)
         self._true_clicked = _Clicked((147, 237, 82, 102), self._choice_handler, True)
-        self._cover_clicked = _Clicked((0, 296, 0, 128), lambda :None)
+        self._cover_clicked = _Clicked((0, 296, 0, 128), lambda: None)
         self._cover_clicked.vibrate = False
 
         # notice
         self._notices = []
         self._notice_clicked_s = [_Clicked((0, 296, 0, 36), self._notice_handler, True),
                                   _Clicked((0, 296, 36, 128), self._notice_handler, False)]
+
+        # APIs
+
+        @self.API.get_api("configs")
+        def get_config(args, _):
+            try:
+                return {"status": 1, "value": self.Config.read(args["path"])}
+            except KeyError:
+                return {"status": 0, "value": None}
+
+        @self.API.get_api("themes")
+        def get_themes(_, __):
+            r = []
+            for i in self.themes.keys():
+                r.append(i)
+
+            return {"status": 1, "current": self.now_theme, "installed": r}
+
+        @self.API.post_api("set_theme")
+        def set_theme(args, _):
+            try:
+                self.change_theme(args["name"])
+                return  {"status": 1}
+            except (ValueError, KeyError):
+                return {"status": 0}
+
+        @self.API.get_api("applications")
+        def get_applications(args, _):
+            r = []
+            try:
+                show_hidden = args["show_hidden"]
+            except KeyError:
+                show_hidden = False
+            for name, application in self.apps.items():
+                if not show_hidden and not application.show_in_drawer:
+                    continue
+                r.append(name)
+            return {"status": 1, "installed": r}
 
     def __getattr__(self, name):
         if name in self.plugins:
@@ -611,7 +648,7 @@ class Env:
         if index == -1:
             return
         try:
-            self.bluetooth_apps[data[:index]](data[index+1:])
+            self.bluetooth_apps[data[:index]](data[index + 1:])
         except KeyError:
             pass
 
@@ -626,3 +663,16 @@ class Env:
         self.screen_reversed = not self.screen_reversed
         self.Config.set("screen_reversed", self.screen_reversed)
         self.display(refresh="t")
+
+    def change_theme(self, name):
+        if self.now_theme == name:
+            return
+        if name in self.themes:
+            self.Config.set("theme", name)
+            if self.Now is self.themes[self.now_theme]:
+                self.Now.pause()
+                self.Now = self.themes[name]
+                self.Now.active()
+            self.now_theme = name
+        else:
+            raise ValueError("Theme not found")

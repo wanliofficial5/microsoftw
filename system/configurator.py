@@ -104,7 +104,7 @@ class Configurator:  # 没有对多线程进行适配，需要自行加锁
                 self.save()
             return default_value
 
-    def read(self, path, raise_error=False):
+    def read(self, path, raise_error=True):
         if path[0] == "/":
             finder = self.config
             path = path[1:]
