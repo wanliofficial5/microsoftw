@@ -559,3 +559,10 @@ class Env:
 
     def notice_shock_async(self):
         self.Pool.add(self.notice_shock)
+
+    def custom_shock(self, frequency, duty, length):
+        if self.Config.read("shock") and self.Config.read("other_shock"):
+            self.Taptic.shock(frequency, duty, length)
+
+    def custom_shock_async(self, frequency, duty, length):
+        self.Pool.add(self.custom_shock, frequency, duty, length)
