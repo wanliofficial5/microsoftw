@@ -11,7 +11,7 @@ from framework.struct import Page
 class TextClock(Element):
     def __init__(self, page):
         super().__init__(page)
-        self.background = Image.new("RGB", (296, 128), (0, 0, 0))
+        self.background = Image.new("RGB", (296, 128), (255, 255, 255))
         self.font25 = ImageFont.truetype(
             "resources/fonts/PTSerifCaption.ttc", 53)
 
@@ -19,7 +19,7 @@ class TextClock(Element):
         new_image = self.background.copy()
         now_time = time.strftime("%H : %M", time.localtime())
         draw_image = ImageDraw.Draw(new_image)
-        draw_image.text((58, 32), now_time, font=self.font25)
+        draw_image.text((58, 32), now_time, font=self.font25, fill="black")
         return new_image
 
 
@@ -50,9 +50,9 @@ class Theme(ThemeBase):
     def preview(self):
         font = ImageFont.truetype(
             "resources/fonts/PTSerifCaption.ttc", 53)
-        img = Image.new("RGB", (296, 128), (0, 0, 0))
+        img = Image.new("RGB", (296, 128), (255, 255, 255))
         draw_image = ImageDraw.Draw(img)
-        draw_image.text((58, 32), "10 : 09", font=font)
+        draw_image.text((58, 32), "10 : 09", font=font, fill="black")
         return img
 
     def updater(self):
