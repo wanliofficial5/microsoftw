@@ -95,22 +95,23 @@ class Connector:
                         ws.send(json.dumps({"type": "cmd_result", "data": "stopped"}))
                     elif cmd.startswith("eval:"):
                         cmd = cmd[5:]
-                        self.pool.add(lambda : ws.send(json.dumps({"type": "cmd_result", "data": objstr(self.eval_env.run(cmd))})))
+                        self.pool.add(lambda: ws.send(json.dumps({"type": "cmd_result", "data":
+                            objstr(self.eval_env.run(cmd))})))
                     else:
                         ws.send(json.dumps({"type": "cmd_result", "data": "unknown command"}))
                 elif data["type"] == "get_data":
                     if not self.status:
-                        ws.send(json.dumps({"type": "get_data", "data": "not running"}))
+                        ws.send(json.dumps({"type": "data_result", "data": "not running"}))
                         return
-                    last_time = int(data["data"]["last_time"])
+                    last_time = int(data["data"])
                     # 返回晚于last_time的数据
                     new_data = {}
                     for record_time in self.data.keys():
                         if record_time > last_time:
                             new_data[record_time] = self.data[record_time].to_dict()
-                    ws.send(json.dumps({"type": "get_data", "data": data}))
+                    ws.send(json.dumps({"type'": "data_result", "data": json.dumps(new_data)}))
                 elif data["type"] == "get_now":
-                    ws.send(json.dumps({"type": "get_now", "data": self.data[sorted(self.data.keys())[-1]].to_dict()}))
+                    ws.send(json.dumps({"type": "now_result", "data": self.data[sorted(self.data.keys())[-1]].to_dict()}))
 
             except Exception as e:
                 self.logger.error("[%s] %s" % (self.address, e))
