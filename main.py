@@ -18,8 +18,8 @@ def main_thread():
     load_lock = threading.Barrier(2)
 
     def opening():
-        env.Screen.display(Image.open("resources/images/simplebytes.jpg"))
-        opening_image_paths = ["resources/images/raspberry.jpg", ]
+        env.Screen.display(Image.open("resources/images/raspberry.jpg"))
+        opening_image_paths = []
         opening_images = []
         for path in opening_image_paths:
             opening_images.append(Image.open(Path(path)))
