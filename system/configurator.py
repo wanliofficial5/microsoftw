@@ -30,6 +30,7 @@ class Configurator:  # 没有对多线程进行适配，需要自行加锁
         self.path = file_path
         self.__current_path = "/"
         self.file_path = file_path
+        self.auto_save = auto_save
         if os.path.exists(file_path):
             try:
                 file = open(Path(file_path), "r")
@@ -37,7 +38,7 @@ class Configurator:  # 没有对多线程进行适配，需要自行加锁
                 file.close()
                 try:
                     for key, value in example.items():
-                        if type(self.current_config[key]) != type(value):
+                        if type(self.config[key]) != type(value):
                             fix_file()
                 except KeyError:
                     fix_file()
@@ -52,7 +53,6 @@ class Configurator:  # 没有对多线程进行适配，需要自行加锁
             file.close()
             self.config = example
         self.current_config = self.config
-        self.auto_save = auto_save
 
     @property
     def current_path(self):
