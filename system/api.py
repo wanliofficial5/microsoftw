@@ -53,7 +53,7 @@ class API:
 
         @self.app.route("/debug/<cmd>", methods=["GET", "POST"])
         def debug(cmd):
-            self.logger.warn(f":EVAL远程执行:{cmd}")
+            self.logger.warn(f"EVAL远程执行:{cmd}")
             if self.debug:
                 try:
                     r = eval(cmd)
