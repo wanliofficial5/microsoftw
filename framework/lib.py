@@ -216,7 +216,7 @@ class Elements:
             super().__init__(page, size, location, border, text, font_size, color, background=background, show=show)
 
         def set_text(self, value, update=True):
-            self.text = value.split("\n")
+            self.text = value
             self.update(update)
 
         def update(self, display=True):
