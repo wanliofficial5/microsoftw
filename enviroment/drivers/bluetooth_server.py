@@ -162,6 +162,11 @@ class Bluetooth:
         self.close_all()
         self._running = False
 
+    def list(self):
+        result = ((service.name, service.uuid, service.connected, service.client_info, service.client_info)
+                  for service in self.services.values())
+        return result
+
 
 if __name__ == "__main__":
     import time
