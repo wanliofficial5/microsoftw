@@ -38,3 +38,5 @@ configs
 /logs/
 /applications/番茄钟/record.txt
 /applications/单词卡/t
+/system/token.txt
+/.idea/remote-mappings.xml
