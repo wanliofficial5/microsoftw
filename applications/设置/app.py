@@ -40,7 +40,7 @@ class FlaskSettingPage(lib.Pages.PageWithTitle):
         port = self.api.port
         token = self.api.token
         link = f"http://{ip}:{port}?token={token}"
-        img = qrcode.make(link, border=1, box_size=2, level=3)
+        img = qrcode.make(link, border=1, box_size=2, version=3)
         self.qr_img.set_image(img, False)
 
 
