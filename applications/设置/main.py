@@ -2,7 +2,7 @@ from applications.设置.about import AboutBook
 from applications.设置.app import AppSettingsBook
 from applications.设置.general import GeneralSettingsBook
 from applications.设置.system import SystemSettingsBook
-from framework import struct, lib
+from framework import struct
 from framework import lib
 import socket
 
