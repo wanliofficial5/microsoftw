@@ -16,10 +16,19 @@ def get_host_ip():
 
 class BluetoothSettingPage(lib.Pages.PageWithTitle):
     def __init__(self, book):
+        self.env = book.base.env
         super().__init__(book, "蓝牙配网")
-        self.add_element(lib.Elements.MultipleLinesLabel(self, location=(4, 35), size=(292, 128),
-                                                         text='当前无网络\n'
-                                                              '（蓝牙配网开发尚未完成，若需连网络请切换至web分支）\n'))
+        self.qr_img = self.add_element(lib.Elements.Image(self, (15, 44)))
+        self.add_element(lib.Elements.TextElement(self, (100, 48), "当前未连接到WI-FI", font_size=16))
+        self.add_element(lib.Elements.MultipleLinesLabel(self, (84, 64), (212, 68),
+                                                         "-使用简单水墨扫描左侧二维码\n"
+                                                         "-暂不支持iOS设备，敬请谅解",
+                                                         border=(18, 5)))
+
+    def active(self):
+        uuid = self.env.bluetooth_service.uuid
+        img = qrcode.make(uuid, border=1, box_size=2, version=4)
+        self.qr_img.set_image(img, False)
 
 
 class FlaskSettingPage(lib.Pages.PageWithTitle):
@@ -28,11 +37,11 @@ class FlaskSettingPage(lib.Pages.PageWithTitle):
         self.api = self.env.API
         super().__init__(book, "连接APP")
 
-        self.qr_img = self.add_element(lib.Elements.Image(self, (15, 40)))
-        self.add_element(lib.Elements.TextElement(self, (100, 46), "扫描左侧二维码", font_size=16))
-        self.add_element(lib.Elements.MultipleLinesLabel(self, (84, 60), (212, 68),
-                                                         "-请确保您的手机和树莓派在统一局域网下\n"
-                                                         "-暂不支持iOS设备，敬请谅解",
+        self.qr_img = self.add_element(lib.Elements.Image(self, (15, 44)))
+        self.add_element(lib.Elements.TextElement(self, (100, 48), "扫描左侧二维码", font_size=16))
+        self.add_element(lib.Elements.MultipleLinesLabel(self, (84, 64), (212, 68),
+                                                         "-当前已连接至WI-FI\n"
+                                                         "-请确保您的手机和树莓派在统一局域网下",
                                                          border=(18, 5)))
 
     def active(self):
