@@ -367,7 +367,7 @@ class Screen:
         self._last_display = 0
 
         self._partial_time = 0  # times
-        self.refresh_time = 20  # times
+        self.refresh_time = 60  # times
 
         self._status = True
 

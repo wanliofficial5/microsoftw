@@ -341,7 +341,7 @@ class Env:
         if self.Now is not self.themes[self.now_theme]:
             self.Now.pause()
             self.Now = self.themes[self.now_theme]
-            self.Now.active()
+            self.Now.active("t")
             return True
 
     def open_app(self, target: str, to_stack=True):
@@ -351,7 +351,7 @@ class Env:
                 if to_stack:  # TODO:在这里添加异常处理
                     self.back_stack.put(self.Now)
                 self.Now = self.apps[target]
-                self.Now.active()
+                self.Now.active("t")
         else:
             raise KeyError("The targeted application is not found.")
 

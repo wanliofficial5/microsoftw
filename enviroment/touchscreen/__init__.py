@@ -1,4 +1,6 @@
 import threading as _threading
+import time
+import time as _time
 
 from enviroment.touchscreen.events import Clicked, Slide, SlideY, SlideB
 
@@ -45,6 +47,8 @@ class TouchHandler:
         self.back_left = SlideB()
         self.back_right = SlideB()
         self.home_bar = SlideY()
+
+        self.double_clicked_flag = 0
 
     def set_clicked(self, content):
         self.data_lock.acquire()
@@ -117,6 +121,9 @@ class TouchHandler:
         app_slide_y = self.env.Now.touch_records_slide_y
         app_clicked = self.env.Now.touch_records_clicked
 
+        if ICNT_Dev.TouchCount >= 2:
+            self.double_clicked_flag = _time.time()
+
         if d_t and not o_t:  # Start touching
             print(f"Start Touch: [{d_x}, {d_y}]")
             if ICNT_Dev.X[0] <= 20:
@@ -140,6 +147,28 @@ class TouchHandler:
                     i.temp_location = (d_x, d_y)
 
         elif not d_t and o_t:  # Stop touching
+            if time.time() - self.double_clicked_flag < 0.5:
+                self.pool.add(self.env.display, refresh="t")
+                self.double_clicked_flag = 0
+
+                self.back_left.active = False
+                self.back_right.active = False
+                self.home_bar.active = False
+                for i in self.clicked:
+                    i.active = False
+                for i in self.slide_x:
+                    i.active = False
+                for i in self.slide_y:
+                    i.active = False
+                for i in app_clicked:
+                    i.active = False
+                for i in app_slide_x:
+                    i.active = False
+                for i in app_slide_y:
+                    i.active = False
+                self.env.Now.Book.Page.touch_records_rlock.release()
+                self.data_lock.release()
+                return
             print(f"Stop Touch: [{d_x}, {d_y}]")
             slided = False
             if self.back_left.active:
