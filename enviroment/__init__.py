@@ -156,8 +156,7 @@ class FakePage:
 
 class Env:
     def __init__(self, simulator):
-        self.config = configurator.Configurator()
-        self.config.check(example_config, True)
+        self.config = configurator.Configurator(example=example_config)
 
         # locks
         self.display_lock = _threading.Lock()
