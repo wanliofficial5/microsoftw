@@ -325,7 +325,10 @@ class Base:
 
     def display(self, refresh="a") -> None:
         if self._active:
-            self.env.display(self.Book.render(), refresh)
+            self.env.display(refresh=refresh)
+
+    def render(self) -> _Image:
+        return self.Book.render()
 
     def active(self, refresh="a") -> None:  # This function will be called when this Base is active.
         self._active = True

@@ -379,8 +379,7 @@ class Env:
 
     def display(self, image=None, refresh="a"):
         if not image:
-
-            image = self.Now.Book.render()
+            image = self.Now.render()
         if self.display_lock.acquire(blocking=False):
             self.Screen.wait_busy()
             self.display_lock.release()
@@ -490,14 +489,14 @@ class Env:
             self._close_event()
             return True
         if self.back_stack.empty():
-            if not self._update_temp:
+            if self._update_temp:
                 self.display()
             return self.Now.back()
         else:
             i = self.back_stack.get()
             if callable(i):
                 i()
-                if not self._update_temp:
+                if self._update_temp:
                     self.display()
                 return True
             elif isinstance(i, _struct.Base):
@@ -507,11 +506,11 @@ class Env:
                     self.Now.pause()
                     self.Now = i
                     self.Now.active()
-                if not self._update_temp:
+                if self._update_temp:
                     self.display()
                 return True
             else:
-                if not self._update_temp:
+                if self._update_temp:
                     self.display()
                 return False
 

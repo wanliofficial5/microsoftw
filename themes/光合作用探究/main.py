@@ -11,7 +11,7 @@ from objprint import objstr
 from traceback import format_exc
 
 SERVER = "wss://zzzing.cn/ebox"
-ID = "JOCKER"
+ID = "Random"
 
 
 class Status:

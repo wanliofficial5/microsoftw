@@ -664,18 +664,17 @@ class ThemeBase(_Base):
         self._docker_status = False
         self.display()
 
-    def display(self, refresh="a"):
-        if self._active:
-            if self._docker_status:
-                new_image = self.Book.render()
-                new_image.paste(self._docker_image, (60, 0))
-                x = 112
-                for i in self.docker_list:
-                    new_image.paste(self.env.apps[i].icon, (x, 5))
-                    x += 30
-                self.env.display(new_image, refresh)
-            else:
-                self.env.display(self.Book.render(), refresh)
+    def render(self) -> _Image:
+        if self._docker_status:
+            new_image = self.Book.render()
+            new_image.paste(self._docker_image, (60, 0))
+            x = 112
+            for i in self.docker_list:
+                new_image.paste(self.env.apps[i].icon, (x, 5))
+                x += 30
+            return new_image
+        else:
+            return self.Book.render()
 
     @property
     def touch_records_clicked(self):
@@ -734,26 +733,25 @@ class AppBase(_Base):
             self.env.Config.set("docker", self.docker_list)
         super().active(refresh)
 
-    def display(self, refresh="a"):
-        if self._active:
-            if self._control_bar_status:
-                new_image = self.Book.render()
-                new_image.paste(self._control_bar_image, (0, 0), mask=self._control_bar_mask)
-                new_image.paste(self.icon, (6, 6))
-                image_draw = _ImageDraw.ImageDraw(new_image)
-                title = f"{self.title[:5]}..." if len(self.title) > 4 and self.docker_list else self.title
-                image_draw.text((30, 7), title, fill="black", font=self._control_bar_font)
-                image_draw.text((224, 7), _time.strftime("%H:%M", _time.localtime()), fill="black",
-                                font=self._control_bar_font)
+    def render(self):
+        if self._control_bar_status:
+            new_image = self.Book.render()
+            new_image.paste(self._control_bar_image, (0, 0), mask=self._control_bar_mask)
+            new_image.paste(self.icon, (6, 6))
+            image_draw = _ImageDraw.ImageDraw(new_image)
+            title = f"{self.title[:5]}..." if len(self.title) > 4 and self.docker_list else self.title
+            image_draw.text((30, 7), title, fill="black", font=self._control_bar_font)
+            image_draw.text((224, 7), _time.strftime("%H:%M", _time.localtime()), fill="black",
+                            font=self._control_bar_font)
 
-                x = 112
-                for i in self.docker_list:
-                    new_image.paste(self.env.apps[i].icon, (x, 5))
-                    x += 30
+            x = 112
+            for i in self.docker_list:
+                new_image.paste(self.env.apps[i].icon, (x, 5))
+                x += 30
 
-                self.env.display(new_image, refresh)
-            else:
-                self.env.display(self.Book.render(), refresh)
+            return new_image
+        else:
+            return self.Book.render()
 
     def active_control_bar(self, _):
         self._control_bar_temp = _time.time()
