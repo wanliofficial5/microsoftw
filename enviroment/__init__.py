@@ -31,7 +31,8 @@ example_config = {
     "vibrate": True,
     "feedback_vibrate": True,
     "notice_vibrate": True,
-    "other_vibrate": True
+    "other_vibrate": True,
+    "screen_reversed": False
 }
 
 
@@ -194,6 +195,7 @@ class Env:
 
         # screen
         self.Screen = simulator
+        self.screen_reversed = self.Config.read("screen_reversed")
 
         # logger
         self.Logger = _logger.Logger(0)
@@ -350,6 +352,9 @@ class Env:
                 image.paste(self.right_img, mask=self.right_img_alpha)
             if self._home_bar:
                 image.paste(self.bar_img, mask=self.bar_img_alpha)
+
+            if self.screen_reversed:
+                image = image.rotate(180)
 
             if refresh == "a":
                 self.Screen.display_auto(image)
@@ -616,3 +621,8 @@ class Env:
     @property
     def bluetooth_service_status(self):
         return self._bluetooth_service_status
+
+    def screen_reverse(self):
+        self.screen_reversed = not self.screen_reversed
+        self.Config.set("screen_reversed", self.screen_reversed)
+        self.display(refresh="t")

@@ -13,12 +13,14 @@ class SystemSettingsPage(lib.Pages.ListPage):
                          ["关机",
                           "重启",
                           "切换分支",
-                          "清空日志"],
+                          "清空日志",
+                          "反转屏幕"],
                          funcs=[
                              self.poweroff,
                              self.reboot,
                              self.change_branch,
-                             self.env.clean_logs
+                             self.clean_logs,
+                             self.screen_reverse
                          ]
                          )
 
@@ -40,6 +42,10 @@ class SystemSettingsPage(lib.Pages.ListPage):
             self.book.base.env.quit()
             os.system("sudo python3 change_branch.py &")
             os.kill(os.getpid(), signal.SIGTERM)
+
+    def screen_reverse(self):
+        if self.env.choice("反转屏幕", "是否反转屏幕?\n该操作将立即生效"):
+            self.env.screen_reverse()
 
 
 class SystemSettingsBook(struct.Book):

@@ -122,6 +122,10 @@ class TouchHandler:
         app_slide_y = self.env.Now.touch_records_slide_y
         app_clicked = self.env.Now.touch_records_clicked
 
+        if self.env.screen_reversed:
+            d_x = 296 - d_x
+            d_y = 128 - d_y
+
         if d_t and not o_t:  # Start touching
             print(f"Start Touch: [{d_x}, {d_y}]")
             if d_x <= 20:
