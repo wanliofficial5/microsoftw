@@ -11,7 +11,7 @@ from enviroment.touchscreen.events import Clicked as _Clicked, \
 
 class Elements:
     class Image(_Element):
-        def __init__(self, page, location=(0, 0), image=None, show=True):
+        def __init__(self, page, location, image=None, show=True):
             super().__init__(page, location)
             self._image = image
             self.show = show
@@ -34,7 +34,7 @@ class Elements:
                 return self._image
 
     class TextElement(_Element):
-        def __init__(self, page, location=(0, 0), text="", font=None, font_size=12, color="black", background=None,
+        def __init__(self, page, location, text="", font=None, font_size=12, color="black", background=None,
                      show=True):
             super().__init__(page, location)
             self.color = color
@@ -83,7 +83,7 @@ class Elements:
             return self.image
 
     class Label(TextElement):
-        def __init__(self, page, size=(296, 128), location=(0, 0), border=(0, 0), text="", font_size=12, color="black",
+        def __init__(self, page, location, size, border=(0, 0), text="", font_size=12, color="black",
                      background=None, show=True, align="L"):
             """
             相较于TextElement，这个模块不支持自定义字体，但是可以实现文本的左对齐和右对齐和添加边界(border)功能
@@ -133,7 +133,7 @@ class Elements:
             self.page.update(display, refresh)
 
     class ImageButton(Image):
-        def __init__(self, page, func, size, location=(0, 0), image=None, show=True):
+        def __init__(self, page, location, size, func, image=None, show=True):
             super().__init__(page, location, image, show)
             self.func = func
             self.size = size
@@ -153,8 +153,7 @@ class Elements:
                 self.page.update(update, refresh)
 
     class TextElementButton(TextElement):
-        def __init__(self, page, size, func=lambda: None, location=(0, 0), border=(0, 0), text="", font=None,
-                     font_size=12, color="black",
+        def __init__(self, page, location, size, func, border=(0, 0), text="", font=None, font_size=12, color="black",
                      background=None, show=True):
             self.size = size
             self.border = border
@@ -188,7 +187,7 @@ class Elements:
                      font_size=12, color="black", border_color="black", background=None, show=True, align="C"):
             self.border_color = border_color
             self.func = func
-            super().__init__(page, size, location, border, text, font_size, color, background, show, align)
+            super().__init__(page, location, size, border, text, font_size, color, background, show, align)
             self.clicked = _Clicked((location[0], location[0] + size[0], location[1], location[1] + size[1]),
                                     self.func)
             if show:
@@ -208,10 +207,10 @@ class Elements:
             self.touch_records[0].func = func
 
     class MultipleLinesLabel(Label):
-        def __init__(self, page, size=(296, 128), location=(0, 0), border=(0, 0), text="", font_size=12,
-                     color="black", background=None, space=0, show=True):
+        def __init__(self, page, location, size, text="", border=(0, 0), font_size=12, color="black", background=None,
+                     space=0, show=True):
             self.space = space
-            super().__init__(page, size, location, border, text, font_size, color, background=background, show=show)
+            super().__init__(page, location, size, border, text, font_size, color, background=background, show=show)
 
         def set_text(self, value, update=True, refresh="a"):
             self.text = value

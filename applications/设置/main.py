@@ -43,8 +43,8 @@ class OnlineSettingsPage(struct.Page):
         self.ip_font = ImageFont.truetype("resources/fonts/PTSerifCaption.ttc", 30)
         self.ip_text = lib.Elements.TextElement(self, (26, 60), "IP:", self.ip_font)
         self.add_element(self.ip_text)
-        self.add_element(lib.Elements.Label(self, (292, 24), (0, 0), (4, 4), "网络设置工具", font_size=16))
-        self.add_element(lib.Elements.MultipleLinesLabel(self, size=(292, 128), location=(4, 25),
+        self.add_element(lib.Elements.Label(self, (0, 0), (292, 24), (4, 4), "网络设置工具", font_size=16))
+        self.add_element(lib.Elements.MultipleLinesLabel(self, location=(4, 25), size=(292, 128),
                                                          text="提示：在和树莓派同一局域网下用浏览器访问如下ip地址即可打开设置页面。（当前尚未完工）"))
 
 
@@ -161,24 +161,24 @@ class ThemeSelectPage(struct.Page):
         self.theme_show = lib.Elements.Image(self)
         self.add_element(self.theme_show)
 
-        self.next_button = lib.Elements.ImageButton(
-            self, self.go_next, (24, 24), (233, 100), Image.open("applications/设置/resources/right.png"), False)
+        self.next_button = lib.Elements.ImageButton(self, (233, 100), (24, 24), self.go_next,
+                                                    Image.open("applications/设置/resources/right.png"), False)
         self.add_element(self.next_button)
 
-        self.prev_button = lib.Elements.ImageButton(
-            self, self.go_prev, (24, 24), (39, 100), Image.open("applications/设置/resources/left.png"), False)
+        self.prev_button = lib.Elements.ImageButton(self, (39, 100), (24, 24), self.go_prev,
+                                                    Image.open("applications/设置/resources/left.png"), False)
         self.add_element(self.prev_button)
 
         self.add_element(lib.Elements.LabelButton(
             self, (160, 28), self.select,  (68, 100),
             background=Image.open("applications/设置/resources/title_blank.png"), border=(8, 2)))
 
-        self.title_text = lib.Elements.Label(self, (133, 28), (92, 100), font_size=16, border=(0, 4), align="C")
+        self.title_text = lib.Elements.Label(self, (92, 100), (133, 28), border=(0, 4), font_size=16, align="C")
         self.add_element(self.title_text)
 
-        self.index_show = lib.Elements.Label(
-            self, (60, 18), (230, 5), background=Image.open("applications/设置/resources/index_blank.png"),
-            border=(0, 4), align="C")
+        self.index_show = lib.Elements.Label(self, (230, 5), (60, 18), border=(0, 4),
+                                             background=Image.open("applications/设置/resources/index_blank.png"),
+                                             align="C")
         self.add_element(self.index_show)
 
         self.tick = lib.Elements.Image(self, (73, 100), image=Image.open("resources/images/ok.png"), show=False)
@@ -260,7 +260,7 @@ class SystemSettingsPage(lib.Pages.ListPage):
 class AboutPage(lib.Pages.PageWithTitle):
     def __init__(self, book):
         super().__init__(book, "关于")
-        self.add_element(lib.Elements.MultipleLinesLabel(self, size=(266, 108), location=(15, 35),
+        self.add_element(lib.Elements.MultipleLinesLabel(self, location=(15, 35), size=(266, 108),
                                                          text="欢迎使用:\n这是由@fu1fan和@xuanzhi33倾力打造的eInkUI\n仓库地址: "
                                                               "https://gitee.com/fu1fan/e-ink-ui"))
 

@@ -21,12 +21,13 @@ class MainPage(struct.Page):
         super().__init__(book)
         self._background = book.base.env.page_with_title_img
 
-        self.clock = lib.Elements.Label(self, (296, 30), border=(0, 8), font_size=16, align="C")
+        self.clock = lib.Elements.Label(self, size=(296, 30), border=(0, 8), font_size=16, align="C")
         self.add_element(self.clock)
 
         self.add_element(lib.Elements.TextElement(self, (10, 40), "一言说:", font_size=16))
 
-        self.text = lib.Elements.MultipleLinesLabel(self, size=(296, 266), location=(0, 45), border=(20, 20), text="加载中")
+        self.text = lib.Elements.MultipleLinesLabel(self, location=(0, 45), size=(296, 266), text="加载中",
+                                                    border=(20, 20))
         self.add_element(self.text)
 
         self.touch_records_clicked = [events.Clicked((0, 128, 20, 128), self.next)]
