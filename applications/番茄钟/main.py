@@ -20,8 +20,6 @@ status = {
 
 class Time(lib.Elements.TextElement):
     def update(self, display=True):
-        self.background = Image.new("RGBA", (296, 128), self._background) if self._background else \
-            Image.new("RGBA", (296, 128), (255, 255, 255, 0))
         self.image = self.background.copy()
         self._image_draw = ImageDraw.ImageDraw(self.image)
         if len(self.text) == 1:
@@ -165,6 +163,7 @@ class Application(lib.AppBase):
         super().__init__(env)
         self.add_book("main", MainBook(self))
         self.title = "番茄时钟"
+        self.icon = Image.open("applications/番茄钟/icon.png")
 
     def active(self, refresh="a"):
         self.Book.Page.active()
