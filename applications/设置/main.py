@@ -54,12 +54,11 @@ class GeneralSettingsPage(lib.Pages.ListPage):
                          ["主题",
                           "Docker",
                           "更新",
-                          "恢复", ],
+                         ],
                          funcs=[
                              self.theme,
                              self.docker,
                              self.update_ui,
-                             self.fix_up,
                          ])
 
     def theme(self):
@@ -73,16 +72,7 @@ class GeneralSettingsPage(lib.Pages.ListPage):
     def update_ui(self):
         self.book.base.env.Screen.display(Image.open("resources/images/raspberry.jpg"))
         self.book.base.env.quit()
-        os.popen("git checkout . && git clean -f")
-        os.popen("git pull")
-        os.system("sudo python3 restart.py &")
-        os.kill(os.getpid(), signal.SIGTERM)
-
-    def fix_up(self):
-        self.book.base.env.Screen.display(Image.open("resources/images/raspberry.jpg"))
-        self.book.base.env.quit()
-        os.popen("git checkout . && git clean -f")
-        os.system("sudo python3 restart.py &")
+        os.system("sudo python3 updater.py &")
         os.kill(os.getpid(), signal.SIGTERM)
 
 
