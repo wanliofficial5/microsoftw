@@ -118,6 +118,7 @@ class DockerEmulator(struct.Element):
 class DockerSettingPage(lib.Pages.ListPage):
     def __init__(self, book):
         super().__init__(book, "编辑", [], func=self.select)
+        self.docker_list = self.env.Config.read("docker")
         self.env = book.base.env
         self.emulator = DockerEmulator(self)
         self.add_element(self.emulator)
