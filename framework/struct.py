@@ -60,6 +60,18 @@ class Element:
         self._touch_records = value
         self.page.create_touch_record()
 
+    def touch_records_append(self, value):
+        self._touch_records.append(value)
+        self.page.create_touch_record()
+
+    def touch_records_clear(self):
+        self._touch_records = []
+        self.page.create_touch_record()
+
+    def touch_records_remove(self, value):
+        self._touch_records.remove(value)
+        self.page.create_touch_record()
+
     @_abc.abstractmethod
     def render(self) -> _Image:
         return None
