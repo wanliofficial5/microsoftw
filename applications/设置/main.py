@@ -90,7 +90,7 @@ class DockerEmulator(struct.Element):
     def __init__(self, page):
         super().__init__(page)
         self.env = page.book.base.env
-        self._location = (60, 1)
+        self._location = (60, 0)
         self._background = self.env.docker_img
         self.img = self._background
 
