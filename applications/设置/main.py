@@ -53,27 +53,87 @@ class GeneralSettingsPage(lib.Pages.ListPage):
         super().__init__(book, "通用",
                          ["主题",
                           "Docker",
+                          "震动",
                           "更新",
                          ],
                          funcs=[
                              self.theme,
                              self.docker,
+                             self.taptic,
                              self.update_ui,
                          ])
 
     def theme(self):
-        self.book.Pages["theme"].active()
         self.book.change_page("theme")
 
     def docker(self):
-        self.book.Pages["docker"].active()
         self.book.change_page("docker")
 
+    def taptic(self):
+        self.book.change_page("taptic")
+
     def update_ui(self):
-        self.book.base.env.Screen.display(Image.open("resources/images/raspberry.jpg"))
-        self.book.base.env.quit()
-        os.system("sudo python3 updater.py &")
-        os.kill(os.getpid(), signal.SIGTERM)
+        if self.book.base.env.choice("即将更新...", "请不要断开电源或网络"):
+            self.book.base.env.Screen.display(Image.open("resources/images/raspberry.jpg"))
+            self.book.base.env.quit()
+            os.system("sudo python3 updater.py &")
+            os.kill(os.getpid(), signal.SIGTERM)
+
+
+class TapticSettingsPage(lib.Pages.ListPage):
+    def __init__(self, book):
+        self.env = book.base.env
+        style1 = "ON" if self.env.Config.read("shock") else "OFF"
+        style2 = "ON" if self.env.Config.read("feedback_shock") else "OFF"
+        style3 = "ON" if self.env.Config.read("notice_shock") else "OFF"
+        style4 = "ON" if self.env.Config.read("other_shock") else "OFF"
+        super().__init__(book, "震动",
+                         ["总开关",
+                          "反馈震动",
+                          "通知震动",
+                          "其他震动"
+                          ],
+                         funcs=[
+                             self.set_shock,
+                             self.set_feedback_shock,
+                             self.set_notice_shock,
+                             self.set_other_shock
+                         ],
+                         styles=[
+                             style1, style2, style3, style4
+                         ])
+
+    def set_shock(self):
+        if self.env.Config.read("shock"):
+            self.env.Config.set("shock", False)
+            self.set_style(0, "OFF")
+        else:
+            self.env.Config.set("shock", True)
+            self.set_style(0, "ON")
+
+    def set_feedback_shock(self):
+        if self.env.Config.read("feedback_shock"):
+            self.env.Config.set("feedback_shock", False)
+            self.set_style(1, "OFF")
+        else:
+            self.env.Config.set("feedback_shock", True)
+            self.set_style(1, "ON")
+
+    def set_notice_shock(self):
+        if self.env.Config.read("notice_shock"):
+            self.env.Config.set("notice_shock", False)
+            self.set_style(2, "OFF")
+        else:
+            self.env.Config.set("notice_shock", True)
+            self.set_style(2, "ON")
+
+    def set_other_shock(self):
+        if self.env.Config.read("other_shock"):
+            self.env.Config.set("other_shock", False)
+            self.set_style(3, "OFF")
+        else:
+            self.env.Config.set("other_shock", True)
+            self.set_style(3, "ON")
 
 
 class DockerEmulator(struct.Element):
@@ -108,25 +168,25 @@ class DockerSettingPage(lib.Pages.ListPage):
             return
         if self.items[index] in self.docker_list:
             self.docker_list.remove(self.items[index])
-            self.env.config.set("docker", self.docker_list)
+            self.env.Config.set("docker", self.docker_list)
             self.emulator.update(self.docker_list)
             self.set_style(index)
         else:
             if len(self.docker_list) < 3:
                 self.docker_list.append(self.items[index])
-                self.env.config.set("docker", self.docker_list)
+                self.env.Config.set("docker", self.docker_list)
                 self.emulator.update(self.docker_list)
                 self.set_style(index, "OK")
 
     def active(self):
-        self.docker_list = self.env.config.read("docker")
+        self.docker_list = self.env.Config.read("docker")
         flag = False
         for i in self.docker_list.copy():
             if i not in self.env.apps:
                 self.docker_list.remove(i)
                 flag = True
         if flag:
-            self.env.config.set("docker", self.docker_list)
+            self.env.Config.set("docker", self.docker_list)
 
         self.clear(False)
         for app_name, app in self.env.apps.items():
@@ -219,30 +279,43 @@ class ThemeSelectPage(struct.Page):
         if self.themes[self.at] != self.now_theme:
             self.env.now_theme = self.now_theme = self.themes[self.at]
             self.tick.set_show(True, True)
-            self.env.config.set("theme", self.now_theme)
+            self.env.Config.set("theme", self.now_theme)
 
 
 class SystemSettingsPage(lib.Pages.ListPage):
     def __init__(self, book):
-        env = book.base.env
+        self.env = book.base.env
         super().__init__(book, "系统选项",
                          ["关机",
                           "重启",
                           "切换分支",
                           "清空日志"],
                          funcs=[
-                             env.poweroff,
-                             env.reboot,
+                             self.env.poweroff,
+                             self.reboot,
                              self.change_branch,
-                             env.clean_logs
+                             self.env.clean_logs
                          ]
                          )
 
+    def poweroff(self):
+        if self.env.choice("关机", "确认关闭电源?"):
+            self.env.poweroff()
+
+    def reboot(self):
+        if self.env.choice("重启", "是否重启？\n预计耗时30秒，期间屏幕会未响应。"):
+            self.env.reboot()
+
+    def clean_logs(self):
+        if self.env.choice("清空日志", "是否清空日志？\nlogs文件夹内所有文件将被删除！"):
+            self.env.clean_logs()
+
     def change_branch(self):
-        self.book.base.env.Screen.display(Image.open("resources/images/raspberry.jpg"))
-        self.book.base.env.quit()
-        os.system("sudo python3 change_branch.py &")
-        os.kill(os.getpid(), signal.SIGTERM)
+        if self.env.choice("切换分支", "即将重启到@xuanzhi33编写的web分支\n预计耗时10秒，期间屏幕可能未响应。"):
+            self.book.base.env.Screen.display(Image.open("resources/images/raspberry.jpg"))
+            self.book.base.env.quit()
+            os.system("sudo python3 change_branch.py &")
+            os.kill(os.getpid(), signal.SIGTERM)
 
 
 class AboutPage(lib.Pages.PageWithTitle):
@@ -265,6 +338,7 @@ class GeneralSettingsBook(struct.Book):
         self.add_page("main", GeneralSettingsPage(self))
         self.add_page("docker", DockerSettingPage(self), False)
         self.add_page("theme", ThemeSelectPage(self), False)
+        self.add_page("taptic", TapticSettingsPage(self), False)
 
 
 class SystemSettingsBook(struct.Book):

@@ -464,14 +464,14 @@ class ThemeBase(_Base):
     def active(self, refresh="a"):
         self._docker_status = False
 
-        self.docker_list = self.env.config.read("docker")
+        self.docker_list = self.env.Config.read("docker")
         flag = False
         for i in self.docker_list.copy():
             if i not in self.env.apps:
                 self.docker_list.remove(i)
                 flag = True
         if flag:
-            self.env.config.set("docker", self.docker_list)
+            self.env.Config.set("docker", self.docker_list)
 
         super().active(refresh)
 
@@ -554,14 +554,14 @@ class AppBase(_Base):
 
     def active(self, refresh="a"):
         self._control_bar_status = False
-        self.docker_list = self.env.config.read("docker")
+        self.docker_list = self.env.Config.read("docker")
         flag = False
         for i in self.docker_list.copy():
             if i not in self.env.apps:
                 self.docker_list.remove(i)
                 flag = True
         if flag:
-            self.env.config.set("docker", self.docker_list)
+            self.env.Config.set("docker", self.docker_list)
         super().active(refresh)
 
     def display(self, refresh="a"):

@@ -23,7 +23,11 @@ from system import configurator
 
 example_config = {
     "theme": "默认（黑）",
-    "docker": ["天气"]
+    "docker": ["天气"],
+    "shock": True,
+    "feedback_shock": True,
+    "notice_shock": True,
+    "other_shock": True
 }
 
 
@@ -415,7 +419,7 @@ class Env:
     def home_bar(self):
         if self._home_bar:
             self._home_bar = False
-            self.Pool.add(self.Taptic.shock)
+            self.feedback_shock_async()
             if not self.back_home():
                 self.display()
         else:
@@ -438,13 +442,13 @@ class Env:
         self.Screen.quit()
 
     def start(self):
-        self.now_theme = self.config.read("theme")
+        self.now_theme = self.Config.read("theme")
         try:
             self.Now = self.themes[self.now_theme]
         except KeyError:
             self.now_theme = "默认（黑）"
             self.Now = self.themes["默认（黑）"]
-            self.config.set("theme", "默认（黑）")
+            self.Config.set("theme", "默认（黑）")
         self.Now.active("t")
 
     def poweroff(self):
@@ -534,3 +538,19 @@ class Env:
         self._notices.append(Notice(text, icon, func))
         self._touch_setter()
         self.display()
+
+    def feedback_shock(self):
+        if self.Config.read("shock") and self.Config.read("feedback_shock"):
+            self.Taptic.shock()
+
+    def feedback_shock_async(self):
+        self.Pool.add(self.feedback_shock)
+
+    def notice_shock(self):
+        if self.Config.read("shock") and self.Config.read("notice_shock"):
+            self.Taptic.shock(221, 20, 0.5)
+            _time.sleep(0.5)
+            self.Taptic.shock(221, 20, 0.5)
+
+    def notice_shock_async(self):
+        self.Pool.add(self.notice_shock)
