@@ -50,6 +50,7 @@ class MainPage(struct.Page):
         self.flag = True
         self.clock.set_text(time.strftime("%H:%M", time.localtime()), False)
         self.book.base.env.Pool.add(self.next)
+        self.book.base.env.Pool.add(self.clock_updater)
 
     def next(self):
         self.text.set_text(get_yiyan())
