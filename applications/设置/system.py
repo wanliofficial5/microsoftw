@@ -33,7 +33,7 @@ class SystemSettingsPage(lib.Pages.ListPage):
             self.env.reboot()
 
     def clean_logs(self):
-        if self.env.choice("清空日志", "是否清空日志？\nlogs文件夹内所有文件将被删除！"):
+        if self.env.choice("清空日志", "是否清空日志？\nlogs文件夹内所有文件将被删除！", display=True):
             self.env.clean_logs()
 
     def change_branch(self):
