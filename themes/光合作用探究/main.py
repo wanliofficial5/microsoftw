@@ -128,7 +128,7 @@ class Connector:
         # ...
 
         self.pool.add(self.mainloop)
-        self.pool.add(self.socket_loop)
+        self.pool.add(self.socket_loop)  # 超时处理～
 
     def disactive(self):
         # 断开培养箱和服务器，并停止主循环

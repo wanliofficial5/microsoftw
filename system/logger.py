@@ -42,7 +42,7 @@ class Logger:
                 content = content[:-1]
             if "\n" in content:
                 content = "\n" + content
-            line = f'[DEBUG][{get_name(1)}][{time.strftime("%Y%m%d-%H:%M", time.localtime())}]{content}\n'
+            line = f'[DEBUG][{get_name(2)}][{time.strftime("%Y%m%d-%H:%M", time.localtime())}]{content}\n'
             f = open(self.path, "a")
             f.write(line)
             f.close()
@@ -53,7 +53,7 @@ class Logger:
                 content = content[:-1]
             if "\n" in content:
                 content = "\n" + content
-            line = f'[INFO][{get_name(1)}][{time.strftime("%Y%m%d-%H:%M", time.localtime())}]{content}\n'
+            line = f'[INFO][{get_name(2)}][{time.strftime("%Y%m%d-%H:%M", time.localtime())}]{content}\n'
             f = open(self.path, "a")
             f.write(line)
             f.close()
@@ -64,7 +64,7 @@ class Logger:
                 content = content[:-1]
             if "\n" in content:
                 content = "\n" + content
-            line = f'[WARNING][{get_name(1)}][{time.strftime("%Y%m%d-%H:%M", time.localtime())}]{content}\n'
+            line = f'[WARNING][{get_name(2)}][{time.strftime("%Y%m%d-%H:%M", time.localtime())}]{content}\n'
             f = open(self.path, "a")
             f.write(line)
             f.close()
@@ -74,7 +74,7 @@ class Logger:
             content = content[:-1]
         if "\n" in content:
             content = "\n" + content
-        line = f'[ERROR][{get_name(1)}][{time.strftime("%Y%m%d-%H:%M", time.localtime())}]{content}\n'
+        line = f'[ERROR][{get_name(2)}][{time.strftime("%Y%m%d-%H:%M", time.localtime())}]{content}\n'
         f = open(self.path, "a")
         f.write(line)
         f.close()
