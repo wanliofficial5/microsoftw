@@ -123,7 +123,7 @@ class Elements:
                     else:
                         length += font_size
                 if self.align == "C":
-                    x = _ceil((self.size[0] - 2 * self.border[0] - length) / 2)
+                    x = _ceil((self.size[0] - length) / 2)
                 elif self.align == "R":
                     x = self.size[0] - 2 * self.border[0] - length
                 else:
