@@ -26,7 +26,7 @@ class TodayPage(struct.Page):
         if self.forcast.is_inited():
             self.title.set_text(self.forcast.city)
             realtime = self.forcast.get_realtime()
-            self.now_temp.set_text(realtime.temp+"℃", False)
+            self.now_temp.set_text(realtime.temp + "℃", False)
             self.text.set_text(realtime.text, False)
             self.weather_icon.set_image(self.forcast.get_image(realtime.icon_id, 44), True)
             more = self.forcast.get_more()
