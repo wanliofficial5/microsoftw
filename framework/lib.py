@@ -355,7 +355,7 @@ class Pages:
             if index >= len(self.items):
                 return
             if self.func:
-                self.func(index)
+                self.func(self.at * 3 + index)
             else:
                 self.funcs[self.at * 3 + index]()
 
