@@ -1,6 +1,7 @@
 import threading
 import os
 import time
+import traceback
 
 from flask import Flask, request, abort
 
@@ -8,12 +9,14 @@ from flask import Flask, request, abort
 class API:
     def __init__(self, env, debug=False):
         self.env = env
+        self.logger = env.Logger
         self.debug = debug
         self.port = 5050
 
+        self.thread = None
+
         self.app = Flask(__name__)
 
-        self.thread = None
         # 通过设置use_reloader防止出现signal报错
 
         self.gets = {}
@@ -30,6 +33,8 @@ class API:
 
         @self.app.route("/api/<name>", methods=["GET", "POST"])
         def handler(name):
+            self.logger.info(f"API请求:\nurl:{request.url}\n"
+                             f"args:{str(request.args)}\ndata:{request.data.decode('utf-8')}")
             try:
                 if request.args["token"] != self.token:
                     raise PermissionError
@@ -48,8 +53,13 @@ class API:
 
         @self.app.route("/debug/<cmd>", methods=["GET", "POST"])
         def debug(cmd):
+            self.logger.warn(f":EVAL远程执行:{cmd}")
             if self.debug:
-                r = eval(cmd)
+                try:
+                    r = eval(cmd)
+                except Exception as e:
+                    self.logger.error(traceback.format_exc())
+                    raise e
                 if r:
                     return r
                 else:
@@ -81,5 +91,5 @@ class API:
         self.port = port
         self.thread = threading.Thread(target=self.app.run, kwargs={"host": "0.0.0.0", "port": self.port,
                                                                     "debug": self.debug, "use_reloader": False})
-        print(f"flask_token:{self.token}")
+        self.logger.info(f"flask_api启动, port:{self.port}, token:{self.token}")
         self.thread.start()
