@@ -234,9 +234,9 @@ class Env:
         self._events_stack = []
 
         self._fake = FakePage(self)
-        self._label_left = _lib.Elements.Label(self._fake, size=(85, 12), align="C")
-        self._label_right = _lib.Elements.Label(self._fake, size=(85, 12), align="C")
-        self._multiple_text = _lib.Elements.MultipleLinesLabel(self._fake,,
+        self._label_left = _lib.Elements.Label(self._fake, size=(85, 12), align="C", location=(0, 0))
+        self._label_right = _lib.Elements.Label(self._fake, size=(85, 12), align="C", location=(0, 0))
+        self._multiple_text = _lib.Elements.MultipleLinesLabel(self._fake, location=(0, 0), size=(0, 0))
 
         self._event_close_clicked = _Clicked((210, 235, 28, 53), self._close_event)
         self._false_clicked = _Clicked((59, 147, 82, 102), self._choice_handler, False)

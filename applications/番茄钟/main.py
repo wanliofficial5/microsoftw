@@ -19,13 +19,13 @@ status = {
 
 
 class Time(lib.Elements.TextElement):
-    def update(self, display=True):
+    def update(self, display=True, refresh="a"):
         self.image = self.background.copy()
         self._image_draw = ImageDraw.ImageDraw(self.image)
         if len(self.text) == 1:
             self.text = "0" + self.text
         self._image_draw.text((0, 0), self.text, self.color, self._font)
-        self.page.update(display)
+        self.page.update(display, refresh)
 
 
 class MainPage(lib.Pages.PageWithTitle):
