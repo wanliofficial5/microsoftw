@@ -11,6 +11,8 @@ from PIL import Image as _Image, \
 
 from system import threadpool as _threadpool
 from system import logger as _logger
+from system import configurator as _configurator
+from system import api as _api
 from .touchscreen import Clicked as _Clicked, \
     SlideY as _SlideY, \
     TouchHandler as _TouchHandler, \
@@ -19,7 +21,7 @@ from .touchscreen.events import SlideX as _SlideX, Clicked as _Clicked
 import os as _os
 from framework.struct import Base as _Base
 from framework import lib as _lib
-from system import configurator
+
 
 from enviroment.drivers import taptic as _taptic, bluetooth_server as _bluetooth
 
@@ -179,7 +181,7 @@ class BluetoothApp:
 
 class Env:
     def __init__(self, simulator):
-        self.Config = configurator.Configurator(example=example_config)
+        self.Config = _configurator.Configurator(example=example_config)
 
         # locks
         self.display_lock = _threading.Lock()
@@ -216,6 +218,10 @@ class Env:
                                                             self._bluetooth_handler,
                                                             status_callback=self._bluetooth_status_handler)
         self._bluetooth_service_status = False
+
+        # flask
+        self.API = _api.API(True)
+        self.API.run()
 
         # themes
         self.themes = {}
