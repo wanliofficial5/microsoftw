@@ -167,7 +167,7 @@ class BluetoothApp:
     def __init__(self, name, func, env):
         self.name = name
         self._func = func
-        self._env = func
+        self._env = env
 
     def __call__(self, *args, **kwargs):
         return self._func(*args, **kwargs)
@@ -218,6 +218,7 @@ class Env:
 
         # bluetooth
         self.Bluetooth = _bluetooth.Bluetooth(self.Pool, self.Logger)
+        self._bluetooth_apps = {}
         self.bluetooth_service = self.Bluetooth.new_service("eink-clock", "94f39d29-7d6d-437d-973b-fba39e49d4ee",
                                                             self._bluetooth_handler,
                                                             status_callback=self._bluetooth_status_handler)
@@ -315,7 +316,7 @@ class Env:
         def set_theme(args, _):
             try:
                 self.change_theme(args["name"])
-                return  {"status": 1}
+                return {"status": 1}
             except (ValueError, KeyError):
                 return {"status": 0}
 
@@ -350,6 +351,25 @@ class Env:
                 return {"status": 0}
             self.prompt(title, text)
             return {"status": 1}
+
+        # WI-FI
+        @self.bluetooth_app("WI-FI")
+        def set_wifi(data):
+            index = data.find("|")
+            ssid, psk = data[0: index], data[index + 1:]
+            wpa_supplicant = open('/etc/wpa_supplicant/wpa_supplicant.conf', 'w')
+            wpa_supplicant.write('ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev\n')
+            wpa_supplicant.write('update_config=1\n')
+            wpa_supplicant.write('\n')
+            wpa_supplicant.write('network={\n')
+            wpa_supplicant.write('\tssid="' + ssid + '"\n')
+            wpa_supplicant.write('\tpsk="' + psk + '"\n')
+            wpa_supplicant.write('}')
+            wpa_supplicant.close()
+            set_wifi.send(1)
+            self.reboot()
+
+        self.Pool.add(self.bluetooth_service.accept, True)
 
     def __getattr__(self, name):
         if name in self.plugins:
@@ -667,7 +687,7 @@ class Env:
         if index == -1:
             return
         try:
-            self.bluetooth_apps[data[:index]](data[index + 1:])
+            self._bluetooth_apps[data[:index]](data[index + 1:])
         except KeyError:
             pass
 
@@ -679,7 +699,7 @@ class Env:
             raise RuntimeError("蓝牙应用已存在")
 
         def decorator(func):
-            self.bluetooth_apps[name] = func
+            self._bluetooth_apps[name] = func
             return BluetoothApp(name, func, self)
 
         return decorator
