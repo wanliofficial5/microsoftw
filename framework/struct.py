@@ -166,10 +166,10 @@ class Page:
         else:
             return self.old_render.copy()
 
-    def update(self, display=True):
+    def update(self, display=True, refresh="a"):
         self._update = True
         if display:
-            self.book.update(self)
+            self.book.update(self, refresh)
 
 
 class Book:
@@ -213,9 +213,9 @@ class Book:
     def render(self) -> _Image:
         return self.Page.render()
 
-    def update(self, page):
+    def update(self, page, refresh="a"):
         if page is self.Pages[self.now_page] and self.is_active:
-            self.base.display()
+            self.base.display(refresh)
 
     def back(self) -> bool:
         if self.back_stack.empty():

@@ -16,18 +16,18 @@ class Elements:
             self._image = image
             self.show = show
 
-        def set_show(self, value, update=True):
+        def set_show(self, value, update=True, refresh="a"):
             if value != self.show:
                 self.show = value
-                self.page.update(update)
+                self.page.update(update, refresh)
 
         @property
         def image(self):
             return self._image
 
-        def set_image(self, value, update=True):
+        def set_image(self, value, update=True, refresh="a"):
             self._image = value
-            self.page.update(update)
+            self.page.update(update, refresh)
 
         def render(self):
             if self.show:
@@ -49,35 +49,35 @@ class Elements:
             self.update(False)
             self.show = show
 
-        def set_show(self, value, update=True):
+        def set_show(self, value, update=True, refresh="a"):
             if value != self.show:
                 self.show = value
-                self.page.update(update)
+                self.page.update(update, refresh)
 
-        def update(self, display=True):
+        def update(self, display=True, refresh="a"):
             self.image = self.background.copy()
             self._image_draw = _ImageDraw.ImageDraw(self.image)
             self._image_draw.text((0, 0), self.text, self.color, self._font)
-            self.page.update(display)
+            self.page.update(display,  refresh)
 
-        def set_text(self, value, update=True):
+        def set_text(self, value, update=True, refresh="a"):
             self.text = value
-            self.update(update)
+            self.update(update, refresh)
 
-        def set_color(self, value, update=True):
+        def set_color(self, value, update=True, refresh="a"):
             self.color = value
-            self.update(update)
+            self.update(update, refresh)
 
-        def set_background(self, value, update=True):
-            self._background = value
-            self.update(update)
+        def set_background(self, value, update=True, refresh="a"):
+            self.background = value
+            self.update(update, refresh)
 
-        def set_font(self, font=None, font_size=12, update=True):
+        def set_font(self, font=None, font_size=12, update=True, refresh="a"):
             if font:
                 self._font = font
             else:
                 self._font = self.page.book.base.env.get_font(font_size)
-            self.update(update)
+            self.update(update, refresh)
 
         def render(self) -> _Image:
             return self.image
@@ -93,19 +93,19 @@ class Elements:
             self.align = align
             super().__init__(page, location, text, font_size=font_size, color=color, background=background, show=show)
 
-        def set_size(self, value, update=True):
+        def set_size(self, value, update=True, refresh="a"):
             self.size = value
-            self.update(update)
+            self.update(update, refresh)
 
-        def set_border(self, value, update=True):
+        def set_border(self, value, update=True, refresh="a"):
             self.border = value
-            self.update(update)
+            self.update(update, refresh)
 
-        def set_align(self, value, update=True):
+        def set_align(self, value, update=True, refresh="a"):
             self.align = value
-            self.update(update)
+            self.update(update, refresh)
 
-        def update(self, display=True):
+        def update(self, display=True, refresh="a"):
             self.image = self.background.copy()
             self._image_draw = _ImageDraw.ImageDraw(self.image)
             if self.align == "L":
@@ -130,7 +130,7 @@ class Elements:
                     raise ValueError
 
             self._image_draw.text((x, self.border[1]), self.text, self.color, self._font)
-            self.page.update(display)
+            self.page.update(display, refresh)
 
     class ImageButton(Image):
         def __init__(self, page, func, size, location=(0, 0), image=None, show=True):
@@ -142,7 +142,7 @@ class Elements:
             if show:
                 self.touch_records = [self.clicked]
 
-        def set_show(self, value, update=True):
+        def set_show(self, value, update=True, refresh="a"):
             if value != self.show:
                 self.show = value
                 if value:
@@ -150,7 +150,7 @@ class Elements:
                 else:
                     self.touch_records = []
                 self.page.create_touch_record()
-                self.page.update(update)
+                self.page.update(update, refresh)
 
     class TextElementButton(TextElement):
         def __init__(self, page, size, func=lambda: None, location=(0, 0), border=(0, 0), text="", font=None,
@@ -164,7 +164,7 @@ class Elements:
             if show:
                 self.touch_records = [self.clicked]
 
-        def set_show(self, value, update=True):
+        def set_show(self, value, update=True, refresh="a"):
             if value != self.show:
                 self.show = value
                 if value:
@@ -172,18 +172,16 @@ class Elements:
                 else:
                     self.touch_records = []
                 self.page.create_touch_record()
-                self.page.update(update)
+                self.page.update(update, refresh)
 
         def set_func(self, func):
             self.touch_records[0].func = func
 
-        def update(self, display=True):
-            self.background = _Image.new("RGBA", (296, 128), self._background) if self._background else \
-                _Image.new("RGBA", (296, 128), (255, 255, 255, 0))
+        def update(self, display=True, refresh="a"):
             self.image = self.background.copy()
             self._image_draw = _ImageDraw.ImageDraw(self.image)
             self._image_draw.text((self.border[0], self.border[1]), self.text, self.color, self._font)
-            self.page.update(display)
+            self.page.update(display, refresh)
 
     class LabelButton(Label):
         def __init__(self, page, size, func=lambda: None, location=(0, 0), border=(0, 0), text="",
@@ -196,7 +194,7 @@ class Elements:
             if show:
                 self.touch_records = [self.clicked]
 
-        def set_show(self, value, update=True):
+        def set_show(self, value, update=True, refresh="a"):
             if value != self.show:
                 self.show = value
                 if value:
@@ -204,7 +202,7 @@ class Elements:
                 else:
                     self.touch_records = []
                 self.page.create_touch_record()
-                self.page.update(update)
+                self.page.update(update, refresh)
 
         def set_func(self, func):
             self.touch_records[0].func = func
@@ -215,11 +213,11 @@ class Elements:
             self.space = space
             super().__init__(page, size, location, border, text, font_size, color, background=background, show=show)
 
-        def set_text(self, value, update=True):
+        def set_text(self, value, update=True, refresh="a"):
             self.text = value
-            self.update(update)
+            self.update(update, refresh)
 
-        def update(self, display=True):
+        def update(self, display=True, refresh="a"):
             text = self.text.split("\n")
             self.image = self.background.copy()
             self._image_draw = _ImageDraw.ImageDraw(self.image)
@@ -247,7 +245,7 @@ class Elements:
                         start = end
                 new_text += f"{i[start: end]}\n"
             self._image_draw.text(self.border, new_text, self.color, self._font, space=self.space)
-            self.page.update(display)
+            self.page.update(display, refresh)
 
 
 class Pages:
