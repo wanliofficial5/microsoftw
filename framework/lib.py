@@ -445,7 +445,7 @@ class ThemeBase(_Base):
                                 _Clicked((195, 235, 0, 30), self.open_setting),
                                 _Clicked((112, 142, 0, 30), self.open_app, 0),
                                 _Clicked((142, 172, 0, 30), self.open_app, 1),
-                                _Clicked((172, 202, 0, 30), self.open_app, 1),
+                                _Clicked((172, 202, 0, 30), self.open_app, 2),
                                 ]
 
         self.docker_list = []
@@ -537,10 +537,30 @@ class AppBase(_Base):
         self._control_bar_temp = 0
         self._inactive_records = [_SlideY((0, 296, 0, 20), self.active_control_bar, limit="+")]
         self._active_records = [_Clicked((266, 296, 0, 30), self.env.back_home),
-                                _Clicked((0, 296, 30, 128), self.close_control_bar)]
+                                _Clicked((0, 296, 30, 128), self.close_control_bar),
+                                _Clicked((112, 142, 0, 30), self.open_app, 0),
+                                _Clicked((142, 172, 0, 30), self.open_app, 1),
+                                _Clicked((172, 202, 0, 30), self.open_app, 2),
+                                ]
+
+        self.docker_list = []
+
+    def open_app(self, index):
+        try:
+            self.env.open_app(self.docker_list[index])
+        except IndexError:
+            pass
 
     def active(self, refresh="a"):
         self._control_bar_status = False
+        self.docker_list = self.env.config.read("docker")
+        flag = False
+        for i in self.docker_list.copy():
+            if i not in self.env.apps:
+                self.docker_list.remove(i)
+                flag = True
+        if flag:
+            self.env.config.set("docker", self.docker_list)
         super().active(refresh)
 
     def display(self, refresh="a"):
@@ -550,9 +570,16 @@ class AppBase(_Base):
                 new_image.paste(self._control_bar_image, (0, 0), mask=self._control_bar_mask)
                 new_image.paste(self.icon, (6, 6))
                 image_draw = _ImageDraw.ImageDraw(new_image)
-                image_draw.text((30, 7), self.title, fill="black", font=self._control_bar_font)
+                title = f"{self.title[:5]}..." if len(self.title) > 4 and self.docker_list else self.title
+                image_draw.text((30, 7), title, fill="black", font=self._control_bar_font)
                 image_draw.text((224, 7), _time.strftime("%H:%M", _time.localtime()), fill="black",
                                 font=self._control_bar_font)
+
+                x = 112
+                for i in self.docker_list:
+                    new_image.paste(self.env.apps[i].icon, (x, 5))
+                    x += 30
+
                 self.env.display(new_image, refresh)
             else:
                 self.env.display(self.Book.render(), refresh)
