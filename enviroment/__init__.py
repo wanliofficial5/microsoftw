@@ -239,6 +239,8 @@ class Env:
         self.on_alpha = self.on_img.split()[3]
         self.off_img = _Image.open("resources/images/off.png").convert("RGBA")
         self.off_alpha = self.off_img.split()[3]
+        self.next_img = _Image.open("resources/images/next.png").convert("RGBA")
+        self.next_alpha = self.next_img.split()[3]
 
         # choice
         self._events_stack = []

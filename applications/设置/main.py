@@ -24,28 +24,25 @@ class SettingsPage(lib.Pages.ListPage):
     def __init__(self, book):
         cb = book.base.change_book
         super().__init__(book, "设置",
-                         ["在线配置(暂不开放)",
+                         ["蓝牙配置(暂不开放)",
                           "通用",
                           "系统选项",
                           "关于"],
                          funcs=[
-                             lambda: cb("online"),
+                             lambda: cb("bluetooth"),
                              lambda: cb("general"),
                              lambda: cb("system"),
                              lambda: cb("about")
-                         ]
+                         ],
+                         styles=["NEXT"]*4
                          )
 
 
-class OnlineSettingsPage(struct.Page):
+class BluetoothSettingsPage(lib.Pages.PageWithTitle):
     def __init__(self, book):
-        super().__init__(book)
-        self.ip_font = ImageFont.truetype("resources/fonts/PTSerifCaption.ttc", 30)
-        self.ip_text = lib.Elements.TextElement(self, (26, 60), "IP:", self.ip_font)
-        self.add_element(self.ip_text)
-        self.add_element(lib.Elements.Label(self, (0, 0), (292, 24), (4, 4), "网络设置工具", font_size=16))
-        self.add_element(lib.Elements.MultipleLinesLabel(self, location=(4, 25), size=(292, 128),
-                                                         text="提示：在和树莓派同一局域网下用浏览器访问如下ip地址即可打开设置页面。（当前尚未完工）"))
+        super().__init__(book, "蓝牙设置工具")
+        self.add_element(lib.Elements.MultipleLinesLabel(self, location=(4, 35), size=(292, 128),
+                                                         text='搜索微信小程序"简单水墨"来对该设备进行设置\n(暂不开放)'))
 
 
 class GeneralSettingsPage(lib.Pages.ListPage):
@@ -61,7 +58,8 @@ class GeneralSettingsPage(lib.Pages.ListPage):
                              self.docker,
                              self.taptic,
                              self.update_ui,
-                         ])
+                         ],
+                         styles=["NEXT", "NEXT", "NEXT", None])
 
     def theme(self):
         self.book.change_page("theme")
@@ -326,10 +324,10 @@ class AboutPage(lib.Pages.PageWithTitle):
                                                               "https://gitee.com/fu1fan/e-ink-ui"))
 
 
-class OnlineSettingsBook(struct.Book):
+class BluetoothSettingsBook(struct.Book):
     def __init__(self, base):
         super().__init__(base)
-        self.add_page("main", OnlineSettingsPage(self))
+        self.add_page("main", BluetoothSettingsPage(self))
 
 
 class GeneralSettingsBook(struct.Book):
@@ -366,7 +364,7 @@ class Application(lib.AppBase):
         self.icon = Image.open("applications/设置/icon.png")
         self.title = self.name
         self.add_book("main", MainBook(self))
-        self.add_book("online", OnlineSettingsBook(self), False)
+        self.add_book("bluetooth", BluetoothSettingsBook(self), False)
         self.add_book("general", GeneralSettingsBook(self), False)
         self.add_book("system", SystemSettingsBook(self), False)
         self.add_book("about", AboutBook(self), False)
