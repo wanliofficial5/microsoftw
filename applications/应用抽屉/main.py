@@ -40,4 +40,3 @@ class Application(AppBase):
 
     def active(self, refresh="a"):
         super().active(refresh)
-        self.Book.Page.set_style(0, "OK")
