@@ -38,9 +38,8 @@ class Elements:
                      show=True):
             super().__init__(page, location)
             self.color = color
-            self._background = background
+            self.background = background if background else _Image.new("RGBA", (296, 128), (255, 255, 255, 0))
             self.text = text
-            self.background = None
             if font:
                 self._font = font
             else:
@@ -56,8 +55,6 @@ class Elements:
                 self.page.update(update)
 
         def update(self, display=True):
-            self.background = _Image.new("RGBA", (296, 128), self._background) if self._background else \
-                _Image.new("RGBA", (296, 128), (255, 255, 255, 0))
             self.image = self.background.copy()
             self._image_draw = _ImageDraw.ImageDraw(self.image)
             self._image_draw.text((0, 0), self.text, self.color, self._font)
@@ -109,8 +106,6 @@ class Elements:
             self.update(update)
 
         def update(self, display=True):
-            self.background = _Image.new("RGBA", self.size, self._background) if self._background else \
-                _Image.new("RGBA", self.size, (255, 255, 255, 0))
             self.image = self.background.copy()
             self._image_draw = _ImageDraw.ImageDraw(self.image)
             if self.align == "L":
@@ -226,8 +221,6 @@ class Elements:
 
         def update(self, display=True):
             text = self.text.split("\n")
-            self.background = _Image.new("RGBA", self.size, self._background) if self._background else \
-                _Image.new("RGBA", self.size, (255, 255, 255, 0))
             self.image = self.background.copy()
             self._image_draw = _ImageDraw.ImageDraw(self.image)
             line_length = self.size[0] - 2 * self.border[0] - 4
@@ -456,6 +449,10 @@ class ThemeBase(_Base):
                                 ]
 
         self.docker_list = []
+
+    @property
+    def preview(self):
+        return self.Book.render()
 
     def open_app(self, index):
         try:
