@@ -46,14 +46,29 @@ class TouchHandler:
         self.back_right = SlideB()
         self.home_bar = SlideY()
 
+    def set_clicked(self, content):
+        self.data_lock.acquire()
+        self.clicked = content
+        self.data_lock.release()
+
     def add_clicked(self, clicked: Clicked):
         self.data_lock.acquire()
         self.clicked.append(clicked)
         self.data_lock.release()
 
+    def set_slide_x(self, content):
+        self.data_lock.acquire()
+        self.slide_x = content
+        self.data_lock.release()
+
     def add_slide_x(self, slide: Slide):
         self.data_lock.acquire()
         self.slide_x.append(slide)
+        self.data_lock.release()
+
+    def set_slide_y(self, content):
+        self.data_lock.acquire()
+        self.slide_y = content
         self.data_lock.release()
 
     def add_slide_y(self, slide: Slide):

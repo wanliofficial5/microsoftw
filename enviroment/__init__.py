@@ -1,3 +1,4 @@
+import threading
 import threading as _threading
 import time as _time
 from queue import LifoQueue as _LifoQueue
@@ -6,7 +7,8 @@ from queue import LifoQueue as _LifoQueue
 import wx as _wx
 
 from PIL import Image as _Image, \
-    ImageFont as _ImageFont
+    ImageFont as _ImageFont, \
+    ImageDraw as _ImageDraw
 
 from system import threadpool as _threadpool
 from system import logger as _logger
@@ -14,16 +16,42 @@ from .touchscreen import Clicked as _Clicked, \
     SlideY as _SlideY, \
     TouchHandler as _TouchHandler, \
     TouchRecoder as _TouchRecoder
-from .touchscreen.events import SlideX as _SlideX
+from .touchscreen.events import SlideX as _SlideX, Clicked as _Clicked
 import os as _os
 from framework.struct import Base as _Base
+from framework import lib as _lib
 from system import configurator
-
 
 example_config = {
     "theme": "默认（黑）",
     "docker": ["天气"]
 }
+
+
+class Choice:
+    def __init__(self, title, text, icon, false_text, true_text):
+        self.icon = icon
+        self.title = title
+        self.text = text
+        self.false_text = false_text
+        self.true_text = true_text
+        self.event_1 = threading.Event()
+        self.result = None
+        self.event_2 = threading.Event()
+
+
+class Prompt:
+    def __init__(self, title, text, icon):
+        self.icon = icon
+        self.title = title
+        self.text = text
+
+
+class Notice:
+    def __init__(self, text, icon, func):
+        self.text = text
+        self.icon = icon
+        self.func = func
 
 
 # 模拟器屏幕
@@ -92,11 +120,11 @@ class Simulator:
         self.env.TouchHandler.handle(self.touch_recoder_dev, self.touch_recoder_old)
 
     def updateImage(self, image: _Image):
-
         def bitmapThreading():
             wximg = _wx.Image(296, 128, image.convert("RGB").tobytes())
             bmp = _wx.Bitmap(wximg)
             self.static_bit.SetBitmap(bmp)
+
         _threading.Thread(target=bitmapThreading).start()
 
     def display(self, image: _Image):
@@ -113,6 +141,18 @@ class Simulator:
 
     def quit(self):
         pass
+
+
+class FakePage:
+    def __init__(self, env):
+        self.env = env
+
+    @staticmethod
+    def update(*args, **kwargs):
+        pass
+
+    def __getattr__(self, _):
+        return self
 
 
 class Env:
@@ -184,6 +224,28 @@ class Env:
         self.page_with_title_img = _Image.open("resources/images/page_with_title.png")
         self.ok_img = _Image.open("resources/images/ok.png")
         self.ok_alpha = self.ok_img.split()[3]
+        self.prompt_img = _Image.open("resources/images/prompt.png")
+        self.prompt_alpha = self.prompt_img.split()[3]
+        self.choice_img = _Image.open("resources/images/choice.png")
+        self.choice_alpha = self.choice_img.split()[3]
+        self.notice_img = _Image.open("resources/images/notice.jpg")
+
+        # choice
+        self._events_stack = []
+
+        self._fake = FakePage(self)
+        self._label_left = _lib.Elements.Label(self._fake, size=(85, 12), align="C")
+        self._label_right = _lib.Elements.Label(self._fake, size=(85, 12), align="C")
+        self._multiple_text = _lib.Elements.MultipleLinesLabel(self._fake, border=(5, 0))
+
+        self._event_close_clicked = _Clicked((210, 235, 28, 53), self._close_event)
+        self._false_clicked = _Clicked((59, 147, 82, 102), self._choice_handler, False)
+        self._true_clicked = _Clicked((147, 237, 82, 102), self._choice_handler, True)
+
+        # notice
+        self._notices = []
+        self._notice_clicked_s = [_Clicked((0, 296, 0, 36), self._notice_handler, True),
+                                  _Clicked((0, 296, 36, 128), self._notice_handler, False)]
 
     def __getattr__(self, name):
         if name in self.plugins:
@@ -193,13 +255,48 @@ class Env:
 
     def display(self, image=None, refresh="a"):
         if not image:
-            self.Now.display()
-            return
+            image = self.Now.Book.render()
         if self.display_lock.acquire(blocking=False):
             self.Screen.wait_busy()
             self.display_lock.release()
 
             self._update_temp = False
+
+            draw = _ImageDraw.ImageDraw(image)
+            if self._events_stack:
+                handling = self._events_stack[-1]
+                if isinstance(handling, Choice):
+                    image.paste(self.choice_img, mask=self.choice_alpha)
+                    self._multiple_text.set_size((174, 30))
+                    self._label_left.set_text(handling.false_text)
+                    temp = self._label_left.render()
+                    a = temp.split()[3]
+                    image.paste(temp, (61, 86), mask=a)
+                    self._label_right.set_text(handling.true_text)
+                    temp = self._label_right.render()
+                    a = temp.split()[3]
+                    image.paste(temp, (148, 86), mask=a)
+                else:
+                    image.paste(self.prompt_img, mask=self.prompt_alpha)
+                    self._multiple_text.set_size((174, 48))
+                if handling.icon:
+                    image.paste(handling.icon, (65, 32))
+                    draw.text((88, 34), handling.title, "black", font=self.get_font(16))
+                else:
+                    draw.text((65, 34), handling.title, "black", font=self.get_font(16))
+                self._multiple_text.set_text(handling.text)
+                temp = self._multiple_text.render()
+                a = temp.split()[3]
+                image.paste(self._multiple_text.render(), (61, 53), mask=a)
+
+            if self._notices:
+                handling = self._notices[-1]
+                image.paste(self.notice_img, (3, 3))
+                if handling.icon:
+                    image.paste(handling.icon, (10, 9))
+                    draw.text((34, 10), handling.text, "black", font=self.get_font(16))
+                else:
+                    draw.text((10, 10), handling.text, "black", font=self.get_font(16))
 
             if self._show_left_back:
                 image.paste(self.left_img, mask=self.left_img_alpha)
@@ -228,6 +325,15 @@ class Env:
 
     def back_home(self) -> bool:
         self.back_stack.queue.clear()
+        flag = False
+        if self._notices:
+            self._notices = []
+            flag = True
+        while self._events_stack:
+            self._close_event()
+            flag = True
+        if flag:
+            self.TouchHandler.clear_clicked()
         if self.Now is not self.themes[self.now_theme]:
             self.Now.pause()
             self.Now = self.themes[self.now_theme]
@@ -249,6 +355,12 @@ class Env:
         self._update_temp = self._show_left_back or self._show_right_back
         self._show_left_back = False
         self._show_right_back = False
+        if self._notices:
+            self._notice_handler(False)
+            return True
+        if self._events_stack:
+            self._close_event()
+            return True
         if self.back_stack.empty():
             if self._update_temp:
                 self.display()
@@ -327,6 +439,7 @@ class Env:
             self.Now = self.themes["默认（黑）"]
             self.config.set("theme", "默认（黑）")
         self.Now.active()
+        self.prompt("欢迎使用", "eInkUI beta")
 
     def poweroff(self):
         self.Logger.info("关机")
@@ -346,3 +459,72 @@ class Env:
 
     def screenshot(self):
         return self.Now.Book.render()
+
+    def _touch_setter(self):
+        if self._notices:
+            self.TouchHandler.set_clicked(self._notice_clicked_s)
+        elif self._events_stack:
+            if isinstance(self._events_stack[-1], Choice):
+                self.TouchHandler.set_clicked([self._event_close_clicked, self._true_clicked, self._false_clicked])
+            else:
+                self.TouchHandler.set_clicked([self._event_close_clicked])
+        else:
+            self.TouchHandler.clear_clicked()
+
+    def _close_event(self):
+        handling = self._events_stack[-1]
+        if isinstance(handling, Choice):
+            handling.result = False
+            handling.event_1.set()
+            handling.event_2.wait()
+            handling.event_1.set()
+        del self._events_stack[-1]
+        self._touch_setter()
+        self.display()
+
+    def _choice_handler(self, result):
+        handling = self._events_stack[-1]
+        handling.result = result
+        handling.event_1.set()
+        handling.event_2.wait()
+        del self._events_stack[-1]
+        handling.event_1.set()
+        self._touch_setter()
+        self.display()
+
+    def _notice_handler(self, result):
+        if result:
+            func = self._notices[-1].func
+            del self._notices[-1]
+            self._update_temp = True
+            self._touch_setter()
+            func()
+            if self._update_temp:
+                self.display()
+        else:
+            del self._notices[-1]
+            self._touch_setter()
+            self.display()
+
+    def choice(self, title, text="", icon=None, false_text="取消", true_text="确认") -> bool:
+        c = Choice(title, text, icon, false_text, true_text)
+        self._events_stack.append(c)
+        self._touch_setter()
+        self.display()
+        c.event_1.wait()
+        c.event_1.clear()
+        r = c.result
+        c.event_2.set()
+        c.event_1.wait()
+        return r
+
+    def prompt(self, title, text="", icon=None):
+        p = Prompt(title, text, icon)
+        self._events_stack.append(p)
+        self._touch_setter()
+        self.display()
+
+    def notice(self, text="", icon=None, func=lambda: None):
+        self._notices.append(Notice(text, icon, func))
+        self._touch_setter()
+        self.display()
