@@ -32,7 +32,7 @@ example_config = {
 
 
 class Choice:
-    def __init__(self, title, text, icon, false_text, true_text):
+    def __init__(self, title, text, icon, false_text, true_text, display):
         self.icon = icon
         self.title = title
         self.text = text
@@ -41,6 +41,7 @@ class Choice:
         self.event_1 = _threading.Event()
         self.result = None
         self.event_2 = _threading.Event()
+        self.display = display
 
 
 class Prompt:
@@ -495,6 +496,7 @@ class Env:
         self.display()
 
     def _choice_handler(self, result):
+        self._update_temp = True
         handling = self._events_stack[-1]
         handling.result = result
         handling.event_1.set()
@@ -502,7 +504,8 @@ class Env:
         del self._events_stack[-1]
         handling.event_1.set()
         self._touch_setter()
-        self.display()
+        if handling.display:
+            self.display()
 
     def _notice_handler(self, result):
         if result:
@@ -518,13 +521,13 @@ class Env:
             self._touch_setter()
             self.display()
 
-    def choice(self, title, text="", icon=None, false_text="取消", true_text="确认") -> bool:
-        c = Choice(title, text, icon, false_text, true_text)
+    def choice(self, title, text="", icon=None, false_text="取消", true_text="确认", display=False) -> bool:
+        c = Choice(title, text, icon, false_text, true_text, display)
         self._events_stack.append(c)
         self._touch_setter()
         self.display()
         c.event_1.wait()
-        c.event_1.clear()
+        c.event_1.set()
         r = c.result
         c.event_2.set()
         c.event_1.wait()
