@@ -378,6 +378,8 @@ class Pages:
             if self.at > 0:
                 self.at -= 1
                 self._update = True
+                for i in range(1, 3):
+                    self.list_clicked[i].vibrate = True
                 self.update(display)
 
         def go_to(self, index=0, display=True):
@@ -394,6 +396,9 @@ class Pages:
                 for i in range(3):
                     index = self.at * 3 + i
                     if index + 1 > len(self.items):
+                        # 处理震动
+                        for j in range(i, 3):
+                            self.list_clicked[j].vibrate = False
                         break
                     y = 37 + i * 30
                     if self.icons[index]:

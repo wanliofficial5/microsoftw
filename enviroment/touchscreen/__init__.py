@@ -236,7 +236,8 @@ class TouchHandler:
                         i.active = False
                         if i.area[0] <= d_x <= i.area[1] and i.area[2] <= d_y <= i.area[3]:
                             self.pool.add(i.func, *i.args, **i.kwargs)
-                            self.env.feedback_vibrate_async()
+                            if i.vibrate:
+                                self.env.feedback_vibrate_async()
                             break
                 else:
                     for i in _ReIter(app_clicked):
@@ -244,7 +245,8 @@ class TouchHandler:
                             i.active = False
                             if i.area[0] <= d_x <= i.area[1] and i.area[2] <= d_y <= i.area[3]:
                                 self.pool.add(i.func, *i.args, **i.kwargs)
-                                self.env.feedback_vibrate_async()
+                                if i.vibrate:
+                                    self.env.feedback_vibrate_async()
                                 break
 
         elif d_t and o_t:  # Keep touching

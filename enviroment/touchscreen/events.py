@@ -7,6 +7,8 @@ class Clicked:  # call the function when the object is clicked.
         self.args = arg
         self.kwargs = kwargs
 
+        self.vibrate = True
+
     @property
     def temp_location(self):
         return self._temp_location
