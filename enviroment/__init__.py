@@ -369,7 +369,7 @@ class Env:
             set_wifi.send(1)
             self.reboot()
 
-        self.Pool.add(self.bluetooth_service.accept, True)
+        # self.Pool.add(self.bluetooth_service.accept, True)
 
     def __getattr__(self, name):
         if name in self.plugins:
