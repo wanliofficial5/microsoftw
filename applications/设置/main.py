@@ -5,6 +5,8 @@ import os, signal
 
 from PIL import Image, ImageFont
 
+from enviroment.touchscreen.events import SlideX
+
 
 def get_host_ip():
     try:
@@ -183,6 +185,14 @@ class ThemeSelectPage(struct.Page):
         self.add_element(self.tick)
 
         self.at = 0
+
+        self.touch_records = [SlideX((0, 296, 0, 128), self.slide_handler)]
+
+    def slide_handler(self, dis):
+        if dis > 0:
+            self.go_prev()
+        else:
+            self.go_next()
 
     def active(self):
         self.themes = list(self.env.themes.keys())
