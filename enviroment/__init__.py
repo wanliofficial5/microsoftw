@@ -490,7 +490,7 @@ class Env:
             self._close_event()
             return True
         if self.back_stack.empty():
-            if self._update_temp:
+            if not self._update_temp:
                 self.display()
             return self.Now.back()
         else:
