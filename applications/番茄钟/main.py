@@ -164,11 +164,3 @@ class Application(lib.AppBase):
         self.add_book("main", MainBook(self))
         self.title = "番茄时钟"
         self.icon = Image.open("applications/番茄钟/icon.png")
-
-    def active(self, refresh="a"):
-        self.Book.Page.active()
-        super().active(refresh=refresh)
-
-    def pause(self):
-        super().pause()
-        self.Book.Page.pause()

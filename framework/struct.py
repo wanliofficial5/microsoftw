@@ -91,6 +91,12 @@ class Page:
         self._update = True
         self._touch_records = []
 
+    def active(self):
+        pass
+
+    def pause(self):
+        pass
+
     @property
     def background(self):
         return self._background
@@ -191,15 +197,26 @@ class Book:
         self.Pages = {}
         self.Page = None
         self.now_page = ""
-        self.is_active = False
+        self._active = False
 
         self.back_stack = _LifoQueue()
+
+    def active(self):
+        self._active = True
+        self.Page.active()
+
+    def pause(self):
+        self._active = False
+        self.Page.pause()
 
     def add_page(self, name, page, as_default=True):
         self.Pages[name] = page
         if as_default:
-            self.now_page = name
-            self.Page = page
+            if self._active:
+                self.change_page(name)
+            else:
+                self.now_page = name
+                self.Page = page
 
     def change_to(self, display=True):
         if display:
@@ -209,6 +226,7 @@ class Book:
         if target in self.Pages:
             if to_stack:
                 self.back_stack.put(self.now_page)
+            self.Page.pause()
             self.Page.touch_records_rlock.acquire()
             for i in self.Page.touch_records_clicked:
                 i.active = False
@@ -219,6 +237,7 @@ class Book:
             self.Page.touch_records_rlock.release()
             self.now_page = target
             self.Page = self.Pages[target]
+            self.Page.active()
             self.base.display()
         else:
             raise KeyError("The targeted page is not found.")
@@ -227,7 +246,7 @@ class Book:
         return self.Page.render()
 
     def update(self, page, refresh="a"):
-        if page is self.Pages[self.now_page] and self.is_active:
+        if page is self.Pages[self.now_page] and self._active:
             self.base.display(refresh)
 
     def back(self) -> bool:
@@ -271,8 +290,11 @@ class Base:
     def add_book(self, name, book, as_default=True):
         self.Books[name] = book
         if as_default:
-            self._now_book = name
-            self.Book = book
+            if self._active:
+                self.change_book(name)
+            else:
+                self._now_book = name
+                self.Book = book
 
     @property
     def touch_records_slide_x(self):
@@ -293,10 +315,10 @@ class Base:
         if target in self.Books:
             if to_stacks:
                 self.back_stack.put(self.now_book)
-            self.Book.is_active = False
+            self.Book.pause()
             self._now_book = target
             self.Book = self.Books[target]
-            self.Book.is_active = True
+            self.Book.active()
             self.Book.change_to(display)
         else:
             raise KeyError("The targeted book is not found.")
@@ -307,17 +329,17 @@ class Base:
 
     def active(self, refresh="a") -> None:  # This function will be called when this Base is active.
         self._active = True
-        self.Book.is_active = True
+        self.Book.active()
         self.display(refresh)
 
     def pause(self) -> None:  # This function will be called when this Base is paused.
         self._active = False
-        self.Book.is_active = False
+        self.Book.pause()
 
     def shutdown(self) -> None:  # This function will be called when the eInkUI is shutdown.
         # Technically this function should be done within 1s
         self._active = False
-        self.Book.is_active = False
+        self.Book.pause()
 
     def back(self) -> bool:
         self.env._show_left_back = False

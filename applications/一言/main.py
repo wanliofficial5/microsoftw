@@ -69,11 +69,3 @@ class Application(lib.AppBase):
         self.title = "一言"
 
         self.add_book("main", MainBook(self))
-
-    def active(self, refresh="a"):
-        self.Book.Page.active()
-        super().active(refresh)
-
-    def pause(self):
-        self.Book.Page.pause()
-        super().pause()
