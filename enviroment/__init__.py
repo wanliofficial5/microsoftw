@@ -181,6 +181,9 @@ class BluetoothApp:
 
 class Env:
     def __init__(self, simulator):
+        # plugins
+        self.plugins = {}
+
         self.Config = _configurator.Configurator(example=example_config)
 
         # locks
@@ -221,8 +224,7 @@ class Env:
 
         # flask
         self.API = _api.API(self, True)
-        self.API.run()
-        # self.API.run()
+        self.API.start()
 
         # themes
         self.themes = {}
@@ -230,9 +232,6 @@ class Env:
 
         # applications
         self.apps = {}
-
-        # plugins
-        self.plugins = {}
 
         self.Now = None
 
