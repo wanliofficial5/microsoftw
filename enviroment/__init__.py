@@ -279,6 +279,8 @@ class Env:
         self._event_close_clicked = _Clicked((210, 235, 28, 53), self._close_event)
         self._false_clicked = _Clicked((59, 147, 82, 102), self._choice_handler, False)
         self._true_clicked = _Clicked((147, 237, 82, 102), self._choice_handler, True)
+        self._cover_clicked = _Clicked((0, 296, 0, 128), lambda :None)
+        self._cover_clicked.vibrate = False
 
         # notice
         self._notices = []
@@ -503,9 +505,10 @@ class Env:
             self.TouchHandler.set_clicked(self._notice_clicked_s)
         elif self._events_stack:
             if isinstance(self._events_stack[-1], Choice):
-                self.TouchHandler.set_clicked([self._event_close_clicked, self._true_clicked, self._false_clicked])
+                self.TouchHandler.set_clicked([self._cover_clicked, self._event_close_clicked, self._true_clicked,
+                                               self._false_clicked])
             else:
-                self.TouchHandler.set_clicked([self._event_close_clicked])
+                self.TouchHandler.set_clicked([self._cover_clicked, self._event_close_clicked])
         else:
             self.TouchHandler.clear_clicked()
 
