@@ -130,6 +130,7 @@ class Page:
         self.resort()
         self._elements_rlock.release()
         self._update = True
+        return element
 
     def resort(self):
         self._elements_rlock.acquire()
