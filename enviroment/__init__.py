@@ -221,6 +221,7 @@ class Env:
 
         # flask
         self.API = _api.API(self, True)
+        self.API.run()
         # self.API.run()
 
         # themes

@@ -55,4 +55,4 @@ class API:
 
     def run(self, port=5000):
         self.port = port
-        self.thread.run()
+        self.thread.start()
