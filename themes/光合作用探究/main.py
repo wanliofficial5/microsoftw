@@ -109,7 +109,7 @@ class Connector:
                     for record_time in self.data.keys():
                         if record_time > last_time:
                             new_data[record_time] = self.data[record_time].to_dict()
-                    ws.send(json.dumps({"type'": "data_result", "data": json.dumps(new_data)}))
+                    ws.send(json.dumps({"type": "data_result", "data": new_data}))
                 elif data["type"] == "get_now":
                     ws.send(json.dumps({"type": "now_result", "data": self.data[sorted(self.data.keys())[-1]].to_dict()}))
 
