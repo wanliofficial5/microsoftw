@@ -240,7 +240,7 @@ class Env:
         self._fake = FakePage(self)
         self._label_left = _lib.Elements.Label(self._fake, size=(85, 12), align="C", location=(0, 0))
         self._label_right = _lib.Elements.Label(self._fake, size=(85, 12), align="C", location=(0, 0))
-        self._multiple_text = _lib.Elements.MultipleLinesLabel(self._fake, location=(0, 0), size=(0, 0))
+        self._multiple_text = _lib.Elements.MultipleLinesLabel(self._fake, location=(0, 0), size=(0, 0), border=(3, 0))
 
         self._event_close_clicked = _Clicked((210, 235, 28, 53), self._close_event)
         self._false_clicked = _Clicked((59, 147, 82, 102), self._choice_handler, False)
@@ -443,7 +443,7 @@ class Env:
             self.Now = self.themes["默认（黑）"]
             self.config.set("theme", "默认（黑）")
         self.Now.active()
-        self.prompt("欢迎使用", "eInkUI beta")
+        self.prompt("欢迎使用", "eInkUI beta\n本版本不代表最终品质")
 
     def poweroff(self):
         self.Logger.info("关机")

@@ -141,5 +141,5 @@ class Application(lib.AppBase):
     def active(self, refresh="a"):
         super().active(refresh)
         if not os.path.exists("applications/单词卡/t"):
-            self.env.prompt("欢迎使用单词卡！", "随机显示高考3500词：\n每60秒自动切换单词，也可以左右滑动切换单词", icon=self.icon)
+            self.env.prompt("欢迎使用单词卡！", "随机显示高考3500词\n说明：每60秒自动切换单词，也可以左右滑动切换单词", icon=self.icon)
             open("applications/单词卡/t", "w")
