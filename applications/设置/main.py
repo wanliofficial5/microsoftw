@@ -6,7 +6,6 @@ import os, signal
 from PIL import Image, ImageFont
 
 
-
 def get_host_ip():
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -50,16 +49,20 @@ class OnlineSettingsPage(struct.Page):
 class GeneralSettingsPage(lib.Pages.ListPage):
     def __init__(self, book):
         super().__init__(book, "通用",
-                         ["主题（未完成）",
-                          "Docker（施工中）",
+                         ["主题（施工中）",
+                          "Docker",
                           "更新",
                           "恢复", ],
                          funcs=[
-                             lambda: None,
+                             self.theme,
                              self.docker,
                              self.update_ui,
                              self.fix_up,
                          ])
+
+    def theme(self):
+        self.book.Pages["theme"].active()
+        self.book.change_page("theme")
 
     def docker(self):
         self.book.Pages["docker"].active()
@@ -134,6 +137,7 @@ class DockerSettingPage(lib.Pages.ListPage):
         if flag:
             self.env.config.set("docker", self.docker_list)
 
+        self.clear(False)
         for app_name, app in self.env.apps.items():
             if app.show_in_drawer:
                 self.append(app_name, icon=app.icon, display=False)
@@ -143,6 +147,80 @@ class DockerSettingPage(lib.Pages.ListPage):
 
         self.inited = True
         self.emulator.update(self.docker_list)
+
+
+class ThemeSelectPage(struct.Page):
+    def __init__(self, book):
+        super().__init__(book)
+        self.env = book.base.env
+        self.themes = []
+        self.now_theme = None
+
+        # 界面
+        self.theme_show = lib.Elements.Image(self)
+        self.add_element(self.theme_show)
+
+        self.next_button = lib.Elements.ImageButton(
+            self, self.go_next, (24, 24), (233, 100), Image.open("applications/设置/resources/right.png"), False)
+        self.add_element(self.next_button)
+
+        self.prev_button = lib.Elements.ImageButton(
+            self, self.go_prev, (24, 24), (39, 100), Image.open("applications/设置/resources/left.png"), False)
+        self.add_element(self.prev_button)
+
+        self.add_element(lib.Elements.LabelButton(
+            self, (160, 28), self.select,  (68, 100),
+            background=Image.open("applications/设置/resources/title_blank.png"), border=(8, 2)))
+
+        self.title_text = lib.Elements.Label(self, (133, 28), (92, 100), font_size=16, border=(0, 4), align="C")
+        self.add_element(self.title_text)
+
+        self.index_show = lib.Elements.Label(
+            self, (60, 18), (230, 5), background=Image.open("applications/设置/resources/index_blank.png"),
+            border=(0, 4), align="C")
+        self.add_element(self.index_show)
+
+        self.tick = lib.Elements.Image(self, (73, 100), image=Image.open("resources/images/ok.png"), show=False)
+        self.add_element(self.tick)
+
+        self.at = 0
+
+    def active(self):
+        self.themes = list(self.env.themes.keys())
+        self.now_theme = self.env.now_theme
+        self.at = self.themes.index(self.now_theme)
+        self.prev_button.set_show(self.at > 0, False)
+        self.next_button.set_show(self.at < len(self.themes) - 1, False)
+        self.index_show.set_text(f"{self.at+1}/{len(self.themes)}", False)
+        self.theme_show.set_image(self.env.themes[self.now_theme].preview, False)
+        self.title_text.set_text(self.now_theme, False)
+        self.tick.set_show(True, False)
+
+    def go_next(self):
+        if self.at < len(self.themes) - 1:
+            self.at += 1
+            self.prev_button.set_show(self.at > 0, False)
+            self.next_button.set_show(self.at < len(self.themes) - 1, False)
+            self.index_show.set_text(f"{self.at + 1}/{len(self.themes)}", False)
+            self.theme_show.set_image(self.env.themes[self.themes[self.at]].preview, False)
+            self.title_text.set_text(self.themes[self.at], False)
+            self.tick.set_show(self.themes[self.at] == self.now_theme, True)
+
+    def go_prev(self):
+        if self.at > 0:
+            self.at -= 1
+            self.prev_button.set_show(self.at > 0, False)
+            self.next_button.set_show(self.at < len(self.themes) - 1, False)
+            self.index_show.set_text(f"{self.at + 1}/{len(self.themes)}", False)
+            self.theme_show.set_image(self.env.themes[self.themes[self.at]].preview, False)
+            self.title_text.set_text(self.themes[self.at], False)
+            self.tick.set_show(self.themes[self.at] == self.now_theme, True)
+
+    def select(self):
+        if self.themes[self.at] != self.now_theme:
+            self.env.now_theme = self.now_theme = self.themes[self.at]
+            self.tick.set_show(True, True)
+            self.env.config.set("theme", self.now_theme)
 
 
 class SystemSettingsPage(lib.Pages.ListPage):
@@ -188,6 +266,7 @@ class GeneralSettingsBook(struct.Book):
         super().__init__(base)
         self.add_page("main", GeneralSettingsPage(self))
         self.add_page("docker", DockerSettingPage(self), False)
+        self.add_page("theme", ThemeSelectPage(self), False)
 
 
 class SystemSettingsBook(struct.Book):
@@ -221,11 +300,3 @@ class Application(lib.AppBase):
         self.add_book("about", AboutBook(self), False)
 
         self.show_in_drawer = False
-
-    def active(self, refresh="a"):
-        self.Books["online"].Page.ip_text.set_text(get_host_ip(), False)
-        self.change_book("main", display=False)
-        self.back_stack.queue.clear()
-        self.Book.Page.go_to(display=False)
-        super().active(refresh)
-
