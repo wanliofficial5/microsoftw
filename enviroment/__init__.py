@@ -227,7 +227,8 @@ class Env:
         self.prompt_alpha = self.prompt_img.split()[3]
         self.choice_img = _Image.open("resources/images/choice.png")
         self.choice_alpha = self.choice_img.split()[3]
-        self.notice_img = _Image.open("resources/images/notice.jpg")
+        self.notice_img = _Image.open("resources/images/notice.png")
+        self.notice_alpha = self.notice_img.split()[3]
         self.on_img = _Image.open("resources/images/on.png").convert("RGBA")
         self.on_alpha = self.on_img.split()[3]
         self.off_img = _Image.open("resources/images/off.png").convert("RGBA")
@@ -294,7 +295,7 @@ class Env:
 
             if self._notices:
                 handling = self._notices[-1]
-                image.paste(self.notice_img, (3, 3))
+                image.paste(self.notice_img, (0, 0), mask=self.notice_alpha)
                 if handling.icon:
                     image.paste(handling.icon, (10, 9))
                     draw.text((34, 10), handling.text, "black", font=self.get_font(16))
@@ -442,7 +443,7 @@ class Env:
             self.Now = self.themes["默认（黑）"]
             self.config.set("theme", "默认（黑）")
         self.Now.active()
-        self.prompt("欢迎使用", "eInkUI beta\n本版本不代表最终品质")
+        self.notice("欢迎使用!beta版不代表成品质量。")
 
     def poweroff(self):
         self.Logger.info("关机")
