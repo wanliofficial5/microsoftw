@@ -7,7 +7,7 @@ import json
 
 import websocket
 
-SERVER = "ws://101.32.192.218:7700"
+SERVER = "wss://zzzing.cn:7700"
 ID = "JOCKER"
 
 
@@ -128,7 +128,7 @@ class Connector:
         # ...
 
         self.pool.add(self.mainloop)
-        self.pool.add(self.socket_loop)  # 超时处理～
+        self.pool.add(self.socket_loop)
 
     def disactive(self):
         # 断开培养箱和服务器，并停止主循环
@@ -174,11 +174,14 @@ class MainPage(lib.Pages.PageWithTitle):
         self.box = self.add_element(lib.Elements.TextElement(self, (190, 93), "培养箱：在线"))
         self.server = self.add_element(lib.Elements.TextElement(self, (190, 108), "服务器: 未连接"))
 
-        self.add_element(lib.Elements.LabelButton(self, size=(48, 16), func=self.exit, location=(250, 7), text="退出",
+        self.add_element(lib.Elements.LabelButton(self, size=(45, 20), func=self.exit, location=(250, 7), text="退出",
                                                   font_size=16))
 
         self.connector = Connector(book.base.env.Pool, book.base.env.Logger,
                                    "uuid", "address", self.status_handler, self.data_handler)
+
+    def active(self):
+        super().active()
         self.connector.active()
 
     def status_handler(self, status: Status):
