@@ -364,7 +364,7 @@ class Screen:
         self._driver.init()
         self._last_display = time.time()
 
-        self.auto_sleep_time = 2  # seconds
+        self.auto_sleep_time = 600  # seconds
         self._last_display = 0
 
         self._partial_time = 0  # times
