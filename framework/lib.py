@@ -389,8 +389,8 @@ class Pages:
             if self._update:
                 new_image = self.background.copy()
                 draw = _ImageDraw.ImageDraw(new_image)
-                draw.text((10, 8), self.title, "black", self.font)
-                draw.text((254, 8), f"{self.at + 1}/{_ceil(len(self.items) / 3)}", "black", self.font)
+                draw.text((10, 7), self.title, "black", self.font)
+                draw.text((254, 7), f"{self.at + 1}/{_ceil(len(self.items) / 3)}", "black", self.font)
                 for i in range(3):
                     index = self.at * 3 + i
                     if index + 1 > len(self.items):
