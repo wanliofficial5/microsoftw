@@ -229,6 +229,10 @@ class Env:
         self.choice_img = _Image.open("resources/images/choice.png")
         self.choice_alpha = self.choice_img.split()[3]
         self.notice_img = _Image.open("resources/images/notice.jpg")
+        self.on_img = _Image.open("resources/images/on.png").convert("RGBA")
+        self.on_alpha = self.on_img.split()[3]
+        self.off_img = _Image.open("resources/images/off.png").convert("RGBA")
+        self.off_alpha = self.off_img.split()[3]
 
         # choice
         self._events_stack = []

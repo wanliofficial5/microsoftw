@@ -251,8 +251,12 @@ class Pages:
     class ListPage(_Page):
         def __init__(self, book, title, items: [str], icons=None, styles=None, funcs=None, func=None):
             super().__init__(book)
+            self.env = book.base.env
             self.styles_img = {
-                "OK": [book.base.env.ok_img, book.base.env.ok_alpha]
+                "OK": [self.env.ok_img, self.env.ok_alpha, 253, -2],
+                "ON": [self.env.on_img, self.env.on_img, 242, 0],
+                "OFF": [self.env.off_img, self.env.off_img, 242, 0]
+
             }
             self._background = book.base.env.list_img
             self.more_img = book.base.env.list_more_img
@@ -399,7 +403,7 @@ class Pages:
                         draw.text((8, y + 2), self.items[index], "black", self.font)
                     if self.styles[index]:
                         img = self.styles_img[self.styles[index]]
-                        new_image.paste(img[0], (253, y - 2), mask=img[1])
+                        new_image.paste(img[0], (img[-2], y + img[-1]), mask=img[1])
                 if self.at * 3 + 3 < len(self.items):
                     new_image.paste(self.more_img, (105, 122))
 
