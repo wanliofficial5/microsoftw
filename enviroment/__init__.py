@@ -332,6 +332,25 @@ class Env:
                 r.append(name)
             return {"status": 1, "installed": r}
 
+        @self.API.post_api("notice")
+        def notice(args, _):
+            try:
+                text = args["text"]
+            except KeyError:
+                return {"status": 0}
+            self.notice(text)
+            return {"status": 1}
+
+        @self.API.post_api("prompt")
+        def prompt(args, _):
+            try:
+                title = args["title"]
+                text = args["text"]
+            except KeyError:
+                return {"status": 0}
+            self.prompt(title, text)
+            return {"status": 1}
+
     def __getattr__(self, name):
         if name in self.plugins:
             return self.plugins[name]
