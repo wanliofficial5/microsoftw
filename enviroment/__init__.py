@@ -442,7 +442,6 @@ class Env:
             self.Now = self.themes["默认（黑）"]
             self.config.set("theme", "默认（黑）")
         self.Now.active()
-        self.notice("欢迎使用!beta版不代表成品质量。")
 
     def poweroff(self):
         self.Logger.info("关机")
