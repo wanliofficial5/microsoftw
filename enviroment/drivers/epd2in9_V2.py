@@ -404,6 +404,9 @@ class Screen:
         self._partial_time += 1
         self._last_display = time.time()
 
+    def wait_busy(self):
+        self._driver.wait_busy()
+
     def sleep(self):
         self._driver.sleep()
 
