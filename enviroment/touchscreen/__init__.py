@@ -188,23 +188,19 @@ class TouchHandler:
             slided = False
             if self.back_left.active:
                 if d_x - self.back_left.temp_location[0] > 20:
-                    # TODO
                     self.pool.add(self.env.back)
                     slided = True
-                else:
-                    pass
+                self.pool.add(self.env.back_left, False)
                 self.back_left.active = False
             elif self.back_right.active:
                 if self.back_right.temp_location[0] - d_x > 20:
                     self.pool.add(self.env.back)
                     slided = True
-                else:
-                    pass
+                self.pool.add(self.env.back_right, False)
                 self.back_left.active = False
-            elif self.home_bar:
+            elif self.home_bar.active:
                 if self.home_bar.temp_location[1] - d_y > 20 and 100 <= d_x <= 200:
-                    # TODO
-                    self.pool.add(self.env)
+                    self.pool.add(self.env.home_bar)
             if not slided:
                 for i in _ReIter(app_slide_y):
                     if i.active:
@@ -243,11 +239,11 @@ class TouchHandler:
             if not (ICNT_Dev.X[0] == ICNT_Old.X[0] and ICNT_Dev.Y[0] == ICNT_Old.Y[0]):
                 if self.back_left.active and not self.back_left.showed:
                     if d_x - self.back_left.temp_location[0] >= 20:
-                        # TODO: show
+                        self.pool.add(self.env.back_left, True)
                         self.back_left.showed = True
                 elif self.back_right.active and not self.back_right.showed:
                     if d_x - self.back_right.temp_location[0] >= 20:
-                        # TODO: show
+                        self.pool.add(self.env.back_right, True)
                         self.back_right.showed = True
 
         self.env.Now.Book.Page.touch_records_rlock.release()

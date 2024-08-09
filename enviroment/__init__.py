@@ -1,18 +1,21 @@
-from queue import LifoQueue
+import threading as _threading
+import time
+from queue import LifoQueue as _LifoQueue
 
-from PIL import Image, ImageTk, ImageFont, ImageDraw
-from system import threadpool
+from PIL import Image, ImageTk, ImageFont as _ImageFont, ImageDraw
+from system import threadpool as _threadpool
 from .drivers import epd2in9_V2, icnt86
 from .touchscreen import Clicked as _Clicked, \
     SlideX as _SlideX, \
     SlideY as _SlideY, \
     TouchHandler as _TouchHandler
-import os
+import os as _os
 
 
 class Env:
     def __init__(self):
         # locks
+        self.display_lock = _threading.Lock()
 
         # fonts
         self.fonts = {"heiti": {}}
@@ -22,7 +25,7 @@ class Env:
         self.Screen.initial()
 
         # threadpool
-        self.Pool = threadpool.ThreadPool(20, print)
+        self.Pool = _threadpool.ThreadPool(20, print)
         self.Pool.start()
 
         # touchscreen
@@ -42,13 +45,27 @@ class Env:
 
         self.Now = None
 
-        self.back_stack = LifoQueue()
+        self.back_stack = _LifoQueue()
+
+        # show
+        self._show_left_back = False
+        self._show_right_back = False
+        self._show_home_bar = False
+        self._home_bar = False
+
+    def display_auto(self):
+        if self.display_lock.acquire(blocking=False):
+            self.Screen.wait_busy()
+            self.display_lock.release()
+            image = self.Now.render()
+
+            self.Screen.display_auto(image)
 
     def get_font(self, size, font_name="heiti"):
         if size in self.fonts[font_name]:
             return self.fonts[font_name][size]
         else:
-            self.fonts[font_name][size] = ImageFont.truetype("resources/fonts/STHeiti_Light.ttc", size)
+            self.fonts[font_name][size] = _ImageFont.truetype("resources/fonts/STHeiti_Light.ttc", size)
             return self.fonts[font_name][size]
 
     def back_home(self):
@@ -82,11 +99,33 @@ class Env:
     def add_back(self, item):
         self.back_stack.put(item)
 
+    def left_back(self, show: bool):
+        if show != self._show_left_back:
+            self._show_left_back = show
+            self.display_auto()
+
+    def right_back(self, show: bool):
+        if show != self._show_right_back:
+            self._show_right_back = show
+            self.display_auto()
+
+    def home_bar(self):
+        if self._home_bar:
+            self.back_home()
+            self._home_bar = False
+        else:
+            self._home_bar = True
+            self.display_auto()
+            time.sleep(1)
+            if self._home_bar:
+                self._home_bar = False
+                self.display_auto()
+
     @staticmethod
     def poweroff():
         # TODO: run shutdown
-        os.system("sudo poweroff")
+        _os.system("sudo poweroff")
 
     @staticmethod
     def reboot():
-        os.system("sudo reboot")
+        _os.system("sudo reboot")

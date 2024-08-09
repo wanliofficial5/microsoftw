@@ -151,7 +151,7 @@ class Book:
         self.back_stack.put(item)
 
 
-class App:
+class Basic:
     def __init__(self, env):
         self.env = env
         self.name = ""
@@ -178,17 +178,15 @@ class App:
             raise KeyError("The targeted book is not found.")
 
     def display(self) -> None:
-        if self.display_lock.acquire(blocking=True) and self._active:
-            self.env.Screen.wait_busy()
-            self.display_lock.release()
+        if self._active:
             self.env.Screen.display_auto(self.Book.render())
 
-    def active(self) -> None:  # This function will be called when this App is active. But not first started.
+    def active(self) -> None:  # This function will be called when this Basic is active. But not first started.
         self._active = True
         self.Book.is_active = True
         self.display()
 
-    def pause(self) -> None:  # This function will be called when this App is paused.
+    def pause(self) -> None:  # This function will be called when this Basic is paused.
         self._active = False
         self.Book.is_active = False
 

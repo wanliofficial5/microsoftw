@@ -9,8 +9,13 @@ import enviroment
 from system import configurator
 
 
-def main_thread():
-    pass
+'''
+PaperTheme and PaperApp
+Back
+Home
+AppController
+Docker
+'''
 
 
 example_config = {
