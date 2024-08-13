@@ -32,13 +32,13 @@ class TouchRecoder:
 
 
 class Clicked:  # call the function when the object is clicked.
-    def __init__(self):
-        self.area = (0, 0, 0, 0)
+    def __init__(self, area=(0, 0, 0, 0), func=lambda: None, *arg, **kwargs):
+        self.area = area
         self._temp_location = (0, 0)
-        self.func = None
+        self.func = func
         self.active = False
-        self.args = []
-        self.kwargs = {}
+        self.args = arg
+        self.kwargs = kwargs
 
     @property
     def temp_location(self):
@@ -159,9 +159,9 @@ class TouchHandler:
         d_y = ICNT_Dev.Y[0]
         o_x = ICNT_Old.X[0]
         o_y = ICNT_Old.Y[0]
-        app_slide_x = self.env.Now.Book.Page.touch_records_slide_x
-        app_slide_y = self.env.Now.Book.Page.touch_records_slide_y
-        app_clicked = self.env.Now.Book.Page.touch_records_clicked
+        app_slide_x = self.env.Now.touch_records_slide_x
+        app_slide_y = self.env.Now.touch_records_slide_y
+        app_clicked = self.env.Now.touch_records_clicked
 
         if d_t and not o_t:  # Start touching
             if ICNT_Dev.X[0] <= 20:

@@ -1,12 +1,14 @@
 import threading
+import time
 
-from PIL import Image
+from PIL import Image, ImageDraw
 from queue import LifoQueue
 from enviroment.touchscreen import Clicked, SlideX, SlideY
 
 
 class Element:
     def __init__(self, page):
+        self.location = (0, 0)
         self.page = page
         self._layer = 0
         # self.update = False
@@ -85,7 +87,7 @@ class Page:
             new_image = self.background.copy()
             self.elements_rlock.acquire()
             for i in self.elements:
-                new_image.paste(i.render())
+                new_image.paste(i.render(), i.location)
             self.elements_rlock.release()
             self.old_render = new_image
             self.update = False
@@ -151,7 +153,7 @@ class Book:
         self.back_stack.put(item)
 
 
-class Basic:
+class Base:
     def __init__(self, env):
         self.env = env
         self.name = ""
@@ -162,6 +164,18 @@ class Basic:
         self._active = False
 
         self.back_stack = LifoQueue()
+
+    @property
+    def touch_records_slide_x(self):
+        return self.Book.Page.touch_records_slide_x
+
+    @property
+    def touch_records_slide_y(self):
+        return self.Book.Page.touch_records_slide_y
+
+    @property
+    def touch_records_clicked(self):
+        return self.Book.Page.touch_records_clicked
 
     def is_active(self):
         return self._active
@@ -181,12 +195,12 @@ class Basic:
         if self._active:
             self.env.Screen.display_auto(self.Book.render())
 
-    def active(self) -> None:  # This function will be called when this Basic is active. But not first started.
+    def active(self) -> None:  # This function will be called when this Base is active. But not first started.
         self._active = True
         self.Book.is_active = True
         self.display()
 
-    def pause(self) -> None:  # This function will be called when this Basic is paused.
+    def pause(self) -> None:  # This function will be called when this Base is paused.
         self._active = False
         self.Book.is_active = False
 
@@ -218,6 +232,48 @@ class Basic:
 
     def add_back(self, item):
         self.back_stack.put(item)
+
+
+class ThemeBase(Base):
+    pass
+
+
+class AppBase(Base):
+    def __init__(self, env):
+        super().__init__(env)
+        self.title = ""
+        self._control_bar_image = env.images.app_control
+        self.icon = env.images.None20px
+        self.clock_font = self.env.fonts.get_heiti(18)
+        self.title_font = self.env.fonts.get_heiti(19)
+        self._control_bar_status = False
+        self._inactive_clicked = [Clicked((266, 296, 0, 30), self.set_control_bar, True)]
+        self._active_clicked = [Clicked((266, 296, 0, 30), self.env.back_home),
+                                Clicked((0, 296, 30, 128), self.set_control_bar, False)]
+
+    def active(self):
+        self._control_bar_status = False
+
+    def display(self):
+        if self._active:
+            if self._control_bar_status:
+                new_image = self.Book.Page.render()
+                new_image.paste(self._control_bar_image, (0, 0))
+                new_image.paste(self.icon, (4, 4))
+                image_draw = ImageDraw.ImageDraw(new_image)
+                image_draw.text((30, 5), self.title, fill="black", font=self.title_font)
+                image_draw.text((150, 7), time.strftime("%H : %M", time.localtime()), fill="black",
+                                font=self.clock_font)
+
+    def set_control_bar(self, value: bool):
+        self._control_bar_status = value
+        self.display()
+
+    def touch_records_clicked(self):
+        if self._control_bar_status:
+            return self.Book.Page.touch_records_clicked + self._active_clicked
+        else:
+            return self.Book.Page.touch_records_clicked + self._inactive_clicked
 
 
 class Plugin:

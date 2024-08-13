@@ -2,7 +2,7 @@ import threading as _threading
 import time
 from queue import LifoQueue as _LifoQueue
 
-from PIL import Image, ImageTk, ImageFont as _ImageFont, ImageDraw
+from PIL import Image, ImageTk, ImageFont as _Image, _ImageFont, ImageDraw
 from system import threadpool as _threadpool
 from .drivers import epd2in9_V2, icnt86
 from .touchscreen import Clicked as _Clicked, \
@@ -10,6 +10,13 @@ from .touchscreen import Clicked as _Clicked, \
     SlideY as _SlideY, \
     TouchHandler as _TouchHandler
 import os as _os
+
+
+class Images:
+    def __init__(self):
+        self.app_control = Image.open("resources/images/app_control.jpg")
+        self.None18px = Image.open("resources/images/None18px.jpg")
+        self.None20px = Image.open("resources/images/None20px.jpg")
 
 
 class Env:
@@ -52,6 +59,9 @@ class Env:
         self._show_right_back = False
         self._show_home_bar = False
         self._home_bar = False
+
+        # images
+        self.images = Images()
 
     def display_auto(self):
         if self.display_lock.acquire(blocking=False):

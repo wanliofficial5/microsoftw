@@ -1,6 +1,7 @@
 import os
 import threading
 import importlib
+import traceback
 from pathlib import Path
 
 from PIL import Image
@@ -10,9 +11,7 @@ from system import configurator
 
 
 '''
-PaperTheme and PaperApp
-Back
-Home
+Theme and App
 AppController
 Docker
 '''
@@ -53,15 +52,24 @@ if __name__ == "__main__":
 
     # plugins
     for plugin_dir in os.listdir("plugins"):
-        env.plugins[plugin_dir] = importlib.import_module(f"plugins.{plugin_dir}.main").Plugin(env)
+        try:
+            env.plugins[plugin_dir] = importlib.import_module(f"plugins.{plugin_dir}.main").Plugin(env)
+        except:
+            print(traceback.format_exc())
 
     # apps
     for app_dir in os.listdir("applications"):
-        env.apps[app_dir] = importlib.import_module(f"applications.{app_dir}.main").App(env)
+        try:
+            env.apps[app_dir] = importlib.import_module(f"applications.{app_dir}.main").App(env)
+        except:
+            print(traceback.format_exc())
 
     # themes
     for theme_dir in os.listdir("theme"):
-        env.themes[theme_dir] = importlib.import_module(f"themes.{theme_dir}.main").Theme(env)
+        try:
+            env.themes[theme_dir] = importlib.import_module(f"themes.{theme_dir}.main").Theme(env)
+        except:
+            print(traceback.format_exc())
 
     env.now_theme = configurator_main.read("theme")
     env.Now = env.themes[env.now_theme]
