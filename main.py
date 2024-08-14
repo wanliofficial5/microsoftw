@@ -22,13 +22,18 @@ example_config = {
     "update_tdduudf7": 1
 }
 
-if __name__ == "__main__":
+
+
+# 原来的主线程
+
+def mainThread():
+
     print("Running In Develop Mode")
 
     configurator_main = configurator.Configurator()
     configurator_main.check(example_config, True)
 
-    env = enviroment.Env()
+    
 
     load_lock = threading.Barrier(2)
 
@@ -47,8 +52,10 @@ if __name__ == "__main__":
 
 
     env.Pool.add(opening)
+    """
     touch_recoder_dev = enviroment.touchscreen.TouchRecoder()
     touch_recoder_old = enviroment.touchscreen.TouchRecoder()
+    """
 
     # plugins
     for plugin_dir in os.listdir("plugins"):
@@ -75,6 +82,14 @@ if __name__ == "__main__":
     env.Now = env.themes[env.now_theme]
     env.Now.active()
 
+
+"""
     while 1:  # 据说 while 1 的效率比 while True 高
         env.Touch.icnt_scan(touch_recoder_dev, touch_recoder_dev)
         env.TouchHandler.handle(touch_recoder_dev, touch_recoder_old)
+"""
+
+if __name__ == "__main__":
+    env = enviroment.Env()
+    env.Pool.add(mainThread)
+    env.simulator.start(env)

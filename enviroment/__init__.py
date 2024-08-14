@@ -2,14 +2,79 @@ import threading as _threading
 import time
 from queue import LifoQueue as _LifoQueue
 
+# 模拟器GUI wxpython
+import wx
+
+
 from PIL import Image, ImageTk, ImageFont as _Image, _ImageFont, ImageDraw
 from system import threadpool as _threadpool
-from .drivers import epd2in9_V2, icnt86
 from .touchscreen import Clicked as _Clicked, \
     SlideX as _SlideX, \
     SlideY as _SlideY, \
     TouchHandler as _TouchHandler
 import os as _os
+
+# 模拟器屏幕
+class Simulator:
+    def start(self,env):
+        self.env = env
+        self.touch_recoder_dev = env.touchscreen.TouchRecoder()
+        self.touch_recoder_old = en.touchscreen.TouchRecoder()
+        # 创建窗口(296x128)
+        self.app = wx.App()
+        self.frame = wx.Frame(None, title="水墨屏模拟器 v2.0 by xuanzhi33", size=(296, 160))
+
+        # 背景为黑色图片
+        bmp = wx.Bitmap("resources/images/simplebytes.jpg")
+
+        self.staticbit = wx.StaticBitmap(self.frame, -1, bmp)
+
+        # 绑定按下鼠标
+        self.frame.Bind(wx.EVT_LEFT_DOWN, self.mouseDown)
+        # 绑定松开鼠标
+        self.frame.Bind(wx.EVT_LEFT_UP, self.mouseUp)
+
+        self.frame.Show()
+
+        self.app.MainLoop()
+
+
+
+    def mouseDown(event):
+        x = event.GetX()
+        y = event.GetY()
+
+    def mouseUp(event):
+        x = event.GetX()
+        y = event.GetY()
+    
+
+
+    def updateImage(self, image: Image):
+  
+
+        screenshotImg = image
+        
+        wximg = wx.Image(296, 128)
+        wximg.SetData(screenshotImg.convert("RGB").tobytes())
+
+        self.staticbit.SetBitmap(wx.Bitmap(wximg))
+
+    def display(self, image: Image):
+        self.updateImage(image)
+    
+    def display_patial(self, image: Image):
+        self.updateImage(image)
+    
+    def display_auto(self, image: Image):
+        self.updateImage(image)
+
+    def wait_busy(self):
+        pass
+
+    def quit(self):
+        pass
+    
 
 
 class Images:
@@ -27,17 +92,25 @@ class Env:
         # fonts
         self.fonts = {"heiti": {}}
 
+        # 模拟器
+        self.simulator = Simulator()
+
         # screen
-        self.Screen = epd2in9_V2.Screen()
+        self.Screen = self.simulator
         self.Screen.initial()
 
         # threadpool
         self.Pool = _threadpool.ThreadPool(20, print)
         self.Pool.start()
 
+        """
+        
         # touchscreen
-        self.Touch = icnt86.TouchDriver()
+        self.Touch = self.simulator
+
         self.Touch.icnt_init()
+        """
+
         self.TouchHandler = _TouchHandler(self)
 
         # themes
