@@ -56,6 +56,6 @@ class Theme(ThemeBase):
         self.flag = True
         threading.Thread(target=self.updater, daemon=True).start()
 
-    def paste(self):
+    def pause(self):
         super().pause()
         self.flag = False
