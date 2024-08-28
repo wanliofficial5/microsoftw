@@ -235,7 +235,9 @@ class Base:
 
 
 class ThemeBase(Base):
-    pass
+    def __init__(self, env):
+        super().__init__(env)
+
 
 
 class AppBase(Base):

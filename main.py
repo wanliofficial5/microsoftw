@@ -78,6 +78,8 @@ def mainThread():
         except:
             print(traceback.format_exc())
 
+    load_lock.wait()
+
     env.now_theme = configurator_main.read("theme")
     env.Now = env.themes[env.now_theme]
     env.Now.active()

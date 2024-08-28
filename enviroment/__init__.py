@@ -6,7 +6,9 @@ from queue import LifoQueue as _LifoQueue
 import wx
 
 
-from PIL import Image, ImageTk, ImageFont as _Image, _ImageFont, ImageDraw
+from PIL import Image as _Image,\
+    ImageFont as _ImageFont,\
+    ImageDraw as _ImageDraw
 from system import threadpool as _threadpool
 from .touchscreen import Clicked as _Clicked, \
     SlideX as _SlideX, \
@@ -19,7 +21,7 @@ class Simulator:
     def start(self,env):
         self.env = env
         self.touch_recoder_dev = env.touchscreen.TouchRecoder()
-        self.touch_recoder_old = en.touchscreen.TouchRecoder()
+        self.touch_recoder_old = env.touchscreen.TouchRecoder()
         # 创建窗口(296x128)
         self.app = wx.App()
         self.frame = wx.Frame(None, title="水墨屏模拟器 v2.0 by xuanzhi33", size=(296, 160))
@@ -50,7 +52,7 @@ class Simulator:
     
 
 
-    def updateImage(self, image: Image):
+    def updateImage(self, image: _Image):
   
 
         screenshotImg = image
@@ -60,13 +62,13 @@ class Simulator:
 
         self.staticbit.SetBitmap(wx.Bitmap(wximg))
 
-    def display(self, image: Image):
+    def display(self, image: _Image):
         self.updateImage(image)
     
-    def display_patial(self, image: Image):
+    def display_patial(self, image: _Image):
         self.updateImage(image)
     
-    def display_auto(self, image: Image):
+    def display_auto(self, image: _Image):
         self.updateImage(image)
 
     def wait_busy(self):
@@ -79,9 +81,9 @@ class Simulator:
 
 class Images:
     def __init__(self):
-        self.app_control = Image.open("resources/images/app_control.jpg")
-        self.None18px = Image.open("resources/images/None18px.jpg")
-        self.None20px = Image.open("resources/images/None20px.jpg")
+        self.app_control = _Image.open("resources/images/app_control.jpg")
+        self.None18px = _Image.open("resources/images/None18px.jpg")
+        self.None20px = _Image.open("resources/images/None20px.jpg")
 
 
 class Env:
