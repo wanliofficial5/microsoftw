@@ -237,7 +237,32 @@ class Base:
 class ThemeBase(Base):
     def __init__(self, env):
         super().__init__(env)
+        self._docker_image = self.env.images.docker_image
+        self._docker_status = False
 
+        self._inactive_clicked = [Clicked((266, 296, 0, 30), self.set_docker, True)]
+        self._active_clicked =  [Clicked((60, 100, 0, 30), self.open_applist),
+                                 Clicked((0, 296, 30, 128), self.set_docker, False),
+                                 Clicked((195, 235, 0, 30), self.open_setting)]
+
+    def open_applist(self):
+        pass
+
+    def open_setting(self):
+        pass
+
+    def set_docker(self, value: bool):
+        self._docker_status = value
+        self.display()
+
+    def display(self):
+        if self._active:
+            if self._docker_status:
+                new_image = self.Book.Page.render()
+                new_image.paste(self._docker_image, (60, 0))
+                self.env.Screen.display_auto(new_image)
+            else:
+                self.env.Screen.display_auto(self.Book.render())
 
 
 class AppBase(Base):
@@ -266,6 +291,9 @@ class AppBase(Base):
                 image_draw.text((30, 5), self.title, fill="black", font=self.title_font)
                 image_draw.text((150, 7), time.strftime("%H : %M", time.localtime()), fill="black",
                                 font=self.clock_font)
+                self.env.Screen.display_auto(new_image)
+            else:
+                self.env.Screen.display_auto(self.Book.render())
 
     def set_control_bar(self, value: bool):
         self._control_bar_status = value

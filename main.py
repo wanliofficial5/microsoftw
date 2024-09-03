@@ -87,7 +87,7 @@ def mainThread():
 
 """
     while 1:  # 据说 while 1 的效率比 while True 高
-        env.Touch.icnt_scan(touch_recoder_dev, touch_recoder_dev)
+        env.Touch.icnt_scan(touch_recoder_dev, touch_recoder_old)
         env.TouchHandler.handle(touch_recoder_dev, touch_recoder_old)
 """
 

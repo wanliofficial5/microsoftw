@@ -84,6 +84,7 @@ class Images:
         self.app_control = _Image.open("resources/images/app_control.jpg")
         self.None18px = _Image.open("resources/images/None18px.jpg")
         self.None20px = _Image.open("resources/images/None20px.jpg")
+        self.docker_image = _Image.open("resources/images/docker.jpg")
 
 
 class Env:
