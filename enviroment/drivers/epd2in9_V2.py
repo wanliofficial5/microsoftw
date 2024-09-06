@@ -196,7 +196,7 @@ class Epd2in9V2:
 
         self.set_window(0, 0, self.width - 1, self.height - 1)
 
-        self.send_command(0x21)  # Display update control
+        self.send_command(0x21)  # Display _update control
         self.send_data(0x00)
         self.send_data(0x80)
 

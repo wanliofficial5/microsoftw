@@ -11,7 +11,7 @@ class Element:
         self.location = (0, 0)
         self.page = page
         self._layer = 0
-        # self.update = False
+        # self._update = False
         self.background = Image.new("RGBA", (296, 128), (255, 255, 255, 0))
         # self.last_render = self.background
         self._touch_records = []
@@ -45,11 +45,11 @@ class Page:
         self.touch_records_clicked = []
         self.touch_records_slide_x = []
         self.touch_records_slide_y = []
-        self.background = Image.new("RGBA", (296, 128), (255, 255, 255, 1))
+        self.background = Image.new("RGB", (296, 128), (255, 255, 255))
         self.elements_rlock = threading.RLock()
         self.touch_records_rlock = threading.RLock()
         self.old_render = self.background
-        self.update = True
+        self._update = True
 
     @staticmethod
     def _get_sort_key_from(element: Element) -> int:
@@ -83,20 +83,20 @@ class Page:
         self.touch_records_rlock.release()
 
     def render(self):
-        if self.update:
+        if self._update:
             new_image = self.background.copy()
             self.elements_rlock.acquire()
             for i in self.elements:
                 new_image.paste(i.render(), i.location)
             self.elements_rlock.release()
             self.old_render = new_image
-            self.update = False
+            self._update = False
             return new_image
         else:
             return self.old_render
 
     def update(self):
-        self.update = True
+        self._update = True
         self.book.update(self)
 
 

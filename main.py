@@ -1,6 +1,7 @@
 import os
 import threading
 import importlib
+import time
 import traceback
 from pathlib import Path
 
@@ -9,13 +10,11 @@ from PIL import Image
 import enviroment
 from system import configurator
 
-
 '''
 Theme and App
 AppController
 Docker
 '''
-
 
 example_config = {
     "theme": "default",
@@ -23,20 +22,16 @@ example_config = {
 }
 
 
-
 # 原来的主线程
 
 def mainThread():
-
+    time.sleep(0.5)
     print("Running In Develop Mode")
 
     configurator_main = configurator.Configurator()
     configurator_main.check(example_config, True)
 
-    
-
     load_lock = threading.Barrier(2)
-
 
     def opening():
         opening_image_paths = ["resources/images/raspberry.jpg", ]
@@ -47,9 +42,8 @@ def mainThread():
             env.Screen.display_auto(i)
             env.Screen.wait_busy()
         if load_lock.n_waiting == 0:
-            env.Screen.display_auto(Image.open(Path(configurator_main.read("loading_image"))))
+            env.Screen.display_auto(Image.open("resources/images/loading.jpg"))
         load_lock.wait()
-
 
     env.Pool.add(opening)
     """
@@ -72,7 +66,7 @@ def mainThread():
             print(traceback.format_exc())
 
     # themes
-    for theme_dir in os.listdir("theme"):
+    for theme_dir in os.listdir("themes"):
         try:
             env.themes[theme_dir] = importlib.import_module(f"themes.{theme_dir}.main").Theme(env)
         except:
@@ -92,6 +86,7 @@ def mainThread():
 """
 
 if __name__ == "__main__":
-    env = enviroment.Env()
+    simulator = enviroment.Simulator()
+    env = enviroment.Env(simulator)
     env.Pool.add(mainThread)
-    env.simulator.start(env)
+    simulator.start(env)

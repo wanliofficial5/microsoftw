@@ -5,23 +5,24 @@ from queue import LifoQueue as _LifoQueue
 # 模拟器GUI wxpython
 import wx
 
-
-from PIL import Image as _Image,\
-    ImageFont as _ImageFont,\
+from PIL import Image as _Image, \
+    ImageFont as _ImageFont, \
     ImageDraw as _ImageDraw
 from system import threadpool as _threadpool
 from .touchscreen import Clicked as _Clicked, \
     SlideX as _SlideX, \
     SlideY as _SlideY, \
-    TouchHandler as _TouchHandler
+    TouchHandler as _TouchHandler, \
+    TouchRecoder as _TouchRecoder
 import os as _os
+
 
 # 模拟器屏幕
 class Simulator:
-    def start(self,env):
+    def start(self, env):
         self.env = env
-        self.touch_recoder_dev = env.touchscreen.TouchRecoder()
-        self.touch_recoder_old = env.touchscreen.TouchRecoder()
+        self.touch_recoder_dev = _TouchRecoder()
+        self.touch_recoder_old = _TouchRecoder()
         # 创建窗口(296x128)
         self.app = wx.App()
         self.frame = wx.Frame(None, title="水墨屏模拟器 v2.0 by xuanzhi33", size=(296, 160))
@@ -40,34 +41,40 @@ class Simulator:
 
         self.app.MainLoop()
 
-
-
-    def mouseDown(event):
+    def mouseDown(self, event):
         x = event.GetX()
         y = event.GetY()
+        self.touch_recoder_old.Touch = False
+        self.touch_recoder_dev.Touch = True
+        self.touch_recoder_dev.X[0] = x
+        self.touch_recoder_dev.Y[0] = y
+        self.env.TouchHandler.handle(self.touch_recoder_dev, self.touch_recoder_old)
 
-    def mouseUp(event):
+    def mouseUp(self, event):
         x = event.GetX()
         y = event.GetY()
-    
-
+        self.touch_recoder_old.Touch = True
+        self.touch_recoder_dev.Touch = False
+        self.touch_recoder_dev.X[0] = x
+        self.touch_recoder_dev.Y[0] = y
+        self.env.TouchHandler.handle(self.touch_recoder_dev, self.touch_recoder_old)
 
     def updateImage(self, image: _Image):
-  
-
         screenshotImg = image
-        
+        image.show()
+
         wximg = wx.Image(296, 128)
+
         wximg.SetData(screenshotImg.convert("RGB").tobytes())
 
         self.staticbit.SetBitmap(wx.Bitmap(wximg))
 
     def display(self, image: _Image):
         self.updateImage(image)
-    
+
     def display_patial(self, image: _Image):
         self.updateImage(image)
-    
+
     def display_auto(self, image: _Image):
         self.updateImage(image)
 
@@ -76,7 +83,6 @@ class Simulator:
 
     def quit(self):
         pass
-    
 
 
 class Images:
@@ -88,19 +94,15 @@ class Images:
 
 
 class Env:
-    def __init__(self):
+    def __init__(self, simulator):
         # locks
         self.display_lock = _threading.Lock()
 
         # fonts
         self.fonts = {"heiti": {}}
 
-        # 模拟器
-        self.simulator = Simulator()
-
         # screen
-        self.Screen = self.simulator
-        self.Screen.initial()
+        self.Screen = simulator
 
         # threadpool
         self.Pool = _threadpool.ThreadPool(20, print)

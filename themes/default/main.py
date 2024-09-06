@@ -1,7 +1,7 @@
 import threading
 import time
 
-from PIL import ImageFont, ImageDraw
+from PIL import ImageFont, ImageDraw, Image
 
 from framework import ThemeBase, Book, Page, Element
 
@@ -9,6 +9,7 @@ from framework import ThemeBase, Book, Page, Element
 class TextClock(Element):
     def __init__(self, page):
         super().__init__(page)
+        self.background = Image.new("RGB", (296, 128), (0, 0, 0))
         self.font25 = ImageFont.truetype(
             "resources/fonts/PTSerifCaption.ttc", 53)
 
@@ -31,6 +32,7 @@ class MainBook(Book):
         super().__init__(base)
         self.Page = MainPage(self)
         self.Pages["main"] = self.Page
+        self.now_page = "main"
 
 
 class Theme(ThemeBase):
@@ -38,6 +40,7 @@ class Theme(ThemeBase):
         super().__init__(env)
         self.Book = MainBook(self)
         self.Books["main"] = self.Book
+        self.now_book = "main"
         self.flag = False
         self.last_update = -1
 
