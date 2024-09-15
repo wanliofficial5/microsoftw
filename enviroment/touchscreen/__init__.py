@@ -210,7 +210,6 @@ class TouchHandler:
                             self.pool.add(i.func, dis_x)
                             slided = True
                         i.active = False
-
                 for i in _ReIter(app_slide_x):
                     if i.active:
                         dis_x = d_x - i.temp_location[0]
