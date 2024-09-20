@@ -24,7 +24,7 @@ example_config = {
 
 # 原来的主线程
 
-def mainThread():
+def main_thread():
     time.sleep(0.5)
     print("Running In Develop Mode")
 
@@ -88,5 +88,5 @@ def mainThread():
 if __name__ == "__main__":
     simulator = enviroment.Simulator()
     env = enviroment.Env(simulator)
-    env.Pool.add(mainThread)
+    env.Pool.add(main_thread)
     simulator.start(env)

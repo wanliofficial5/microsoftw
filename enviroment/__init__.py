@@ -209,11 +209,11 @@ class Env:
                 self._home_bar = False
                 self.display_auto()
 
-    @staticmethod
-    def poweroff():
+    def poweroff(self):
         # TODO: run shutdown
         _os.system("sudo poweroff")
+        self.Screen.quit()
 
-    @staticmethod
-    def reboot():
+    def reboot(self):
         _os.system("sudo reboot")
+        self.Screen.quit()
