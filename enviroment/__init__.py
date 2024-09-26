@@ -60,14 +60,12 @@ class Simulator:
         self.env.TouchHandler.handle(self.touch_recoder_dev, self.touch_recoder_old)
 
     def updateImage(self, image: _Image):
-        screenshotImg = image
-        image.show()
 
-        wximg = wx.Image(296, 128)
-
-        wximg.SetData(screenshotImg.convert("RGB").tobytes())
-
-        self.staticbit.SetBitmap(wx.Bitmap(wximg))
+        def bitmapThreading():
+            wximg = wx.Image(296, 128, image.convert("RGB").tobytes())
+            bmp = wx.Bitmap(wximg)
+            self.staticbit.SetBitmap(bmp)
+        _threading.Thread(target=bitmapThreading).start()
 
     def display(self, image: _Image):
         self.updateImage(image)
