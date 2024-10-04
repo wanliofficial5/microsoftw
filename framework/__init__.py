@@ -193,7 +193,7 @@ class Base:
 
     def display(self) -> None:
         if self._active:
-            self.env.Screen.display_auto(self.Book.render())
+            self.env.display_auto()
 
     def active(self) -> None:  # This function will be called when this Base is active. But not first started.
         self._active = True

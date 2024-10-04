@@ -140,12 +140,26 @@ class Env:
 
         # images
         self.images = Images()
+        self.left_img = _Image.open("resources/images/back_left.png").convert("RGBA")
+        self.left_img_alpha = self.left_img.split()[3]
+        self.right_img = _Image.open("resources/images/back_right.png").convert("RGBA")
+        self.right_img_alpha = self.right_img.split()[3]
+        self.bar_img = _Image.open("resources/images/home_bar.png").convert("RGBA")
+        self.bar_img_alpha = self.bar_img.split()[3]
 
-    def display_auto(self):
+    def display_auto(self, image=None):
         if self.display_lock.acquire(blocking=False):
             self.Screen.wait_busy()
             self.display_lock.release()
-            image = self.Now.render()
+            if not image:
+                image = self.Now.Book.Page.render()
+
+            if self._show_left_back:
+                image.paste(self.left_img, mask=self.left_img_alpha)
+            if self._show_right_back:
+                image.paste(self.right_img, mask=self.right_img_alpha)
+            if self._show_home_bar:
+                image.paste(self.bar_img, mask=self.bar_img_alpha)
 
             self.Screen.display_auto(image)
 
