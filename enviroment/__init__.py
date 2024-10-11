@@ -223,11 +223,21 @@ class Env:
                 self._home_bar = False
                 self.display_auto()
 
-    def poweroff(self):
-        # TODO: run shutdown
-        _os.system("sudo poweroff")
+    def _shutdown(self):
+        for i in self.apps.values():
+            self.Pool.add(i.shutdown)
+        for i in self.plugins.values():
+            self.Pool.add(i.shutdown)
+        for i in self.themes.values():
+            self.Pool.add(i.shutdown)
+        time.sleep(2)
         self.Screen.quit()
 
+    def poweroff(self):
+        self._shutdown()
+        _os.system("sudo poweroff")
+
     def reboot(self):
+        self._shutdown()
         _os.system("sudo reboot")
-        self.Screen.quit()
+

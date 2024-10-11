@@ -106,7 +106,7 @@ class ThreadPool:
 
     def add_immediately(self, func, *args, **kwargs):
         """
-        这种方法添加的线程可能不受线程池控制
+        这种方法添加的线程不受线程池控制
         """
         if self.full():
             new_thread = threading.Thread(target=func, args=args, kwargs=kwargs)
@@ -115,7 +115,7 @@ class ThreadPool:
         else:
             self.tasks.put((func, args, kwargs))
 
-    def stop(self):
+    def stop(self):  # TODO: join
         self.running = False
 
     def stop_immediately(self):  # 不稳定，不建议使用！
