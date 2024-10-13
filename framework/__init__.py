@@ -87,7 +87,8 @@ class Page:
             new_image = self.background.copy()
             self.elements_rlock.acquire()
             for i in self.elements:
-                new_image.paste(i.render(), i.location)
+                if i:
+                    new_image.paste(i.render(), i.location)
             self.elements_rlock.release()
             self.old_render = new_image
             self._update = False
