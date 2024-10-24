@@ -12,7 +12,6 @@ class Element:
         self.page = page
         self._layer = 0
         # self._update = False
-        self.background = Image.new("RGBA", (296, 128), (255, 255, 255, 0))
         # self.last_render = self.background
         self._touch_records = []
 
@@ -35,7 +34,7 @@ class Element:
         self.page.create_touch_record()
 
     def render(self) -> Image:
-        return self.background
+        return None
 
 
 class Page:
