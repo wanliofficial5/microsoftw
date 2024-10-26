@@ -3,7 +3,9 @@ import time
 
 from PIL import ImageFont, ImageDraw, Image
 
-from framework import ThemeBase, Book, Page, Element
+from framework import ThemeBase
+from framework.struct import Book, Element
+from framework.struct import Page
 
 
 class TextClock(Element):

@@ -1,5 +1,7 @@
 import threading
 
+import framework.struct
+
 
 class _ReIter:  # 反向迭代器
     def __init__(self, content):

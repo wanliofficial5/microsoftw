@@ -8,6 +8,8 @@ import wx
 from PIL import Image as _Image, \
     ImageFont as _ImageFont, \
     ImageDraw as _ImageDraw
+
+import framework.struct
 from system import threadpool as _threadpool
 from .touchscreen import Clicked as _Clicked, \
     SlideX as _SlideX, \
@@ -152,7 +154,7 @@ class Env:
             self.Screen.wait_busy()
             self.display_lock.release()
             if not image:
-                image = self.Now.Book.Page.render()
+                image = framework.struct.Page.render()
 
             if self._show_left_back:
                 image.paste(self.left_img, mask=self.left_img_alpha)
