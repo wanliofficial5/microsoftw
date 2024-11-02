@@ -8,8 +8,8 @@ from enviroment.touchscreen import Clicked, SlideX, SlideY
 
 
 class Element:
-    def __init__(self, page):
-        self.location = (0, 0)
+    def __init__(self, page, location=(0, 0)):
+        self.location = location
         self.page = page
         self._layer = 0
         # self._update = False
@@ -88,8 +88,13 @@ class Page:
             new_image = self.background.copy()
             self.elements_rlock.acquire()
             for i in self.elements:
-                if i:
-                    new_image.paste(i.render(), i.location)
+                j = i.render()
+                if j:
+                    if j.mode == "RGBA":
+                        _, _, _, a = j.split()
+                        new_image.paste(j, i.location, mask=a)
+                    else:
+                        new_image.paste(j, i.location)
             self.elements_rlock.release()
             self.old_render = new_image
             self._update = False
@@ -234,3 +239,15 @@ class Base:
 
     def add_back(self, item):
         self.back_stack.put(item)
+
+
+class Plugin:
+    def __init__(self, env):
+        self.env = env
+
+    def launch(self) -> None:  # This function will be called when the eInkUI is launch.
+        pass
+
+    def shutdown(self) -> None:  # This function will be called when the eInkUI is shutdown.
+        # Technically this function should be done in 5s
+        pass
