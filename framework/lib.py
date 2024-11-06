@@ -5,7 +5,7 @@ from PIL import ImageDraw, Image
 from queue import LifoQueue
 
 from framework.struct import Page as _Page, Element as _Element, Book as _Book, Base as _Base
-from enviroment.touchscreen import Clicked
+from enviroment.touchscreen import Clicked, SlideX, SlideY
 
 
 class Elements:
@@ -30,71 +30,82 @@ class Elements:
     class TextElement(_Element):
         def __init__(self, page, location=(0, 0), text="", font_size=13, color="black", background=None):
             super().__init__(page, location)
-            self.background = Image.new("RGBA", (296, 128), background) if background else \
-                self.background = Image.new("RGBA", (296, 128), (255, 255, 255, 0))
-            self._font = self.page.book.env.get_font(font_size)
-            self._font_size = font_size
-            self._color = color
+            self.font_size = font_size
+            self.color = color
             self._background = background
-            self._text = text
-            self._image = self.background.copy()
-            self._image_draw = ImageDraw.ImageDraw(self._image)
-            self._image_draw.text((0, 0), text, color, self._font)
+            self.text = text
+            self.background = None
+            self._font = None
+            self.image = None
+            self._image_draw = None
+            self.update(False)
 
         def update(self, update=True):
-            self._image = self.background.copy()
-            self._image_draw = ImageDraw.ImageDraw(self._image)
-            self._image_draw.text((0, 0), self._text, self._color, self._font)
+            self.background = Image.new("RGBA", (296, 128), self._background) if self._background else \
+                self.background = Image.new("RGBA", (296, 128), (255, 255, 255, 0))
+            self.image = self.background.copy()
+            self._image_draw = ImageDraw.ImageDraw(self.image)
+            self._image_draw.text((0, 0), self.text, self.color, self._font)
+            if update:
+                self.page.update()
 
-        # FIXME: 使用函数而非属性
+        def set_text(self, value, update=True):
+            self.text = value
+            self.update(update)
 
-        @property
-        def text(self):
-            return self._text
+        def set_color(self, value, update=True):
+            self.color = value
+            self.update(update)
 
-        @text.setter
-        def text(self, value):
-            self._text = value
-            self.update()
-
-        @property
-        def color(self):
-            return self._color
-
-        @color.setter
-        def color(self, value):
-            self._color = value
-            self.update()
-
-        @property
-        def background(self):
-            return self._background
-
-        @background.setter
-        def background(self, value):
+        def set_background(self, value, update=True):
             self._background = value
-            self.update()
+            self.update(update)
 
-        @property
-        def font_size(self):
-            return self._font_size
-
-        @font_size.setter
-        def font_size(self, value, update=True):
-            self._font_size = value
+        def set_font_size(self, value, update=True):
+            self.font_size = value
             self._font = self.page.book.get_font(value)
             self.update(update)
 
         def render(self) -> Image:
-            pass
+            return self.image
 
     class Label(TextElement):
-        pass
+        def __init__(self, page, size, location=(0, 0), border=(0, 0), text="", font_size=13, color="black",
+                     background=None):
+            super().__init__(page, location, text, font_size, color, background)
+            self.size = size
+            self.border = border
 
-    class Button(TextElement):
-        pass
+        def set_size(self, value, update=True):
+            self.size = value
+            self.update(update)
 
-    class MutiLineLabel(TextElement):
+        def set_border(self, value, update=True):
+            self.border = value
+            self.update(update)
+
+        def update(self, update=True):
+            self.background = Image.new("RGBA", self.size, self._background) if self._background else \
+                self.background = Image.new("RGBA", self.size, (255, 255, 255, 0))
+            self.image = self.background.copy()
+            self._image_draw = ImageDraw.ImageDraw(self.image)
+            self._image_draw.text(self.border, self.text, self.color, self._font, )
+            if update:
+                self.page.update()
+
+    class Button(Label):
+        def __init__(self, page, size, func=lambda: None, location=(0, 0), border=(0, 0), text="", font_size=13,
+                     color="black",
+                     background=None):
+            super().__init__(page, size, location, border, text, font_size, color, background)
+            self.func = func
+            self.touch_records.append(Clicked((location[0], location[0]+size[0], location[1], location[1]+size[1]),
+                                              func))
+
+        def set_func(self, func):
+            self.func = func
+
+    class MultipleLineLabel(TextElement):
         pass
 
 
