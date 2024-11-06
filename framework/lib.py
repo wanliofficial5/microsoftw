@@ -1,20 +1,100 @@
 import threading
 import time
 
-from PIL import ImageDraw
+from PIL import ImageDraw, Image
 from queue import LifoQueue
 
 from framework.struct import Page as _Page, Element as _Element, Book as _Book, Base as _Base
 from enviroment.touchscreen import Clicked
 
 
-class AppList(_Book):
-    def __init__(self, base):
-        super().__init__(base)
-        self.env = base.env
-        self.index = 0
+class Elements:
+    class Image(_Element):
+        def __init__(self, page, location=(0, 0), image=None):
+            super().__init__(page, location)
+            self._image = image
 
-    def active(self):
+        @property
+        def image(self):
+            return self._image
+
+        @image.setter
+        def image(self, value, update=True):
+            self._image = value
+            if update:
+                self.page.update()
+
+        def render(self):
+            return self._image
+
+    class TextElement(_Element):
+        def __init__(self, page, location=(0, 0), text="", font_size=13, color="black", background=None):
+            super().__init__(page, location)
+            self.background = Image.new("RGBA", (296, 128), background) if background else \
+                self.background = Image.new("RGBA", (296, 128), (255, 255, 255, 0))
+            self._font = self.page.book.env.get_font(font_size)
+            self._font_size = font_size
+            self._color = color
+            self._background = background
+            self._text = text
+            self._image = self.background.copy()
+            self._image_draw = ImageDraw.ImageDraw(self._image)
+            self._image_draw.text((0, 0), text, color, self._font)
+
+        def update(self, update=True):
+            self._image = self.background.copy()
+            self._image_draw = ImageDraw.ImageDraw(self._image)
+            self._image_draw.text((0, 0), self._text, self._color, self._font)
+
+        # FIXME: 使用函数而非属性
+
+        @property
+        def text(self):
+            return self._text
+
+        @text.setter
+        def text(self, value):
+            self._text = value
+            self.update()
+
+        @property
+        def color(self):
+            return self._color
+
+        @color.setter
+        def color(self, value):
+            self._color = value
+            self.update()
+
+        @property
+        def background(self):
+            return self._background
+
+        @background.setter
+        def background(self, value):
+            self._background = value
+            self.update()
+
+        @property
+        def font_size(self):
+            return self._font_size
+
+        @font_size.setter
+        def font_size(self, value, update=True):
+            self._font_size = value
+            self._font = self.page.book.get_font(value)
+            self.update(update)
+
+        def render(self) -> Image:
+            pass
+
+    class Label(TextElement):
+        pass
+
+    class Button(TextElement):
+        pass
+
+    class MutiLineLabel(TextElement):
         pass
 
 
@@ -100,15 +180,3 @@ class AppBase(_Base):
             return self.Book.Page.touch_records_clicked + self._active_clicked
         else:
             return self.Book.struct.Page.touch_records_clicked + self._inactive_clicked
-
-
-class Plugin:
-    def __init__(self, env):
-        self.env = env
-
-    def launch(self) -> None:  # This function will be called when the eInkUI is launch.
-        pass
-
-    def shutdown(self) -> None:  # This function will be called when the eInkUI is shutdown.
-        # Technically this function should be done in 5s
-        pass
