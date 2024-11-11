@@ -42,7 +42,7 @@ class Elements:
 
         def update(self, update=True):
             self.background = Image.new("RGBA", (296, 128), self._background) if self._background else \
-                self.background = Image.new("RGBA", (296, 128), (255, 255, 255, 0))
+                Image.new("RGBA", (296, 128), (255, 255, 255, 0))
             self.image = self.background.copy()
             self._image_draw = ImageDraw.ImageDraw(self.image)
             self._image_draw.text((0, 0), self.text, self.color, self._font)
@@ -86,7 +86,7 @@ class Elements:
 
         def update(self, update=True):
             self.background = Image.new("RGBA", self.size, self._background) if self._background else \
-                self.background = Image.new("RGBA", self.size, (255, 255, 255, 0))
+                Image.new("RGBA", self.size, (255, 255, 255, 0))
             self.image = self.background.copy()
             self._image_draw = ImageDraw.ImageDraw(self.image)
             self._image_draw.text(self.border, self.text, self.color, self._font, )
