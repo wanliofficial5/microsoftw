@@ -101,7 +101,7 @@ class Env:
         self.display_lock = _threading.Lock()
 
         # fonts
-        self.fonts = {"heiti": {}}
+        self.fonts = {}
 
         # screen
         self.Screen = simulator
@@ -154,7 +154,7 @@ class Env:
             self.Screen.wait_busy()
             self.display_lock.release()
             if not image:
-                image = framework.struct.Page.render()
+                image = self.Now.Book.Page.render()
 
             if self._show_left_back:
                 image.paste(self.left_img, mask=self.left_img_alpha)
@@ -165,12 +165,15 @@ class Env:
 
             self.Screen.display_auto(image)
 
-    def get_font(self, size, font_name="heiti"):
-        if size in self.fonts[font_name]:
-            return self.fonts[font_name][size]
+    def get_font(self, size=12):
+        if self.fonts[size]:
+            return self.fonts[size]
+        elif not size % 12:
+            self.fonts[size] = _ImageFont.truetype("resource/fonts/VonwaonBitmap-12px.ttf", 12)
+        elif not size % 16:
+            self.fonts[size] = _ImageFont.truetype("resource/fonts/VonwaonBitmap-16px.ttf", 12)
         else:
-            self.fonts[font_name][size] = _ImageFont.truetype("resources/fonts/STHeiti_Light.ttc", size)
-            return self.fonts[font_name][size]
+            raise ValueError("It can only be a multiple of 12 or 16.")
 
     def back_home(self):
         self.back_stack.queue.clear()
