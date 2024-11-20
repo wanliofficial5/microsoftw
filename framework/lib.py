@@ -1,5 +1,6 @@
 import threading
 import time
+from math import ceil
 
 from PIL import ImageDraw, Image
 from queue import LifoQueue
@@ -72,9 +73,9 @@ class Elements:
     class Label(TextElement):
         def __init__(self, page, size, location=(0, 0), border=(0, 0), text="", font_size=13, color="black",
                      background=None):
-            super().__init__(page, location, text, font_size, color, background)
             self.size = size
             self.border = border
+            super().__init__(page, location, text, font_size, color, background)
 
         def set_size(self, value, update=True):
             self.size = value
@@ -89,7 +90,7 @@ class Elements:
                 Image.new("RGBA", self.size, (255, 255, 255, 0))
             self.image = self.background.copy()
             self._image_draw = ImageDraw.ImageDraw(self.image)
-            self._image_draw.text(self.border, self.text, self.color, self._font, )
+            self._image_draw.text(self.border, self.text, self.color, self._font)
             if update:
                 self.page.update()
 
@@ -105,8 +106,28 @@ class Elements:
         def set_func(self, func):
             self.func = func
 
-    class MultipleLineLabel(TextElement):
-        pass
+    class MultipleLinesLabel(Label):
+        def __init__(self, page, size, location=(0, 0), border=(0, 0), text="", font_size=13, color="black",
+                     background=None, space=0):
+            super().__init__(page, size, location, border, text, font_size, color, background)
+            self.space = space
+
+        def set_text(self, value, update=True):
+            self.text = value.replace("\n", "")
+            self.update(update)
+
+        def update(self, update=True):
+            line_length = (self.size[0] - 2 * self.border[0]) // self._font.size
+            line_num = min(ceil((self.size[1] - 2 * self.border[1]) / self._font.size),
+                           ceil((len(self.text) / line_length)))
+            new_text = ""
+            self.image = self.background.copy()
+            self._image_draw = ImageDraw.ImageDraw(self.image)
+            for i in range(line_num):
+                new_text += f"{self.text[i*line_length: (i+1)*line_length]}\n"
+            self._image_draw.text(self.border, new_text, self.color, self._font)
+            if update:
+                self.page.update()
 
 
 class ThemeBase(_Base):
