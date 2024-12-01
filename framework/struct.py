@@ -52,6 +52,13 @@ class Page:
         self.old_render = self.background
         self._update = True
 
+        self.init()
+
+        self.create_touch_record()
+
+    def init(self):
+        pass
+
     @staticmethod
     def _get_sort_key_from(element: Element) -> int:
         return element.layer
@@ -117,6 +124,11 @@ class Book:
 
         self.back_stack = LifoQueue()
 
+        self.init()
+
+    def init(self):
+        pass
+
     def change_page(self, target: str, to_stack=True):
         if target in self.Pages:
             if to_stack:
@@ -171,6 +183,11 @@ class Base:
         self._active = False
 
         self.back_stack = LifoQueue()
+
+        self.init()
+
+    def init(self):
+        pass
 
     @property
     def touch_records_slide_x(self):
