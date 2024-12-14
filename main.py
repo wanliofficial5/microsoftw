@@ -14,6 +14,7 @@ from system import configurator
 Theme and App
 AppController
 Docker
+更好的错误处理机制
 '''
 
 example_config = {
