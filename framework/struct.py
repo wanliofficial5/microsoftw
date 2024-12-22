@@ -47,15 +47,16 @@ class Element:
 class Page:
     def __init__(self, book):
         self.book = book
-        self.elements = []
+        self._elements = []
         self.touch_records_clicked = []
         self.touch_records_slide_x = []
         self.touch_records_slide_y = []
-        self.background = Image.new("RGB", (296, 128), (255, 255, 255))
-        self.elements_rlock = threading.RLock()
-        self.touch_records_rlock = threading.RLock()
-        self.old_render = self.background
+        self._background = Image.new("RGB", (296, 128), (255, 255, 255))
+        self._elements_rlock = threading.RLock()
+        self._touch_records_rlock = threading.RLock()
+        self.old_render = self._background
         self._update = True
+        self._touch_records = []
 
         self.init()
 
@@ -64,28 +65,46 @@ class Page:
     def init(self):
         pass
 
+    @property
+    def background(self):
+        return self._background
+
+    @background.setter
+    def background(self, value):
+        self._background = value
+        self.update()
+
+    @property
+    def touch_records(self):
+        return self._touch_records
+
+    @touch_records.setter
+    def touch_records(self, value):
+        self._touch_records = value
+        self.create_touch_record()
+
     @staticmethod
     def _get_sort_key_from(element: Element) -> int:
         return element.layer
 
     def add_element(self, element: Element):
-        self.elements_rlock.acquire()
-        self.elements.append(element)
+        self._elements_rlock.acquire()
+        self._elements.append(element)
         self.resort()
-        self.elements_rlock.release()
+        self._elements_rlock.release()
 
     def resort(self):
-        self.elements_rlock.acquire()
-        self.elements.sort(key=self._get_sort_key_from, reverse=True)
-        self.elements_rlock.release()
+        self._elements_rlock.acquire()
+        self._elements.sort(key=self._get_sort_key_from, reverse=True)
+        self._elements_rlock.release()
         self.create_touch_record()
 
     def create_touch_record(self):
-        self.touch_records_rlock.acquire()
+        self._touch_records_rlock.acquire()
         self.touch_records_clicked = []
         self.touch_records_slide_x = []
         self.touch_records_slide_y = []
-        for i in self.elements:
+        for i in self._elements:
             for j in i.touch_records:
                 if isinstance(j, Clicked):
                     self.touch_records_clicked.append(j)
@@ -93,13 +112,20 @@ class Page:
                     self.touch_records_slide_x.append(j)
                 elif isinstance(j, SlideY):
                     self.touch_records_slide_y.append(j)
-        self.touch_records_rlock.release()
+            for j in self._touch_records:
+                if isinstance(j, Clicked):
+                    self.touch_records_clicked.append(j)
+                elif isinstance(j, SlideX):
+                    self.touch_records_slide_x.append(j)
+                elif isinstance(j, SlideY):
+                    self.touch_records_slide_y.append(j)
+        self._touch_records_rlock.release()
 
     def render(self):
         if self._update:
-            new_image = self.background.copy()
-            self.elements_rlock.acquire()
-            for i in self.elements:
+            new_image = self._background.copy()
+            self._elements_rlock.acquire()
+            for i in self._elements:
                 j = i.render()
                 if j:
                     if j.mode == "RGBA":
@@ -107,7 +133,7 @@ class Page:
                         new_image.paste(j, i.location, mask=a)
                     else:
                         new_image.paste(j, i.location)
-            self.elements_rlock.release()
+            self._elements_rlock.release()
             self.old_render = new_image
             self._update = False
             return new_image.copy()
@@ -138,14 +164,14 @@ class Book:
         if target in self.Pages:
             if to_stack:
                 self.back_stack.put(self.now_page)
-            self.Page.touch_records_rlock.acquire()
+            self.Page._touch_records_rlock.acquire()
             for i in self.Page.touch_records_clicked:
                 i.active = False
             for i in self.Page.touch_records_slide_y:
                 i.active = False
             for i in self.Page.touch_records_slide_x:
                 i.active = False
-            self.Page.touch_records_rlock.release()
+            self.Page._touch_records_rlock.release()
             self.now_page = target
             self.Page = self.Pages[target]
             self.app.display()
