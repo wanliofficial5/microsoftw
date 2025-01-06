@@ -53,11 +53,11 @@ class Clicked:  # call the function when the object is clicked.
 
 
 class Slide:
-    def __init__(self):
-        self.area = (0, 0, 0, 0)  # (x1, x2, y1, y2)
+    def __init__(self, area=(0, 0, 0, 0), func=lambda: None):
+        self.area = area
         self._temp_location = (0, 0)
         self.active = False
-        self.func = None
+        self.func = func
 
     @property
     def temp_location(self):
