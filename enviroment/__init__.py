@@ -148,6 +148,8 @@ class Env:
         self.right_img_alpha = self.right_img.split()[3]
         self.bar_img = _Image.open("resources/images/home_bar.png").convert("RGBA")
         self.bar_img_alpha = self.bar_img.split()[3]
+        self.list_img = _Image.open("resources/images/list.jpg")
+        self.list_more_img = _Image.open("resources/images/more_items_dots.png")
 
     def display_auto(self, image=None):
         if self.display_lock.acquire(blocking=False):

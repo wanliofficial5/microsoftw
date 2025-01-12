@@ -130,6 +130,119 @@ class Elements:
                 self.page.update()
 
 
+class Pages:
+    class ListPage(_Page):
+        def __init__(self, book, title, items: [str], icons=None, funcs=None):
+            super().__init__(book)
+            self.background = book.env.list_img
+            self.more_img = book.env.list_more_img
+            self.old_render = self.background
+            self.title = title
+            self.items = items
+            self.font = book.env.get_font(24)
+            self.icons = icons if icons else [None] * len(items)
+            self.funcs = funcs if funcs else [lambda: None] * len(items)
+            self.at = 0
+            if not len(items) == len(self.icons) == len(self.funcs):
+                raise ValueError("Quantity asymmetry!")
+            self.touch_records = [
+                Clicked((0, 296, 31, 60), self._handler, 0),
+                Clicked((0, 296, 61, 90), self._handler, 1),
+                Clicked((0, 296, 91, 120), self._handler, 2),
+                SlideY((0, 296, 0, 128), self._slide)
+            ]
+
+        def add_element(self, element):
+            raise Exception("No support.")
+
+        def append(self, item, icon=None, func=lambda: None, update=True):
+            self.items.append(item)
+            self.icons.append(icon)
+            self.funcs.append(func)
+            if update:
+                self.update()
+
+        def remove(self, item, update=True):
+            for i in range(len(self.items)):
+                if self.items[i] == item:
+                    del self.items[i]
+                    del self.icons[i]
+                    del self.funcs[i]
+                    self.at = 0
+                    break
+            else:
+                raise ValueError("Item not found!")
+            if update:
+                self.update()
+
+        def insert(self, index, item, icon=None, func=lambda: None, update=True):
+            self.items.insert(index, item)
+            self.icons.insert(index, icon)
+            self.funcs.insert(index, func)
+            if update:
+                self.update()
+
+        def clear(self, update=True):
+            self.items = []
+            self.icons = []
+            self.funcs = []
+            self.at = 0
+            if update:
+                self.update()
+
+        def set_items(self, items: [str], icons=None, funcs=None, update=True):
+            self.items = items
+            self.icons = icons if icons else [None] * len(items)
+            self.funcs = funcs if funcs else [lambda: None] * len(items)
+            self.at = 0
+            if not len(items) == len(self.icons) == len(self.funcs):
+                raise ValueError("Quantity asymmetry!")
+            if update:
+                self.update()
+
+        def _handler(self, index):
+            pass
+
+        def _slide(self, dis):
+            if dis < 0:
+                self.go_next()
+            else:
+                self.go_prev()
+
+        def go_next(self):
+            if (self.at+2) * 3 - len(self.items) < 3:
+                self.at += 1
+                self.update()
+
+        def go_prev(self):
+            if self.at > 0:
+                self.at -= 1
+                self.update()
+
+        def render(self):
+            if self._update:
+                new_image = self.background.copy()
+                draw = ImageDraw.ImageDraw(new_image)
+                draw.text((10, 0), self.title, "black", self.font)
+                draw.text((247, 0), f"{self.at+1}/{ceil(len(self.items)/3)}", "black", self.font)
+                for i in range(3):
+                    index = self.at * 3 + i
+                    if index + 1 > len(self.items):
+                        break
+                    y = 36 + i * 30
+                    if self.icons[index]:
+                        new_image.paste(self.icons[index], (8, y))
+                        draw.text((35, y), self.items[index], "black", self.font)
+                    else:
+                        draw.text((8, y), self.items[index], "black", self.font)
+                if self.at * 3 + 3 < len(self.items):
+                    new_image.paste(self.more_img, (105, 122))
+                self.old_render = new_image
+                return new_image.copy()
+            else:
+                return self.old_render
+
+
 class ThemeBase(_Base):
     def __init__(self, env):
         super().__init__(env)
