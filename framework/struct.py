@@ -53,7 +53,7 @@ class Page:
         self.touch_records_slide_y = []
         self._background = Image.new("RGB", (296, 128), (255, 255, 255))
         self._elements_rlock = threading.RLock()
-        self._touch_records_rlock = threading.RLock()
+        self.touch_records_rlock = threading.RLock()
         self.old_render = self._background
         self._update = True
         self._touch_records = []
@@ -100,7 +100,7 @@ class Page:
         self.create_touch_record()
 
     def create_touch_record(self):
-        self._touch_records_rlock.acquire()
+        self.touch_records_rlock.acquire()
         self.touch_records_clicked = []
         self.touch_records_slide_x = []
         self.touch_records_slide_y = []
@@ -119,7 +119,7 @@ class Page:
                     self.touch_records_slide_x.append(j)
                 elif isinstance(j, SlideY):
                     self.touch_records_slide_y.append(j)
-        self._touch_records_rlock.release()
+        self.touch_records_rlock.release()
 
     def render(self):
         if self._update:
@@ -164,14 +164,14 @@ class Book:
         if target in self.Pages:
             if to_stack:
                 self.back_stack.put(self.now_page)
-            self.Page._touch_records_rlock.acquire()
+            self.Page.touch_records_rlock.acquire()
             for i in self.Page.touch_records_clicked:
                 i.active = False
             for i in self.Page.touch_records_slide_y:
                 i.active = False
             for i in self.Page.touch_records_slide_x:
                 i.active = False
-            self.Page._touch_records_rlock.release()
+            self.Page.touch_records_rlock.release()
             self.now_page = target
             self.Page = self.Pages[target]
             self.app.display()
@@ -250,7 +250,7 @@ class Base:
         if self._active:
             self.env.display_auto()
 
-    def active(self) -> None:  # This function will be called when this Base is active. But not first started.
+    def active(self) -> None:  # This function will be called when this Base is active.
         self._active = True
         self.Book.is_active = True
         self.display()
