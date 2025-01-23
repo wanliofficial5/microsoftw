@@ -146,8 +146,8 @@ class Page:
 
 
 class Book:
-    def __init__(self, app):
-        self.app = app
+    def __init__(self, base):
+        self.base = base
         self.Pages = {}
         self.Page = None
         self.now_page = ""
@@ -174,7 +174,7 @@ class Book:
             self.Page.touch_records_rlock.release()
             self.now_page = target
             self.Page = self.Pages[target]
-            self.app.display()
+            self.base.display()
         else:
             raise KeyError("The targeted page is not found.")
 
@@ -183,7 +183,7 @@ class Book:
 
     def update(self, page):
         if page is self.Pages[self.now_page] and self.is_active:
-            self.app.display()
+            self.base.display()
 
     def back(self) -> bool:
         if self.back_stack.empty():
