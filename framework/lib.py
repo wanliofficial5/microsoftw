@@ -134,12 +134,12 @@ class Pages:
     class ListPage(_Page):
         def __init__(self, book, title, items: [str], icons=None, funcs=None):
             super().__init__(book)
-            self.background = book.env.list_img
-            self.more_img = book.env.list_more_img
+            self._background = book.base.env.list_img
+            self.more_img = book.base.env.list_more_img
             self.old_render = self.background
             self.title = title
             self.items = items
-            self.font = book.env.get_font(24)
+            self.font = book.base.env.get_font(16)
             self.icons = icons if icons else [None] * len(items)
             self.funcs = funcs if funcs else [lambda: None] * len(items)
             self.at = 0
@@ -223,8 +223,8 @@ class Pages:
             if self._update:
                 new_image = self.background.copy()
                 draw = ImageDraw.ImageDraw(new_image)
-                draw.text((10, 0), self.title, "black", self.font)
-                draw.text((247, 0), f"{self.at+1}/{ceil(len(self.items)/3)}", "black", self.font)
+                draw.text((10, 8), self.title, "black", self.font)
+                draw.text((254, 8), f"{self.at+1}/{ceil(len(self.items)/3)}", "black", self.font)
                 for i in range(3):
                     index = self.at * 3 + i
                     if index + 1 > len(self.items):
@@ -238,9 +238,10 @@ class Pages:
                 if self.at * 3 + 3 < len(self.items):
                     new_image.paste(self.more_img, (105, 122))
                 self.old_render = new_image
+                self._update = False
                 return new_image.copy()
             else:
-                return self.old_render
+                return self.old_render.copy()
 
 
 class ThemeBase(_Base):
@@ -254,8 +255,12 @@ class ThemeBase(_Base):
                                 Clicked((0, 296, 30, 128), self.set_docker, False),
                                 Clicked((195, 235, 0, 30), self.open_setting)]
 
+    def active(self):
+        super().active()
+        self._docker_status = False
+
     def open_applist(self):
-        pass
+        self.env.open_app("应用抽屉")
 
     def open_setting(self):
         pass
@@ -291,7 +296,8 @@ class AppBase(_Base):
         self.title = ""
         self._control_bar_image = env.images.app_control
         self.icon = env.images.None20px
-        self.font = self.env.fonts.get_font(16)
+        self.name = ""
+        self.font = self.env.get_font(16)
         self._control_bar_status = False
         self._inactive_clicked = [Clicked((266, 296, 0, 30), self.set_control_bar, True)]
         self._active_clicked = [Clicked((266, 296, 0, 30), self.env.back_home),
@@ -299,6 +305,7 @@ class AppBase(_Base):
 
     def active(self):
         self._control_bar_status = False
+        super().active()
 
     def display(self):
         if self._active:
@@ -323,4 +330,4 @@ class AppBase(_Base):
         if self._control_bar_status:
             return self.Book.Page.touch_records_clicked + self._active_clicked
         else:
-            return self.Book.struct.Page.touch_records_clicked + self._inactive_clicked
+            return self.Book.Page.touch_records_clicked + self._inactive_clicked
