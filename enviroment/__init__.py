@@ -148,8 +148,8 @@ class Env:
         self.right_img_alpha = self.right_img.split()[3]
         self.bar_img = _Image.open("resources/images/home_bar.png").convert("RGBA")
         self.bar_img_alpha = self.bar_img.split()[3]
-        self.list_img = _Image.open("resources/images/list.jpg")
-        self.list_more_img = _Image.open("resources/images/more_items_dots.png")
+        self.list_img = _Image.open("resources/images/list.png")
+        self.list_more_img = _Image.open("resources/images/more_items_dots.jpg")
 
     def display_auto(self, image=None):
         if self.display_lock.acquire(blocking=False):
@@ -168,20 +168,22 @@ class Env:
             self.Screen.display_auto(image)
 
     def get_font(self, size=12):
-        if self.fonts[size]:
+        if size in self.fonts:
             return self.fonts[size]
         elif not size % 12:
-            self.fonts[size] = _ImageFont.truetype("resource/fonts/VonwaonBitmap-12px.ttf", 12)
+            self.fonts[size] = _ImageFont.truetype("resources/fonts/VonwaonBitmap-12px.ttf", size)
         elif not size % 16:
-            self.fonts[size] = _ImageFont.truetype("resource/fonts/VonwaonBitmap-16px.ttf", 12)
+            self.fonts[size] = _ImageFont.truetype("resources/fonts/VonwaonBitmap-16px.ttf", size)
         else:
             raise ValueError("It can only be a multiple of 12 or 16.")
+        return self.fonts[size]
 
     def back_home(self):
         self.back_stack.queue.clear()
         if self.Now is not self.themes[self.now_theme]:
             self.Now.pause()
             self.Now = self.themes[self.now_theme]
+            self.Now.active()
 
     def open_app(self, target: str, to_stack=True):
         if target in self.apps:
@@ -208,12 +210,12 @@ class Env:
     def add_back(self, item):
         self.back_stack.put(item)
 
-    def left_back(self, show: bool):
+    def back_left(self, show: bool):
         if show != self._show_left_back:
             self._show_left_back = show
             self.display_auto()
 
-    def right_back(self, show: bool):
+    def back_right(self, show: bool):
         if show != self._show_right_back:
             self._show_right_back = show
             self.display_auto()
