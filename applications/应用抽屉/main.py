@@ -26,3 +26,4 @@ class Application(AppBase):
         self.Book = MainBook(self)
         self.Books["main"] = self.Book
         self.now_book = "main"
+        self.title = self.name
