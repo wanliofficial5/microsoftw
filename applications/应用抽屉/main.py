@@ -2,6 +2,8 @@ from framework.struct import Book
 from framework.lib import AppBase
 from framework.lib import Pages
 
+from PIL import Image
+
 
 class ApplicationList(Pages.ListPage):
     def __init__(self, book):
@@ -25,5 +27,6 @@ class Application(AppBase):
     def init(self):
         self.Book = MainBook(self)
         self.Books["main"] = self.Book
+        self.icon = Image.open("applications/应用抽屉/icon.png")
         self.now_book = "main"
         self.title = self.name
