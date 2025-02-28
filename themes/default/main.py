@@ -3,7 +3,9 @@ import time
 
 from PIL import ImageFont, ImageDraw, Image
 
-from framework import ThemeBase, Book, Page, Element
+from framework.lib import ThemeBase
+from framework.struct import Book, Element
+from framework.struct import Page
 
 
 class TextClock(Element):
@@ -24,7 +26,7 @@ class TextClock(Element):
 class MainPage(Page):
     def __init__(self, book):
         super().__init__(book)
-        self.elements.append(TextClock(self))
+        self._elements.append(TextClock(self))
 
 
 class MainBook(Book):

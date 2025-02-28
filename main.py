@@ -14,6 +14,7 @@ from system import configurator
 Theme and App
 AppController
 Docker
+更好的错误处理机制
 '''
 
 example_config = {
@@ -61,7 +62,7 @@ def main_thread():
     # apps
     for app_dir in os.listdir("applications"):
         try:
-            env.apps[app_dir] = importlib.import_module(f"applications.{app_dir}.main").App(env)
+            env.apps[app_dir] = importlib.import_module(f"applications.{app_dir}.main").Application(env)
         except:
             print(traceback.format_exc())
 

@@ -121,7 +121,7 @@ class TouchDriver(ICNT86):
         ICNT_Old.P = ICNT_Dev.P.copy()
 
         n = None
-        for _ in range(100):
+        for _ in range(20):
             n = self.digital_read(self.INT)
             if n == 0:
                 break

@@ -1,20 +1,25 @@
+import abc
 import threading
-import time
-
-from PIL import Image, ImageDraw
 from queue import LifoQueue
+
+from PIL import Image
+
 from enviroment.touchscreen import Clicked, SlideX, SlideY
 
 
 class Element:
-    def __init__(self, page):
-        self.location = (0, 0)
+    def __init__(self, page, location=(0, 0)):
+        self.location = location
         self.page = page
         self._layer = 0
         # self._update = False
-        self.background = Image.new("RGBA", (296, 128), (255, 255, 255, 0))
         # self.last_render = self.background
         self._touch_records = []
+
+        self.init()
+
+    def init(self):
+        pass
 
     @property
     def layer(self):
@@ -34,37 +39,64 @@ class Element:
         self._touch_records = value
         self.page.create_touch_record()
 
+    @abc.abstractmethod
     def render(self) -> Image:
-        return self.background
+        return None
 
 
 class Page:
     def __init__(self, book):
         self.book = book
-        self.elements = []
+        self._elements = []
         self.touch_records_clicked = []
         self.touch_records_slide_x = []
         self.touch_records_slide_y = []
-        self.background = Image.new("RGB", (296, 128), (255, 255, 255))
-        self.elements_rlock = threading.RLock()
+        self._background = Image.new("RGB", (296, 128), (255, 255, 255))
+        self._elements_rlock = threading.RLock()
         self.touch_records_rlock = threading.RLock()
-        self.old_render = self.background
+        self.old_render = self._background
         self._update = True
+        self._touch_records = []
+
+        self.init()
+
+        self.create_touch_record()
+
+    def init(self):
+        pass
+
+    @property
+    def background(self):
+        return self._background
+
+    @background.setter
+    def background(self, value):
+        self._background = value
+        self.update()
+
+    @property
+    def touch_records(self):
+        return self._touch_records
+
+    @touch_records.setter
+    def touch_records(self, value):
+        self._touch_records = value
+        self.create_touch_record()
 
     @staticmethod
     def _get_sort_key_from(element: Element) -> int:
         return element.layer
 
     def add_element(self, element: Element):
-        self.elements_rlock.acquire()
-        self.elements.append(element)
+        self._elements_rlock.acquire()
+        self._elements.append(element)
         self.resort()
-        self.elements_rlock.release()
+        self._elements_rlock.release()
 
     def resort(self):
-        self.elements_rlock.acquire()
-        self.elements.sort(key=self._get_sort_key_from, reverse=True)
-        self.elements_rlock.release()
+        self._elements_rlock.acquire()
+        self._elements.sort(key=self._get_sort_key_from, reverse=True)
+        self._elements_rlock.release()
         self.create_touch_record()
 
     def create_touch_record(self):
@@ -72,8 +104,15 @@ class Page:
         self.touch_records_clicked = []
         self.touch_records_slide_x = []
         self.touch_records_slide_y = []
-        for i in self.elements:
+        for i in self._elements:
             for j in i.touch_records:
+                if isinstance(j, Clicked):
+                    self.touch_records_clicked.append(j)
+                elif isinstance(j, SlideX):
+                    self.touch_records_slide_x.append(j)
+                elif isinstance(j, SlideY):
+                    self.touch_records_slide_y.append(j)
+            for j in self._touch_records:
                 if isinstance(j, Clicked):
                     self.touch_records_clicked.append(j)
                 elif isinstance(j, SlideX):
@@ -84,11 +123,17 @@ class Page:
 
     def render(self):
         if self._update:
-            new_image = self.background.copy()
-            self.elements_rlock.acquire()
-            for i in self.elements:
-                new_image.paste(i.render(), i.location)
-            self.elements_rlock.release()
+            new_image = self._background.copy()
+            self._elements_rlock.acquire()
+            for i in self._elements:
+                j = i.render()
+                if j:
+                    if j.mode == "RGBA":
+                        _, _, _, a = j.split()
+                        new_image.paste(j, i.location, mask=a)
+                    else:
+                        new_image.paste(j, i.location)
+            self._elements_rlock.release()
             self.old_render = new_image
             self._update = False
             return new_image.copy()
@@ -101,14 +146,19 @@ class Page:
 
 
 class Book:
-    def __init__(self, app):
-        self.app = app
+    def __init__(self, base):
+        self.base = base
         self.Pages = {}
         self.Page = None
         self.now_page = ""
         self.is_active = False
 
         self.back_stack = LifoQueue()
+
+        self.init()
+
+    def init(self):
+        pass
 
     def change_page(self, target: str, to_stack=True):
         if target in self.Pages:
@@ -124,7 +174,7 @@ class Book:
             self.Page.touch_records_rlock.release()
             self.now_page = target
             self.Page = self.Pages[target]
-            self.app.display()
+            self.base.display()
         else:
             raise KeyError("The targeted page is not found.")
 
@@ -133,7 +183,7 @@ class Book:
 
     def update(self, page):
         if page is self.Pages[self.now_page] and self.is_active:
-            self.app.display()
+            self.base.display()
 
     def back(self) -> bool:
         if self.back_stack.empty():
@@ -165,6 +215,11 @@ class Base:
 
         self.back_stack = LifoQueue()
 
+        self.init()
+
+    def init(self):
+        pass
+
     @property
     def touch_records_slide_x(self):
         return self.Book.Page.touch_records_slide_x
@@ -193,9 +248,9 @@ class Base:
 
     def display(self) -> None:
         if self._active:
-            self.env.Screen.display_auto(self.Book.render())
+            self.env.display_auto()
 
-    def active(self) -> None:  # This function will be called when this Base is active. But not first started.
+    def active(self) -> None:  # This function will be called when this Base is active.
         self._active = True
         self.Book.is_active = True
         self.display()
@@ -232,100 +287,6 @@ class Base:
 
     def add_back(self, item):
         self.back_stack.put(item)
-
-
-class AppList(Book):
-    def __init__(self, base):
-        super().__init__(base)
-        self.env = base.env
-        self.index = 0
-
-    def active(self):
-        pass
-
-
-class ThemeBase(Base):
-    def __init__(self, env):
-        super().__init__(env)
-        self._docker_image = self.env.images.docker_image
-        self._docker_status = False
-
-        self._inactive_clicked = [Clicked((0, 296, 0, 30), self.set_docker, True)]
-        self._active_clicked = [Clicked((60, 100, 0, 30), self.open_applist),
-                                Clicked((0, 296, 30, 128), self.set_docker, False),
-                                Clicked((195, 235, 0, 30), self.open_setting)]
-
-    def open_applist(self):
-        pass
-
-    def open_setting(self):
-        pass
-
-    def set_docker(self, value: bool):
-        self._docker_status = value
-        self.display()
-        time.sleep(2)
-        if self._docker_status:
-            self._docker_status = False
-            self.display()
-
-    def display(self):
-        if self._active:
-            if self._docker_status:
-                new_image = self.Book.Page.render()
-                new_image.paste(self._docker_image, (60, 0))
-                self.env.Screen.display_auto(new_image)
-            else:
-                self.env.Screen.display_auto(self.Book.render())
-
-    @property
-    def touch_records_clicked(self):
-        if self._docker_status:
-            return self.Book.Page.touch_records_clicked + self._active_clicked
-        else:
-            return self.Book.Page.touch_records_clicked + self._inactive_clicked
-
-
-class AppBase(Base):
-    def __init__(self, env):
-        super().__init__(env)
-        self.title = ""
-        self._control_bar_image = env.images.app_control
-        self.icon = env.images.None20px
-        self.clock_font = self.env.fonts.get_heiti(18)
-        self.title_font = self.env.fonts.get_heiti(19)
-        self._control_bar_status = False
-        self._inactive_clicked = [Clicked((266, 296, 0, 30), self.set_control_bar, True)]
-        self._active_clicked = [Clicked((266, 296, 0, 30), self.env.back_home),
-                                Clicked((0, 296, 30, 128), self.set_control_bar, False)]
-
-    def active(self):
-        self._control_bar_status = False
-
-    def display(self):
-        if self._active:
-            if self._control_bar_status:
-                new_image = self.Book.Page.render()
-                new_image.paste(self._control_bar_image, (0, 0))
-                new_image.paste(self.icon, (4, 4))
-                image_draw = ImageDraw.ImageDraw(new_image)
-                image_draw.text((30, 5), self.title, fill="black", font=self.title_font)
-                image_draw.text((150, 7), time.strftime("%H : %M", time.localtime()), fill="black",
-                                font=self.clock_font)
-                self.env.Screen.display_auto(new_image)
-            else:
-                self.env.Screen.display_auto(self.Book.render())
-
-    def set_control_bar(self, value: bool):
-        self._control_bar_status = value
-        self.display()
-
-    @property
-    def touch_records_clicked(self):
-        if self._control_bar_status:
-            return self.Book.Page.touch_records_clicked + self._active_clicked
-        else:
-            return self.Book.Page.touch_records_clicked + self._inactive_clicked
 
 
 class Plugin:

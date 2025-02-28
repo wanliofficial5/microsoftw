@@ -1,5 +1,7 @@
 import threading
 
+import framework.struct
+
 
 class _ReIter:  # 反向迭代器
     def __init__(self, content):
@@ -51,11 +53,11 @@ class Clicked:  # call the function when the object is clicked.
 
 
 class Slide:
-    def __init__(self):
-        self.area = (0, 0, 0, 0)  # (x1, x2, y1, y2)
+    def __init__(self, area=(0, 0, 0, 0), func=lambda: None):
+        self.area = area
         self._temp_location = (0, 0)
         self.active = False
-        self.func = None
+        self.func = func
 
     @property
     def temp_location(self):
@@ -164,6 +166,7 @@ class TouchHandler:
         app_clicked = self.env.Now.touch_records_clicked
 
         if d_t and not o_t:  # Start touching
+            print(f"Start Touch: [{d_x}, {d_y}]")
             if ICNT_Dev.X[0] <= 20:
                 self.back_left.temp_location = (d_x, d_y)
             elif d_x >= 276:
@@ -185,6 +188,7 @@ class TouchHandler:
                     i.temp_location = (d_x, d_y)
 
         elif not d_t and o_t:  # Stop touching
+            print(f"Stop Touch: [{d_x}, {d_y}]")
             slided = False
             if self.back_left.active:
                 if d_x - self.back_left.temp_location[0] > 20:
