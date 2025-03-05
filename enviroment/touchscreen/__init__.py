@@ -159,8 +159,6 @@ class TouchHandler:
         o_t = ICNT_Old.Touch
         d_x = ICNT_Dev.X[0]
         d_y = ICNT_Dev.Y[0]
-        o_x = ICNT_Old.X[0]
-        o_y = ICNT_Old.Y[0]
         app_slide_x = self.env.Now.touch_records_slide_x
         app_slide_y = self.env.Now.touch_records_slide_y
         app_clicked = self.env.Now.touch_records_clicked
@@ -194,14 +192,16 @@ class TouchHandler:
                 if d_x - self.back_left.temp_location[0] > 20:
                     self.pool.add(self.env.back)
                     slided = True
-                self.pool.add(self.env.back_left, False)
+                if self.back_right.showed:
+                    self.pool.add(self.env.back_left, False)
                 self.back_left.active = False
             elif self.back_right.active:
                 if self.back_right.temp_location[0] - d_x > 20:
                     self.pool.add(self.env.back)
                     slided = True
-                self.pool.add(self.env.back_right, False)
-                self.back_left.active = False
+                if self.back_right.showed:
+                    self.pool.add(self.env.back_right, False)
+                self.back_right.active = False
             elif self.home_bar.active:
                 if self.home_bar.temp_location[1] - d_y > 20 and 100 <= d_x <= 200:
                     self.pool.add(self.env.home_bar)
@@ -222,7 +222,6 @@ class TouchHandler:
                             self.pool.add(i.func, dis_x)
                             slided = True
                         i.active = False
-
             if slided:
                 for i in app_clicked:
                     i.active = False

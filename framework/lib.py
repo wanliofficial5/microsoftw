@@ -256,8 +256,8 @@ class ThemeBase(_Base):
                                 Clicked((195, 235, 0, 30), self.open_setting)]
 
     def active(self):
-        super().active()
         self._docker_status = False
+        super().active()
 
     def open_applist(self):
         self.env.open_app("应用抽屉")
@@ -268,10 +268,6 @@ class ThemeBase(_Base):
     def set_docker(self, value: bool):
         self._docker_status = value
         self.display()
-        time.sleep(2)
-        if self._docker_status:
-            self._docker_status = False
-            self.display()
 
     def display(self):
         if self._active:
