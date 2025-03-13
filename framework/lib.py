@@ -288,12 +288,14 @@ class ThemeBase(_Base):
 
 class AppBase(_Base):
     def __init__(self, env):
-        super().__init__(env)
         self.title = ""
-        self._control_bar_image = env.images.app_control
         self.icon = env.images.None20px
         self.name = ""
-        self.font = self.env.get_font(16)
+
+        super().__init__(env)
+
+        self._control_bar_font = self.env.get_font(16)
+        self._control_bar_image = env.images.app_control
         self._control_bar_status = False
         self._inactive_clicked = [Clicked((266, 296, 0, 30), self.set_control_bar, True)]
         self._active_clicked = [Clicked((266, 296, 0, 30), self.env.back_home),
@@ -308,11 +310,11 @@ class AppBase(_Base):
             if self._control_bar_status:
                 new_image = self.Book.Page.render()
                 new_image.paste(self._control_bar_image, (0, 0))
-                new_image.paste(self.icon, (4, 4))
+                new_image.paste(self.icon, (6, 6))
                 image_draw = ImageDraw.ImageDraw(new_image)
-                image_draw.text((30, 5), self.title, fill="black", font=self.font)
-                image_draw.text((150, 7), time.strftime("%H : %M", time.localtime()), fill="black",
-                                font=self.font)
+                image_draw.text((30, 7), self.title, fill="black", font=self._control_bar_font)
+                image_draw.text((170, 7), time.strftime("%H : %M", time.localtime()), fill="black",
+                                font=self._control_bar_font)
                 self.env.Screen.display_auto(new_image)
             else:
                 self.env.Screen.display_auto(self.Book.render())

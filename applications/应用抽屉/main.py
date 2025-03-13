@@ -25,6 +25,7 @@ class MainBook(Book):
 
 class Application(AppBase):
     def init(self):
+        self.name = "应用抽屉"
         self.Book = MainBook(self)
         self.Books["main"] = self.Book
         self.icon = Image.open("applications/应用抽屉/icon.png")
