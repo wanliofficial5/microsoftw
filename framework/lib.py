@@ -201,7 +201,7 @@ class Pages:
                 self.update()
 
         def _handler(self, index):
-            pass
+            self.funcs[self.at*3+index]()
 
         def _slide(self, dis):
             if dis < 0:
@@ -229,12 +229,12 @@ class Pages:
                     index = self.at * 3 + i
                     if index + 1 > len(self.items):
                         break
-                    y = 36 + i * 30
+                    y = 37 + i * 30
                     if self.icons[index]:
                         new_image.paste(self.icons[index], (8, y))
-                        draw.text((35, y), self.items[index], "black", self.font)
+                        draw.text((35, y+1), self.items[index], "black", self.font)
                     else:
-                        draw.text((8, y), self.items[index], "black", self.font)
+                        draw.text((8, y+1), self.items[index], "black", self.font)
                 if self.at * 3 + 3 < len(self.items):
                     new_image.paste(self.more_img, (105, 122))
                 self.old_render = new_image
@@ -313,7 +313,7 @@ class AppBase(_Base):
                 new_image.paste(self.icon, (6, 6))
                 image_draw = ImageDraw.ImageDraw(new_image)
                 image_draw.text((30, 7), self.title, fill="black", font=self._control_bar_font)
-                image_draw.text((170, 7), time.strftime("%H : %M", time.localtime()), fill="black",
+                image_draw.text((224, 7), time.strftime("%H:%M", time.localtime()), fill="black",
                                 font=self._control_bar_font)
                 self.env.Screen.display_auto(new_image)
             else:
