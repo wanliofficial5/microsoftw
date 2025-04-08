@@ -73,6 +73,8 @@ def main_thread():
         except:
             print(traceback.format_exc())
 
+    env.apps["应用抽屉"].update_app_list()
+
     load_lock.wait()
 
     env.now_theme = configurator_main.read("theme")
