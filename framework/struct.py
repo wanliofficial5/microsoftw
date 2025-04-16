@@ -112,13 +112,13 @@ class Page:
                     self.touch_records_slide_x.append(j)
                 elif isinstance(j, SlideY):
                     self.touch_records_slide_y.append(j)
-            for j in self._touch_records:
-                if isinstance(j, Clicked):
-                    self.touch_records_clicked.append(j)
-                elif isinstance(j, SlideX):
-                    self.touch_records_slide_x.append(j)
-                elif isinstance(j, SlideY):
-                    self.touch_records_slide_y.append(j)
+        for j in self._touch_records:
+            if isinstance(j, Clicked):
+                self.touch_records_clicked.append(j)
+            elif isinstance(j, SlideX):
+                self.touch_records_slide_x.append(j)
+            elif isinstance(j, SlideY):
+                self.touch_records_slide_y.append(j)
         self.touch_records_rlock.release()
 
     def render(self):
