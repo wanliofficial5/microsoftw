@@ -135,8 +135,8 @@ class Env:
         # show
         self._show_left_back = False
         self._show_right_back = False
-        self._show_home_bar = False
         self._home_bar = False
+        self._home_bar_temp = 0
 
         # images
         self.images = Images()
@@ -149,7 +149,7 @@ class Env:
         self.list_img = _Image.open("resources/images/list.png")
         self.list_more_img = _Image.open("resources/images/more_items_dots.jpg")
 
-    def display_auto(self, image=None):
+    def display_auto(self, image=None, refresh="auto"):
         if self.display_lock.acquire(blocking=False):
             self.Screen.wait_busy()
             self.display_lock.release()
@@ -160,10 +160,15 @@ class Env:
                 image.paste(self.left_img, mask=self.left_img_alpha)
             if self._show_right_back:
                 image.paste(self.right_img, mask=self.right_img_alpha)
-            if self._show_home_bar:
+            if self._home_bar:
                 image.paste(self.bar_img, mask=self.bar_img_alpha)
 
-            self.Screen.display_auto(image)
+            if refresh == "auto":
+                self.Screen.display_auto(image)
+            elif refresh:
+                self.Screen.display(image)
+            else:
+                self.Screen.display_partial(image)
 
     def get_font(self, size=12):
         if size in self.fonts:
@@ -220,13 +225,14 @@ class Env:
 
     def home_bar(self):
         if self._home_bar:
-            self.back_home()
             self._home_bar = False
+            self.back_home()
         else:
             self._home_bar = True
+            self._home_bar_temp = time.time()
             self.display_auto()
-            time.sleep(1)
-            if self._home_bar:
+            time.sleep(1.5)
+            if self._home_bar and time.time() - self._home_bar_temp >= 1:
                 self._home_bar = False
                 self.display_auto()
 
