@@ -205,6 +205,7 @@ class TouchHandler:
             elif self.home_bar.active:
                 if self.home_bar.temp_location[1] - d_y > 20 and 100 <= d_x <= 200:
                     self.pool.add(self.env.home_bar)
+                self.home_bar.active = False
             if not slided:
                 for i in _ReIter(app_slide_y):
                     if i.active:

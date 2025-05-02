@@ -272,11 +272,11 @@ class ThemeBase(_Base):
     def display(self):
         if self._active:
             if self._docker_status:
-                new_image = self.Book.Page.render()
+                new_image = self.Book.render()
                 new_image.paste(self._docker_image, (60, 0))
-                self.env.Screen.display_auto(new_image)
+                self.env.display(new_image)
             else:
-                self.env.Screen.display_auto(self.Book.render())
+                self.env.display(self.Book.render())
 
     @property
     def touch_records_clicked(self):
@@ -308,16 +308,16 @@ class AppBase(_Base):
     def display(self):
         if self._active:
             if self._control_bar_status:
-                new_image = self.Book.Page.render()
+                new_image = self.Book.render()
                 new_image.paste(self._control_bar_image, (0, 0))
                 new_image.paste(self.icon, (6, 6))
                 image_draw = ImageDraw.ImageDraw(new_image)
                 image_draw.text((30, 7), self.title, fill="black", font=self._control_bar_font)
                 image_draw.text((224, 7), time.strftime("%H:%M", time.localtime()), fill="black",
                                 font=self._control_bar_font)
-                self.env.Screen.display_auto(new_image)
+                self.env.display(new_image)
             else:
-                self.env.Screen.display_auto(self.Book.render())
+                self.env.display(self.Book.render())
 
     def set_control_bar(self, value: bool):
         self._control_bar_status = value

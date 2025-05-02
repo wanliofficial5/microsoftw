@@ -248,7 +248,7 @@ class Base:
 
     def display(self) -> None:
         if self._active:
-            self.env.display_auto()
+            self.env.display()
 
     def active(self) -> None:  # This function will be called when this Base is active.
         self._active = True

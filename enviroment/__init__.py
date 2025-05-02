@@ -149,12 +149,13 @@ class Env:
         self.list_img = _Image.open("resources/images/list.png")
         self.list_more_img = _Image.open("resources/images/more_items_dots.jpg")
 
-    def display_auto(self, image=None, refresh="auto"):
+    def display(self, image=None, refresh="auto"):
+        if not image:
+            self.Now.display()
+            return
         if self.display_lock.acquire(blocking=False):
             self.Screen.wait_busy()
             self.display_lock.release()
-            if not image:
-                image = self.Now.Book.Page.render()
 
             if self._show_left_back:
                 image.paste(self.left_img, mask=self.left_img_alpha)
@@ -181,12 +182,13 @@ class Env:
             raise ValueError("It can only be a multiple of 12 or 16.")
         return self.fonts[size]
 
-    def back_home(self):
+    def back_home(self) -> bool:
         self.back_stack.queue.clear()
         if self.Now is not self.themes[self.now_theme]:
             self.Now.pause()
             self.Now = self.themes[self.now_theme]
             self.Now.active()
+            return True
 
     def open_app(self, target: str, to_stack=True):
         if target in self.apps:
@@ -216,25 +218,26 @@ class Env:
     def back_left(self, show: bool):
         if show != self._show_left_back:
             self._show_left_back = show
-            self.display_auto()
+            self.display()
 
     def back_right(self, show: bool):
         if show != self._show_right_back:
             self._show_right_back = show
-            self.display_auto()
+            self.display()
 
     def home_bar(self):
         if self._home_bar:
             self._home_bar = False
-            self.back_home()
+            if not self.back_home():
+                self.display()
         else:
             self._home_bar = True
             self._home_bar_temp = time.time()
-            self.display_auto()
+            self.display()
             time.sleep(1.5)
             if self._home_bar and time.time() - self._home_bar_temp >= 1:
                 self._home_bar = False
-                self.display_auto()
+                self.display()
 
     def _shutdown(self):
         for i in self.apps.values():
