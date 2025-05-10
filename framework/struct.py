@@ -58,13 +58,6 @@ class Page:
         self._update = True
         self._touch_records = []
 
-        self.init()
-
-        self.create_touch_record()
-
-    def init(self):
-        pass
-
     @property
     def background(self):
         return self._background
@@ -81,6 +74,18 @@ class Page:
     @touch_records.setter
     def touch_records(self, value):
         self._touch_records = value
+        self.create_touch_record()
+
+    def touch_records_append(self, value):
+        self._touch_records.append(value)
+        self.create_touch_record()
+
+    def touch_records_clear(self):
+        self._touch_records = []
+        self.create_touch_record()
+
+    def touch_records_remove(self, value):
+        self._touch_records.remove(value)
         self.create_touch_record()
 
     @staticmethod
@@ -155,10 +160,11 @@ class Book:
 
         self.back_stack = LifoQueue()
 
-        self.init()
-
-    def init(self):
-        pass
+    def add_page(self, name, page, as_default=True):
+        self.Pages[name] = page
+        if as_default:
+            self.now_page = name
+            self.Page = page
 
     def change_page(self, target: str, to_stack=True):
         if target in self.Pages:
@@ -179,7 +185,7 @@ class Book:
             raise KeyError("The targeted page is not found.")
 
     def render(self) -> Image:
-        return self.Pages[self.now_page].render()
+        return self.Page.render()
 
     def update(self, page):
         if page is self.Pages[self.now_page] and self.is_active:
@@ -209,16 +215,25 @@ class Base:
         self.name = ""
         self.Books = {}
         self.Book = None
-        self.now_book = ""
+        self._now_book = ""
         self.display_lock = threading.Lock()
         self._active = False
 
         self.back_stack = LifoQueue()
 
-        self.init()
+    @property
+    def now_book(self):
+        return self._now_book
 
-    def init(self):
-        pass
+    @now_book.setter
+    def now_book(self, value):
+        self.change_book(value, to_stacks=False)
+
+    def add_book(self, name, book, as_default=True):
+        self.Books[name] = book
+        if as_default:
+            self._now_book = name
+            self.Book = book
 
     @property
     def touch_records_slide_x(self):
@@ -240,15 +255,16 @@ class Base:
             if to_stacks:
                 self.back_stack.put(self.now_book)
             self.Book.is_active = False
-            self.now_book = target
+            self._now_book = target
             self.Book = self.Books[target]
             self.Book.is_active = True
+            self.display()
         else:
             raise KeyError("The targeted book is not found.")
 
     def display(self) -> None:
         if self._active:
-            self.env.display()
+            self.env.display(self.Book.render())
 
     def active(self) -> None:  # This function will be called when this Base is active.
         self._active = True
