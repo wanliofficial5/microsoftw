@@ -17,6 +17,7 @@ from .touchscreen import Clicked as _Clicked, \
     TouchHandler as _TouchHandler, \
     TouchRecoder as _TouchRecoder
 import os as _os
+from framework.struct import Base as _Base
 
 
 # 模拟器屏幕
@@ -193,24 +194,28 @@ class Env:
     def open_app(self, target: str, to_stack=True):
         if target in self.apps:
             self.Now.pause()
+            if to_stack:  # TODO:在这里添加异常处理
+                self.back_stack.put(self.Now)
             self.Now = self.apps[target]
             self.Now.active()
         else:
             raise KeyError("The targeted application is not found.")
 
     def back(self) -> bool:
-        if not self.Now.back():
-            if self.back_stack.empty():
-                return False
+        if self.back_stack.empty():
+            return self.Now.back()
+        else:
+            i = self.back_stack.get()
+            if callable(i):
+                i()
+                return True
+            elif isinstance(i, _Base):
+                self.Now.pause()
+                self.Now = i
+                self.Now.active()
+                return True
             else:
-                i = self.back_stack.get()
-                if callable(i):
-                    i()
-                elif isinstance(i, str):
-                    self.open_app(i)
-                else:
-                    return False
-        return True
+                return False
 
     def add_back(self, item):
         self.back_stack.put(item)

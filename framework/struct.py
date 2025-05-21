@@ -285,21 +285,18 @@ class Base:
         self.Book.is_active = False
 
     def back(self) -> bool:
-        if self.Book.back:
-            return True
+        if self.back_stack.empty():
+            return self.Book.back()
         else:
-            if self.back_stack.empty():
-                return False
+            i = self.back_stack.get()
+            if callable(i):
+                i()
+                return True
+            elif isinstance(i, str):
+                self.change_book(i)
+                return True
             else:
-                i = self.back_stack.get()
-                if callable(i):
-                    i()
-                    return True
-                elif isinstance(i, str):
-                    self.change_book(i)
-                    return True
-                else:
-                    return False
+                return False
 
     def add_back(self, item):
         self.back_stack.put(item)
