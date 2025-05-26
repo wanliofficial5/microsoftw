@@ -1,12 +1,12 @@
-import threading
 import time
 from math import ceil
 
-from PIL import ImageDraw, Image
-from queue import LifoQueue
+from PIL import ImageDraw as _ImageDraw,\
+    Image as _Image
 
-from framework.struct import Page as _Page, Element as _Element, Book as _Book, Base as _Base
-from enviroment.touchscreen import Clicked, SlideX, SlideY
+from framework.struct import Page as _Page, Element as _Element, Base as _Base
+from enviroment.touchscreen import Clicked as _Clicked,\
+    SlideY as _SlideY
 
 
 class Elements:
@@ -42,10 +42,10 @@ class Elements:
             self.update(False)
 
         def update(self, update=True):
-            self.background = Image.new("RGBA", (296, 128), self._background) if self._background else \
-                Image.new("RGBA", (296, 128), (255, 255, 255, 0))
+            self.background = _Image.new("RGBA", (296, 128), self._background) if self._background else \
+                _Image.new("RGBA", (296, 128), (255, 255, 255, 0))
             self.image = self.background.copy()
-            self._image_draw = ImageDraw.ImageDraw(self.image)
+            self._image_draw = _ImageDraw.ImageDraw(self.image)
             self._image_draw.text((0, 0), self.text, self.color, self._font)
             if update:
                 self.page.update()
@@ -67,7 +67,7 @@ class Elements:
             self._font = self.page.book.get_font(value)
             self.update(update)
 
-        def render(self) -> Image:
+        def render(self) -> _Image:
             return self.image
 
     class Label(TextElement):
@@ -86,25 +86,36 @@ class Elements:
             self.update(update)
 
         def update(self, update=True):
-            self.background = Image.new("RGBA", self.size, self._background) if self._background else \
-                Image.new("RGBA", self.size, (255, 255, 255, 0))
+            self.background = _Image.new("RGBA", self.size, self._background) if self._background else \
+                _Image.new("RGBA", self.size, (255, 255, 255, 0))
             self.image = self.background.copy()
-            self._image_draw = ImageDraw.ImageDraw(self.image)
+            self._image_draw = _ImageDraw.ImageDraw(self.image)
             self._image_draw.text(self.border, self.text, self.color, self._font)
             if update:
                 self.page.update()
 
     class Button(Label):
         def __init__(self, page, size, func=lambda: None, location=(0, 0), border=(0, 0), text="", font_size=13,
-                     color="black",
-                     background=None):
+                     color="black", border_color="black", background=None):
+            self.border_color = border_color
             super().__init__(page, size, location, border, text, font_size, color, background)
             self.func = func
-            self.touch_records.append(Clicked((location[0], location[0]+size[0], location[1], location[1]+size[1]),
-                                              func))
+            self.touch_records = [(_Clicked((location[0], location[0] + size[0], location[1], location[1] + size[1]),
+                                            self.func))]
+
+        def update(self, update=True):
+            self.background = _Image.new("RGBA", self.size, self._background) if self._background else \
+                _Image.new("RGBA", self.size, (255, 255, 255, 0))
+            self.image = self.background.copy()
+            self._image_draw = _ImageDraw.ImageDraw(self.image)
+            self._image_draw.text(self.border, self.text, self.color, self._font)
+            self._image_draw.rectangle(xy=(0, self.size[0], 0, self.size[1]), fill=None, outline=self.border_color,
+                                       width=min(self.border))
+            if update:
+                self.page.update()
 
         def set_func(self, func):
-            self.func = func
+            self.touch_records[0].func = func
 
     class MultipleLinesLabel(Label):
         def __init__(self, page, size, location=(0, 0), border=(0, 0), text="", font_size=13, color="black",
@@ -122,9 +133,9 @@ class Elements:
                            ceil((len(self.text) / line_length)))
             new_text = ""
             self.image = self.background.copy()
-            self._image_draw = ImageDraw.ImageDraw(self.image)
+            self._image_draw = _ImageDraw.ImageDraw(self.image)
             for i in range(line_num):
-                new_text += f"{self.text[i*line_length: (i+1)*line_length]}\n"
+                new_text += f"{self.text[i * line_length: (i + 1) * line_length]}\n"
             self._image_draw.text(self.border, new_text, self.color, self._font)
             if update:
                 self.page.update()
@@ -146,10 +157,10 @@ class Pages:
             if not len(items) == len(self.icons) == len(self.funcs):
                 raise ValueError("Quantity asymmetry!")
             self.touch_records = [
-                Clicked((0, 296, 31, 60), self._handler, 0),
-                Clicked((0, 296, 61, 90), self._handler, 1),
-                Clicked((0, 296, 91, 120), self._handler, 2),
-                SlideY((0, 296, 0, 128), self._slide)
+                _Clicked((0, 296, 31, 60), self._handler, 0),
+                _Clicked((0, 296, 61, 90), self._handler, 1),
+                _Clicked((0, 296, 91, 120), self._handler, 2),
+                _SlideY((0, 296, 0, 128), self._slide)
             ]
 
         def add_element(self, element):
@@ -201,7 +212,7 @@ class Pages:
                 self.update()
 
         def _handler(self, index):
-            self.funcs[self.at*3+index]()
+            self.funcs[self.at * 3 + index]()
 
         def _slide(self, dis):
             if dis < 0:
@@ -210,7 +221,7 @@ class Pages:
                 self.go_prev()
 
         def go_next(self):
-            if (self.at+2) * 3 - len(self.items) < 3:
+            if (self.at + 2) * 3 - len(self.items) < 3:
                 self.at += 1
                 self.update()
 
@@ -222,9 +233,9 @@ class Pages:
         def render(self):
             if self._update:
                 new_image = self.background.copy()
-                draw = ImageDraw.ImageDraw(new_image)
+                draw = _ImageDraw.ImageDraw(new_image)
                 draw.text((10, 8), self.title, "black", self.font)
-                draw.text((254, 8), f"{self.at+1}/{ceil(len(self.items)/3)}", "black", self.font)
+                draw.text((254, 8), f"{self.at + 1}/{ceil(len(self.items) / 3)}", "black", self.font)
                 for i in range(3):
                     index = self.at * 3 + i
                     if index + 1 > len(self.items):
@@ -232,9 +243,9 @@ class Pages:
                     y = 37 + i * 30
                     if self.icons[index]:
                         new_image.paste(self.icons[index], (8, y))
-                        draw.text((35, y+1), self.items[index], "black", self.font)
+                        draw.text((35, y + 1), self.items[index], "black", self.font)
                     else:
-                        draw.text((8, y+1), self.items[index], "black", self.font)
+                        draw.text((8, y + 1), self.items[index], "black", self.font)
                 if self.at * 3 + 3 < len(self.items):
                     new_image.paste(self.more_img, (105, 122))
                 self.old_render = new_image
@@ -250,10 +261,10 @@ class ThemeBase(_Base):
         self._docker_image = self.env.images.docker_image
         self._docker_status = False
 
-        self._inactive_clicked = [Clicked((0, 296, 0, 30), self.set_docker, True)]
-        self._active_clicked = [Clicked((60, 100, 0, 30), self.open_applist),
-                                Clicked((0, 296, 30, 128), self.set_docker, False),
-                                Clicked((195, 235, 0, 30), self.open_setting)]
+        self._inactive_clicked = [_Clicked((0, 296, 0, 30), self.set_docker, True)]
+        self._active_clicked = [_Clicked((60, 100, 0, 30), self.open_applist),
+                                _Clicked((0, 296, 30, 128), self.set_docker, False),
+                                _Clicked((195, 235, 0, 30), self.open_setting)]
 
     def active(self):
         self._docker_status = False
@@ -297,9 +308,9 @@ class AppBase(_Base):
         self._control_bar_font = self.env.get_font(16)
         self._control_bar_image = env.images.app_control
         self._control_bar_status = False
-        self._inactive_clicked = [Clicked((266, 296, 0, 30), self.set_control_bar, True)]
-        self._active_clicked = [Clicked((266, 296, 0, 30), self.env.back_home),
-                                Clicked((0, 296, 30, 128), self.set_control_bar, False)]
+        self._inactive_clicked = [_Clicked((266, 296, 0, 30), self.set_control_bar, True)]
+        self._active_clicked = [_Clicked((266, 296, 0, 30), self.env.back_home),
+                                _Clicked((0, 296, 30, 128), self.set_control_bar, False)]
 
     def active(self):
         self._control_bar_status = False
@@ -311,7 +322,7 @@ class AppBase(_Base):
                 new_image = self.Book.render()
                 new_image.paste(self._control_bar_image, (0, 0))
                 new_image.paste(self.icon, (6, 6))
-                image_draw = ImageDraw.ImageDraw(new_image)
+                image_draw = _ImageDraw.ImageDraw(new_image)
                 image_draw.text((30, 7), self.title, fill="black", font=self._control_bar_font)
                 image_draw.text((224, 7), time.strftime("%H:%M", time.localtime()), fill="black",
                                 font=self._control_bar_font)
