@@ -1,10 +1,12 @@
-import abc
-import threading
-from queue import LifoQueue
+import abc as _abc
+import threading as _threading
+from queue import LifoQueue as _LifoQueue
 
-from PIL import Image
+from PIL import Image as _Image
 
-from enviroment.touchscreen import Clicked, SlideX, SlideY
+from enviroment.touchscreen import Clicked as _Clicked,\
+    SlideX as _SlideX, \
+    SlideY as _SlideY
 
 
 class Element:
@@ -12,8 +14,6 @@ class Element:
         self.location = location
         self.page = page
         self._layer = 0
-        # self._update = False
-        # self.last_render = self.background
         self._touch_records = []
 
         self.init()
@@ -39,8 +39,8 @@ class Element:
         self._touch_records = value
         self.page.create_touch_record()
 
-    @abc.abstractmethod
-    def render(self) -> Image:
+    @_abc.abstractmethod
+    def render(self) -> _Image:
         return None
 
 
@@ -51,9 +51,9 @@ class Page:
         self.touch_records_clicked = []
         self.touch_records_slide_x = []
         self.touch_records_slide_y = []
-        self._background = Image.new("RGB", (296, 128), (255, 255, 255))
-        self._elements_rlock = threading.RLock()
-        self.touch_records_rlock = threading.RLock()
+        self._background = _Image.new("RGB", (296, 128), (255, 255, 255))
+        self._elements_rlock = _threading.RLock()
+        self.touch_records_rlock = _threading.RLock()
         self.old_render = self._background
         self._update = True
         self._touch_records = []
@@ -111,18 +111,18 @@ class Page:
         self.touch_records_slide_y = []
         for i in self._elements:
             for j in i.touch_records:
-                if isinstance(j, Clicked):
+                if isinstance(j, _Clicked):
                     self.touch_records_clicked.append(j)
-                elif isinstance(j, SlideX):
+                elif isinstance(j, _SlideX):
                     self.touch_records_slide_x.append(j)
-                elif isinstance(j, SlideY):
+                elif isinstance(j, _SlideY):
                     self.touch_records_slide_y.append(j)
         for j in self._touch_records:
-            if isinstance(j, Clicked):
+            if isinstance(j, _Clicked):
                 self.touch_records_clicked.append(j)
-            elif isinstance(j, SlideX):
+            elif isinstance(j, _SlideX):
                 self.touch_records_slide_x.append(j)
-            elif isinstance(j, SlideY):
+            elif isinstance(j, _SlideY):
                 self.touch_records_slide_y.append(j)
         self.touch_records_rlock.release()
 
@@ -158,7 +158,7 @@ class Book:
         self.now_page = ""
         self.is_active = False
 
-        self.back_stack = LifoQueue()
+        self.back_stack = _LifoQueue()
 
     def add_page(self, name, page, as_default=True):
         self.Pages[name] = page
@@ -184,7 +184,7 @@ class Book:
         else:
             raise KeyError("The targeted page is not found.")
 
-    def render(self) -> Image:
+    def render(self) -> _Image:
         return self.Page.render()
 
     def update(self, page):
@@ -216,10 +216,10 @@ class Base:
         self.Books = {}
         self.Book = None
         self._now_book = ""
-        self.display_lock = threading.Lock()
+        self.display_lock = _threading.Lock()
         self._active = False
 
-        self.back_stack = LifoQueue()
+        self.back_stack = _LifoQueue()
 
     @property
     def now_book(self):

@@ -1,5 +1,5 @@
 import time
-from math import ceil
+from math import ceil as _ceil
 
 from PIL import ImageDraw as _ImageDraw,\
     Image as _Image
@@ -129,8 +129,8 @@ class Elements:
 
         def update(self, update=True):
             line_length = (self.size[0] - 2 * self.border[0]) // self._font.size
-            line_num = min(ceil((self.size[1] - 2 * self.border[1]) / self._font.size),
-                           ceil((len(self.text) / line_length)))
+            line_num = min(_ceil((self.size[1] - 2 * self.border[1]) / self._font.size),
+                           _ceil((len(self.text) / line_length)))
             new_text = ""
             self.image = self.background.copy()
             self._image_draw = _ImageDraw.ImageDraw(self.image)
@@ -235,7 +235,7 @@ class Pages:
                 new_image = self.background.copy()
                 draw = _ImageDraw.ImageDraw(new_image)
                 draw.text((10, 8), self.title, "black", self.font)
-                draw.text((254, 8), f"{self.at + 1}/{ceil(len(self.items) / 3)}", "black", self.font)
+                draw.text((254, 8), f"{self.at + 1}/{_ceil(len(self.items) / 3)}", "black", self.font)
                 for i in range(3):
                     index = self.at * 3 + i
                     if index + 1 > len(self.items):

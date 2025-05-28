@@ -1,15 +1,13 @@
 import threading as _threading
-import time
+import time as _time
 from queue import LifoQueue as _LifoQueue
 
 # 模拟器GUI wxpython
-import wx
+import wx as _wx
 
 from PIL import Image as _Image, \
-    ImageFont as _ImageFont, \
-    ImageDraw as _ImageDraw
+    ImageFont as _ImageFont
 
-import framework.struct
 from system import threadpool as _threadpool
 from .touchscreen import Clicked as _Clicked, \
     SlideX as _SlideX, \
@@ -27,18 +25,18 @@ class Simulator:
         self.touch_recoder_dev = _TouchRecoder()
         self.touch_recoder_old = _TouchRecoder()
         # 创建窗口(296x128)
-        self.app = wx.App()
-        self.frame = wx.Frame(None, title="水墨屏模拟器 v2.0 by xuanzhi33", size=(296, 160))
+        self.app = _wx.App()
+        self.frame = _wx.Frame(None, title="水墨屏模拟器 v2.0 by xuanzhi33", size=(296, 160))
 
         # 背景为黑色图片
-        bmp = wx.Bitmap("resources/images/simplebytes.jpg")
+        bmp = _wx.Bitmap("resources/images/simplebytes.jpg")
 
-        self.staticbit = wx.StaticBitmap(self.frame, -1, bmp)
+        self.staticbit = _wx.StaticBitmap(self.frame, -1, bmp)
 
         # 绑定按下鼠标
-        self.frame.Bind(wx.EVT_LEFT_DOWN, self.mouseDown)
+        self.frame.Bind(_wx.EVT_LEFT_DOWN, self.mouseDown)
         # 绑定松开鼠标
-        self.frame.Bind(wx.EVT_LEFT_UP, self.mouseUp)
+        self.frame.Bind(_wx.EVT_LEFT_UP, self.mouseUp)
 
         self.frame.Show()
 
@@ -65,8 +63,8 @@ class Simulator:
     def updateImage(self, image: _Image):
 
         def bitmapThreading():
-            wximg = wx.Image(296, 128, image.convert("RGB").tobytes())
-            bmp = wx.Bitmap(wximg)
+            wximg = _wx.Image(296, 128, image.convert("RGB").tobytes())
+            bmp = _wx.Bitmap(wximg)
             self.staticbit.SetBitmap(bmp)
         _threading.Thread(target=bitmapThreading).start()
 
@@ -237,10 +235,10 @@ class Env:
                 self.display()
         else:
             self._home_bar = True
-            self._home_bar_temp = time.time()
+            self._home_bar_temp = _time.time()
             self.display()
-            time.sleep(1.5)
-            if self._home_bar and time.time() - self._home_bar_temp >= 1:
+            _time.sleep(1.5)
+            if self._home_bar and _time.time() - self._home_bar_temp >= 1:
                 self._home_bar = False
                 self.display()
 
@@ -251,7 +249,7 @@ class Env:
             self.Pool.add(i.shutdown)
         for i in self.themes.values():
             self.Pool.add(i.shutdown)
-        time.sleep(2)
+        _time.sleep(2)
         self.Screen.quit()
 
     def poweroff(self):

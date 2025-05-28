@@ -1,6 +1,4 @@
-import threading
-
-import framework.struct
+import threading as _threading
 
 
 class _ReIter:  # 反向迭代器
@@ -101,7 +99,7 @@ class TouchHandler:
         self.clicked = []
         self.slide_x = []
         self.slide_y = []
-        self.data_lock = threading.Lock()
+        self.data_lock = _threading.Lock()
 
         self.back_left = SlideB()
         self.back_right = SlideB()
