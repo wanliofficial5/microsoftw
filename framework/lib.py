@@ -243,9 +243,9 @@ class Pages:
                     y = 37 + i * 30
                     if self.icons[index]:
                         new_image.paste(self.icons[index], (8, y))
-                        draw.text((35, y + 1), self.items[index], "black", self.font)
+                        draw.text((35, y + 2), self.items[index], "black", self.font)
                     else:
-                        draw.text((8, y + 1), self.items[index], "black", self.font)
+                        draw.text((8, y + 2), self.items[index], "black", self.font)
                 if self.at * 3 + 3 < len(self.items):
                     new_image.paste(self.more_img, (105, 122))
                 self.old_render = new_image
