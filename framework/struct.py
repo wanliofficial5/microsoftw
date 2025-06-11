@@ -293,7 +293,10 @@ class Base:
                 i()
                 return True
             elif isinstance(i, str):
-                self.change_book(i)
+                if self.Book.back():
+                    self.back_stack.put(i)
+                else:
+                    self.change_book(i)
                 return True
             else:
                 return False

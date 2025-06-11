@@ -208,9 +208,12 @@ class Env:
                 i()
                 return True
             elif isinstance(i, _Base):
-                self.Now.pause()
-                self.Now = i
-                self.Now.active()
+                if self.Now.back():
+                    self.back_stack.put(i)
+                else:
+                    self.Now.pause()
+                    self.Now = i
+                    self.Now.active()
                 return True
             else:
                 return False
