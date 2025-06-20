@@ -1,11 +1,11 @@
 import time
 from math import ceil as _ceil
 
-from PIL import ImageDraw as _ImageDraw,\
+from PIL import ImageDraw as _ImageDraw, \
     Image as _Image
 
 from framework.struct import Page as _Page, Element as _Element, Base as _Base
-from enviroment.touchscreen import Clicked as _Clicked,\
+from enviroment.touchscreen import Clicked as _Clicked, \
     SlideY as _SlideY
 
 
@@ -29,14 +29,17 @@ class Elements:
             return self._image
 
     class TextElement(_Element):
-        def __init__(self, page, location=(0, 0), text="", font_size=13, color="black", background=None):
+        def __init__(self, page, location=(0, 0), text="", font=None, font_size=12, color="black", background=None):
             super().__init__(page, location)
-            self.font_size = font_size
+            self._font_size = font_size
             self.color = color
             self._background = background
             self.text = text
             self.background = None
-            self._font = None
+            if font:
+                self._font = font
+            else:
+                self._font = self.page.book.base.env.get_font(font_size)
             self.image = None
             self._image_draw = None
             self.update(False)
@@ -62,20 +65,24 @@ class Elements:
             self._background = value
             self.update(update)
 
-        def set_font_size(self, value, update=True):
-            self.font_size = value
-            self._font = self.page.book.get_font(value)
+        def set_font(self, font=None, font_size=12, update=True):
+            if font:
+                self._font = font
+            else:
+                self._font = self.page.book.base.env.get_font(font_size)
             self.update(update)
 
         def render(self) -> _Image:
             return self.image
 
     class Label(TextElement):
-        def __init__(self, page, size, location=(0, 0), border=(0, 0), text="", font_size=13, color="black",
-                     background=None):
+        def __init__(self, page, size=(296, 128), location=(0, 0), border=(0, 0), text="", font=None, font_size=12,
+                     color="black",
+                     border_color=None, background=None):
             self.size = size
             self.border = border
-            super().__init__(page, location, text, font_size, color, background)
+            self.border_color = border_color
+            super().__init__(page, location, text, font, font_size, color, background)
 
         def set_size(self, value, update=True):
             self.size = value
@@ -85,57 +92,67 @@ class Elements:
             self.border = value
             self.update(update)
 
+        def set_border_color(self, value, update=True):
+            self.border_color = value
+            self.update(update)
+
         def update(self, update=True):
             self.background = _Image.new("RGBA", self.size, self._background) if self._background else \
                 _Image.new("RGBA", self.size, (255, 255, 255, 0))
             self.image = self.background.copy()
             self._image_draw = _ImageDraw.ImageDraw(self.image)
             self._image_draw.text(self.border, self.text, self.color, self._font)
+            if self.border_color:
+                self._image_draw.rectangle(xy=(0, self.size[0], 0, self.size[1]), fill=None, outline=self.border_color)
             if update:
                 self.page.update()
 
     class Button(Label):
-        def __init__(self, page, size, func=lambda: None, location=(0, 0), border=(0, 0), text="", font_size=13,
-                     color="black", border_color="black", background=None):
+        def __init__(self, page, size, func=lambda: None, location=(0, 0), border=(0, 0), text="", font=None,
+                     font_size=12, color="black", border_color="black", background=None):
             self.border_color = border_color
-            super().__init__(page, size, location, border, text, font_size, color, background)
+            super().__init__(page, size, location, border, text, font, font_size, color, background)
             self.func = func
             self.touch_records = [(_Clicked((location[0], location[0] + size[0], location[1], location[1] + size[1]),
                                             self.func))]
-
-        def update(self, update=True):
-            self.background = _Image.new("RGBA", self.size, self._background) if self._background else \
-                _Image.new("RGBA", self.size, (255, 255, 255, 0))
-            self.image = self.background.copy()
-            self._image_draw = _ImageDraw.ImageDraw(self.image)
-            self._image_draw.text(self.border, self.text, self.color, self._font)
-            self._image_draw.rectangle(xy=(0, self.size[0], 0, self.size[1]), fill=None, outline=self.border_color,
-                                       width=min(self.border))
-            if update:
-                self.page.update()
 
         def set_func(self, func):
             self.touch_records[0].func = func
 
     class MultipleLinesLabel(Label):
-        def __init__(self, page, size, location=(0, 0), border=(0, 0), text="", font_size=13, color="black",
-                     background=None, space=0):
-            super().__init__(page, size, location, border, text, font_size, color, background)
+        def __init__(self, page, size=(296, 128), location=(0, 0), border=(0, 0), text="", font=None, font_size=12,
+                     color="black", background=None, space=0):
             self.space = space
+            super().__init__(page, size, location, border, text, font, font_size, color, background)
 
         def set_text(self, value, update=True):
-            self.text = value.replace("\n", "")
+            self.text = value.split("\n")
             self.update(update)
 
         def update(self, update=True):
+            text = self.text.split("\n")
+            self.background = _Image.new("RGBA", self.size, self._background) if self._background else \
+                _Image.new("RGBA", self.size, (255, 255, 255, 0))
             line_length = (self.size[0] - 2 * self.border[0]) // self._font.size
-            line_num = min(_ceil((self.size[1] - 2 * self.border[1]) / self._font.size),
-                           _ceil((len(self.text) / line_length)))
-            new_text = ""
+            text_line = 0
+            for i in text:
+                text_line += _ceil(len(i) / line_length) if len(i) else 1
+            line_num = min(_ceil((self.size[1] - 2 * self.border[1]) / self._font.size), text_line)
             self.image = self.background.copy()
             self._image_draw = _ImageDraw.ImageDraw(self.image)
-            for i in range(line_num):
-                new_text += f"{self.text[i * line_length: (i + 1) * line_length]}\n"
+            new_text = ""
+            k = 0
+            for i in text:
+                if len(i) > line_length:
+                    temp = _ceil(len(i) / line_length)
+                    for j in range(temp):
+                        new_text += f"{i[j * line_length: (j+1) * line_length]}\n"
+                    k += temp
+                else:
+                    new_text += f"{i}\n"
+                    k += 1
+                if k > line_num:
+                    break
             self._image_draw.text(self.border, new_text, self.color, self._font)
             if update:
                 self.page.update()
