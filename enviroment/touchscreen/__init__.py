@@ -210,7 +210,7 @@ class TouchHandler:
                         dis_x = d_x - i.temp_location[0]
                         dis_y = d_y - i.temp_location[1]
                         if abs(dis_y) > 20 and abs(dis_x * 10 // dis_y) <= 5:
-                            self.pool.add(i.func, dis_x)
+                            self.pool.add(i.func, dis_y)
                             slided = True
                         i.active = False
                 for i in _ReIter(app_slide_x):
