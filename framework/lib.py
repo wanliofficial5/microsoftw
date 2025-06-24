@@ -291,7 +291,7 @@ class ThemeBase(_Base):
         self.env.open_app("应用抽屉")
 
     def open_setting(self):
-        pass
+        self.env.open_app("设置")
 
     def set_docker(self, value: bool):
         self._docker_status = value
