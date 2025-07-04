@@ -16,11 +16,6 @@ class Element:
         self._layer = 0
         self._touch_records = []
 
-        self.init()
-
-    def init(self):
-        pass
-
     @property
     def layer(self):
         return self._layer
