@@ -1,5 +1,7 @@
+import string
 import time
 from math import ceil as _ceil
+import string as _string
 
 from PIL import ImageDraw as _ImageDraw, \
     Image as _Image
@@ -31,7 +33,6 @@ class Elements:
     class TextElement(_Element):
         def __init__(self, page, location=(0, 0), text="", font=None, font_size=12, color="black", background=None):
             super().__init__(page, location)
-            self._font_size = font_size
             self.color = color
             self._background = background
             self.text = text
@@ -133,27 +134,32 @@ class Elements:
             text = self.text.split("\n")
             self.background = _Image.new("RGBA", self.size, self._background) if self._background else \
                 _Image.new("RGBA", self.size, (255, 255, 255, 0))
-            line_length = (self.size[0] - 2 * self.border[0]) // self._font.size
-            text_line = 0
-            for i in text:
-                text_line += _ceil(len(i) / line_length) if len(i) else 1
-            line_num = min(_ceil((self.size[1] - 2 * self.border[1]) / self._font.size), text_line)
             self.image = self.background.copy()
             self._image_draw = _ImageDraw.ImageDraw(self.image)
+            line_length = self.size[0] - 2 * self.border[0] - 4
+            font_size = self._font.size
             new_text = ""
-            k = 0
+            if font_size % 12 == 0:
+                add = font_size * 2 / 3
+            else:
+                add = font_size / 2
             for i in text:
-                if len(i) > line_length:
-                    temp = _ceil(len(i) / line_length)
-                    for j in range(temp):
-                        new_text += f"{i[j * line_length: (j+1) * line_length]}\n"
-                    k += temp
-                else:
-                    new_text += f"{i}\n"
-                    k += 1
-                if k > line_num:
-                    break
-            self._image_draw.text(self.border, new_text, self.color, self._font)
+                length = 0
+                start = 0
+                end = 0
+                for j in i:
+                    if " " <= j <= "~":
+                        length += add
+                        end += 1
+                    else:
+                        length += font_size
+                        end += 1
+                    if length > line_length:
+                        length = 0
+                        new_text += f"{i[start: end]}\n"
+                        start = end
+                new_text += f"{i[start: end]}\n"
+            self._image_draw.text(self.border, new_text, self.color, self._font, space=self.space)
             if update:
                 self.page.update()
 
