@@ -40,8 +40,8 @@ class OnlineSettingsPage(Page):
         self.ip_font = ImageFont.truetype("resources/fonts/PTSerifCaption.ttc", 30)
         self.ip_text = lib.Elements.TextElement(self, (26, 60), "IP:", self.ip_font)
         self.add_element(self.ip_text)
-        self.add_element(lib.Elements.Label(self, (296, 24), (0, 0), (4, 4), "网络设置工具", font_size=16))
-        self.add_element(lib.Elements.MultipleLinesLabel(self, location=(4, 25),
+        self.add_element(lib.Elements.Label(self, (292, 24), (0, 0), (4, 4), "网络设置工具", font_size=16))
+        self.add_element(lib.Elements.MultipleLinesLabel(self, size=(292, 128), location=(4, 25),
                                                          text="提示：在和树莓派同一局域网下用浏览器访问如下ip地址即可打开设置页面。（当前尚未完工）"))
 
 
@@ -71,11 +71,10 @@ class SystemSettingsPage(lib.Pages.ListPage):
 class AboutPage(Page):
     def __init__(self, book):
         super().__init__(book)
-        self.add_element(lib.Elements.Label(self, (296, 24), (0, 0), (4, 4), "关于", font_size=16))
-        self.add_element(lib.Elements.MultipleLinesLabel(self, location=(15, 20),
-                                                         text='''欢迎使用:
-                                                         这是由@fu1fan和@xuanzhi33倾力打造的eInkUI
-                                                         仓库地址: https://gitee.com/fu1fan/e-ink-ui'''))
+        self.add_element(lib.Elements.Label(self, (292, 24), (0, 0), (4, 4), "关于", font_size=16))
+        self.add_element(lib.Elements.MultipleLinesLabel(self, size=(266, 108), location=(15, 20),
+                                                         text="欢迎使用:\n这是由@fu1fan和@xuanzhi33倾力打造的eInkUI\n仓库地址: "
+                                                              "https://gitee.com/fu1fan/e-ink-ui"))
 
 
 class OnlineSettingsBook(Book):
