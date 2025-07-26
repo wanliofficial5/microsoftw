@@ -235,7 +235,10 @@ class Pages:
                 self.update()
 
         def _handler(self, index):
-            self.funcs[self.at * 3 + index]()
+            try:
+                self.funcs[self.at * 3 + index]()
+            except IndexError:
+                pass
 
         def _slide(self, dis):
             if dis < 0:
@@ -329,7 +332,8 @@ class AppBase(_Base):
         super().__init__(env)
 
         self._control_bar_font = self.env.get_font(16)
-        self._control_bar_image = env.images.app_control
+        self._control_bar_image = env.app_control_img
+        self._control_bar_mask = env.app_control_alpha
         self._control_bar_status = False
         self._inactive_clicked = [_Clicked((266, 296, 0, 30), self.set_control_bar, True)]
         self._active_clicked = [_Clicked((266, 296, 0, 30), self.env.back_home),
@@ -343,7 +347,7 @@ class AppBase(_Base):
         if self._active:
             if self._control_bar_status:
                 new_image = self.Book.render()
-                new_image.paste(self._control_bar_image, (0, 0))
+                new_image.paste(self._control_bar_image, (0, 0), mask=self._control_bar_mask)
                 new_image.paste(self.icon, (6, 6))
                 image_draw = _ImageDraw.ImageDraw(new_image)
                 image_draw.text((30, 7), self.title, fill="black", font=self._control_bar_font)
