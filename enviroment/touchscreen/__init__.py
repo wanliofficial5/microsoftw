@@ -229,12 +229,17 @@ class TouchHandler:
             else:
                 for i in _ReIter(self.clicked):
                     if i.active:
-                        self.pool.add(i.func, *i.args, **i.kwargs)
                         i.active = False
-                for i in _ReIter(app_clicked):
-                    if i.active:
-                        self.pool.add(i.func, *i.args, **i.kwargs)
-                        i.active = False
+                        if i.area[0] <= d_x <= i.area[1] and i.area[2] <= d_y <= i.area[3]:
+                            self.pool.add(i.func, *i.args, **i.kwargs)
+                            break
+                else:
+                    for i in _ReIter(app_clicked):
+                        if i.active:
+                            i.active = False
+                            if i.area[0] <= d_x <= i.area[1] and i.area[2] <= d_y <= i.area[3]:
+                                self.pool.add(i.func, *i.args, **i.kwargs)
+                                break
 
         elif d_t and o_t:  # Keep touching
             if not (ICNT_Dev.X[0] == ICNT_Old.X[0] and ICNT_Dev.Y[0] == ICNT_Old.Y[0]):
