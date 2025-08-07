@@ -147,6 +147,8 @@ class Env:
         self.bar_img_alpha = self.bar_img.split()[3]
         self.list_img = _Image.open("resources/images/list.png")
         self.list_more_img = _Image.open("resources/images/more_items_dots.jpg")
+        self.app_control_img = _Image.open("resources/images/app_control.png")
+        self.app_control_alpha = self.app_control_img.split()[3]
 
     def display(self, image=None, refresh="auto"):
         if not image:
