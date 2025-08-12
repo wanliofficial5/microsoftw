@@ -247,7 +247,7 @@ class Env:
                 self._home_bar = False
                 self.display()
 
-    def _shutdown(self):
+    def quit(self):
         for i in self.apps.values():
             self.Pool.add(i.shutdown)
         for i in self.plugins.values():
@@ -258,10 +258,12 @@ class Env:
         self.Screen.quit()
 
     def poweroff(self):
-        self._shutdown()
+        self.Screen.display(_Image.open("resources/images/raspberry.jpg"))
+        self.quit()
         _os.system("sudo poweroff")
 
     def reboot(self):
-        self._shutdown()
+        self.Screen.display(_Image.open("resources/images/raspberry.jpg"))
+        self.quit()
         _os.system("sudo reboot")
 

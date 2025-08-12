@@ -1,6 +1,7 @@
 from framework.struct import Book, Page
 from framework import lib
 import socket
+import os, signal
 
 from PIL import Image, ImageFont
 
@@ -48,9 +49,10 @@ class OnlineSettingsPage(Page):
 class GeneralSettingsPage(lib.Pages.ListPage):
     def __init__(self, book):
         super().__init__(book, "通用",
-                         ["主题",
-                          "更新",
-                          "重置", ])
+                         ["主题（未完成）",
+                          "导航栏（未完成）",
+                          "更新（未完成）",
+                          "重置（未完成）", ])
 
 
 class SystemSettingsPage(lib.Pages.ListPage):
@@ -66,6 +68,13 @@ class SystemSettingsPage(lib.Pages.ListPage):
                              lambda:None
                          ]
                          )
+
+    def change_branch(self):
+        self.book.base.env.Screen.display(Image.open("resources/images/raspberry.jpg"))
+        self.book.base.env.quit()
+        os.popen("git checkout web")
+        os.system("python3 main.py &")
+        os.kill(os.getpid(), signal.SIGKILL)
 
 
 class AboutPage(Page):
