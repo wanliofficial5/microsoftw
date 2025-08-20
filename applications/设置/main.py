@@ -65,7 +65,7 @@ class SystemSettingsPage(lib.Pages.ListPage):
                          funcs=[
                              env.poweroff,
                              env.reboot,
-                             lambda:None
+                             self.change_branch
                          ]
                          )
 
