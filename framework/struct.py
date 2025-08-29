@@ -161,7 +161,7 @@ class Book:
             self.now_page = name
             self.Page = page
 
-    def change_page(self, target: str, to_stack=True):
+    def change_page(self, target: str, to_stack=True, display=True):
         if target in self.Pages:
             if to_stack:
                 self.back_stack.put(self.now_page)
@@ -175,7 +175,8 @@ class Book:
             self.Page.touch_records_rlock.release()
             self.now_page = target
             self.Page = self.Pages[target]
-            self.base.display()
+            if display:
+                self.base.display()
         else:
             raise KeyError("The targeted page is not found.")
 
@@ -245,7 +246,7 @@ class Base:
     def is_active(self):
         return self._active
 
-    def change_book(self, target: str, to_stacks=True):
+    def change_book(self, target: str, display=True, to_stacks=True):
         if target in self.Books:
             if to_stacks:
                 self.back_stack.put(self.now_book)
@@ -253,7 +254,8 @@ class Base:
             self._now_book = target
             self.Book = self.Books[target]
             self.Book.is_active = True
-            self.display()
+            if display:
+                self.display()
         else:
             raise KeyError("The targeted book is not found.")
 
