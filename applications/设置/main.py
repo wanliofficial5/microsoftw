@@ -131,5 +131,6 @@ class Application(lib.AppBase):
     def active(self):
         self.Books["online"].Page.ip_text.set_text(get_host_ip(), False)
         self.change_book("main", display=False)
+        self.Book.Page.go_to(display=False)
         super().active()
 

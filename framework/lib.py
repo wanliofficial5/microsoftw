@@ -22,10 +22,9 @@ class Elements:
             return self._image
 
         @image.setter
-        def image(self, value, update=True):
+        def image(self, value, display=True):
             self._image = value
-            if update:
-                self.page.update()
+            self.page.update(display)
 
         def render(self):
             return self._image
@@ -45,14 +44,13 @@ class Elements:
             self._image_draw = None
             self.update(False)
 
-        def update(self, update=True):
+        def update(self, display=True):
             self.background = _Image.new("RGBA", (296, 128), self._background) if self._background else \
                 _Image.new("RGBA", (296, 128), (255, 255, 255, 0))
             self.image = self.background.copy()
             self._image_draw = _ImageDraw.ImageDraw(self.image)
             self._image_draw.text((0, 0), self.text, self.color, self._font)
-            if update:
-                self.page.update()
+            self.page.update(display)
 
         def set_text(self, value, update=True):
             self.text = value
@@ -97,7 +95,7 @@ class Elements:
             self.border_color = value
             self.update(update)
 
-        def update(self, update=True):
+        def update(self, display=True):
             self.background = _Image.new("RGBA", self.size, self._background) if self._background else \
                 _Image.new("RGBA", self.size, (255, 255, 255, 0))
             self.image = self.background.copy()
@@ -105,8 +103,7 @@ class Elements:
             self._image_draw.text(self.border, self.text, self.color, self._font)
             if self.border_color:
                 self._image_draw.rectangle(xy=(0, self.size[0], 0, self.size[1]), fill=None, outline=self.border_color)
-            if update:
-                self.page.update()
+            self.page.update(display)
 
     class Button(Label):
         def __init__(self, page, size, func=lambda: None, location=(0, 0), border=(0, 0), text="", font=None,
@@ -130,7 +127,7 @@ class Elements:
             self.text = value.split("\n")
             self.update(update)
 
-        def update(self, update=True):
+        def update(self, display=True):
             text = self.text.split("\n")
             self.background = _Image.new("RGBA", self.size, self._background) if self._background else \
                 _Image.new("RGBA", self.size, (255, 255, 255, 0))
@@ -160,8 +157,7 @@ class Elements:
                         start = end
                 new_text += f"{i[start: end]}\n"
             self._image_draw.text(self.border, new_text, self.color, self._font, space=self.space)
-            if update:
-                self.page.update()
+            self.page.update(display)
 
 
 class Pages:
@@ -189,14 +185,13 @@ class Pages:
         def add_element(self, element):
             raise Exception("No support.")
 
-        def append(self, item, icon=None, func=lambda: None, update=True):
+        def append(self, item, icon=None, func=lambda: None, display=True):
             self.items.append(item)
             self.icons.append(icon)
             self.funcs.append(func)
-            if update:
-                self.update()
+            self.update(display)
 
-        def remove(self, item, update=True):
+        def remove(self, item, display=True):
             for i in range(len(self.items)):
                 if self.items[i] == item:
                     del self.items[i]
@@ -206,33 +201,33 @@ class Pages:
                     break
             else:
                 raise ValueError("Item not found!")
-            if update:
-                self.update()
+            self._update = True
+            self.update(display)
 
-        def insert(self, index, item, icon=None, func=lambda: None, update=True):
+        def insert(self, index, item, icon=None, func=lambda: None, display=True):
             self.items.insert(index, item)
             self.icons.insert(index, icon)
             self.funcs.insert(index, func)
-            if update:
-                self.update()
+            self._update = True
+            self.update(display)
 
-        def clear(self, update=True):
+        def clear(self, display=True):
             self.items = []
             self.icons = []
             self.funcs = []
             self.at = 0
-            if update:
-                self.update()
+            self._update = True
+            self.update(display)
 
-        def set_items(self, items: [str], icons=None, funcs=None, update=True):
+        def set_items(self, items: [str], icons=None, funcs=None, display=True):
             self.items = items
             self.icons = icons if icons else [None] * len(items)
             self.funcs = funcs if funcs else [lambda: None] * len(items)
             self.at = 0
             if not len(items) == len(self.icons) == len(self.funcs):
                 raise ValueError("Quantity asymmetry!")
-            if update:
-                self.update()
+            self._update = True
+            self.update(display)
 
         def _handler(self, index):
             try:
@@ -246,15 +241,22 @@ class Pages:
             else:
                 self.go_prev()
 
-        def go_next(self):
+        def go_next(self, display=True):
             if (self.at + 2) * 3 - len(self.items) < 3:
                 self.at += 1
-                self.update()
+                self._update = True
+                self.update(display)
 
-        def go_prev(self):
+        def go_prev(self, display=True):
             if self.at > 0:
                 self.at -= 1
-                self.update()
+                self._update = True
+                self.update(display)
+
+        def go_to(self, index=0, display=True):
+            self.at = index
+            self._update = True
+            self.update(display)
 
         def render(self):
             if self._update:

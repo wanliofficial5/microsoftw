@@ -140,9 +140,10 @@ class Page:
         else:
             return self.old_render.copy()
 
-    def update(self):
+    def update(self, display=True):
         self._update = True
-        self.book.update(self)
+        if display:
+            self.book.update(self)
 
 
 class Book:
