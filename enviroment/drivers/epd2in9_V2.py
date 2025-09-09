@@ -196,7 +196,7 @@ class Epd2in9V2:
 
         self.set_window(0, 0, self.width - 1, self.height - 1)
 
-        self.send_command(0x21)  # Display _update control
+        self.send_command(0x21)  # Display update control
         self.send_data(0x00)
         self.send_data(0x80)
 
@@ -360,33 +360,32 @@ class Screen:
         super().__init__()
         self._driver = Epd2in9V2()
 
-        self.auto_sleep_time = 30  # seconds
+        self._driver.init()
+        self._last_display = time.time()
+
+        self.auto_sleep_time = 600  # seconds
         self._last_display = 0
 
         self._partial_time = 0  # times
         self.refresh_time = 10  # times
-        self._initialized = False
+
+        self._status = True
 
         self._exit = False
 
         def auto_sleep_methode():
+            self._last_display = time.time()
             while 1:
                 time.sleep(self.auto_sleep_time)
                 if self._exit:
                     return
                 if time.time() - self._last_display >= self.auto_sleep_time:
                     self._driver.sleep()
+                    self._status = False
+                    print("屏幕休眠。")
 
-        self.auto_refresh_thread = threading.Thread(target=auto_sleep_methode(), daemon=True)
-
-    @property
-    def initialized(self):
-        return self._initialized
-
-    def initial(self):
-        self._driver.init()
-        self._initialized = True
-        self._last_display = time.time()
+        self.auto_refresh_thread = threading.Thread(target=auto_sleep_methode, daemon=True)
+        self.auto_refresh_thread.start()
 
     def display_auto(self, image):
         if self.refresh_time > self._partial_time:
@@ -395,11 +394,17 @@ class Screen:
             self.display(image)
 
     def display(self, image):
+        if not self._status:
+            self._driver.init()
+            self._status = True
         self._driver.display_base(self._driver.get_buffer(image))
         self._partial_time = 0
         self._last_display = time.time()
 
     def display_partial(self, image):
+        if not self._status:
+            self.display(image)
+            return
         self._driver.display_partial(self._driver.get_buffer(image))
         self._partial_time += 1
         self._last_display = time.time()
