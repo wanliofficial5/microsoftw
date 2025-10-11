@@ -1,7 +1,5 @@
-import string
-import time
+import time as _time
 from math import ceil as _ceil
-import string as _string
 
 from PIL import ImageDraw as _ImageDraw, \
     Image as _Image
@@ -13,24 +11,36 @@ from enviroment.touchscreen import Clicked as _Clicked, \
 
 class Elements:
     class Image(_Element):
-        def __init__(self, page, location=(0, 0), image=None):
+        def __init__(self, page, location=(0, 0), image=None, show=True):
             super().__init__(page, location)
             self._image = image
+            self._show = show
+
+        @property
+        def show(self):
+            return self._show
+
+        @show.setter
+        def show(self, value):
+            if value != self._show:
+                self._show = value
+                self.page.update()
 
         @property
         def image(self):
             return self._image
 
-        @image.setter
-        def image(self, value, display=True):
+        def set_image(self, value, display=True):
             self._image = value
             self.page.update(display)
 
         def render(self):
-            return self._image
+            if self._show:
+                return self._image
 
     class TextElement(_Element):
-        def __init__(self, page, location=(0, 0), text="", font=None, font_size=12, color="black", background=None):
+        def __init__(self, page, location=(0, 0), text="", font=None, font_size=12, color="black", background=None,
+                     show=True):
             super().__init__(page, location)
             self.color = color
             self._background = background
@@ -43,6 +53,17 @@ class Elements:
             self.image = None
             self._image_draw = None
             self.update(False)
+            self._show = show
+
+        @property
+        def show(self):
+            return self._show
+
+        @show.setter
+        def show(self, value):
+            if value != self._show:
+                self._show = value
+                self.page.update()
 
         def update(self, display=True):
             self.background = _Image.new("RGBA", (296, 128), self._background) if self._background else \
@@ -77,11 +98,11 @@ class Elements:
     class Label(TextElement):
         def __init__(self, page, size=(296, 128), location=(0, 0), border=(0, 0), text="", font=None, font_size=12,
                      color="black",
-                     border_color=None, background=None):
+                     border_color=None, background=None, show=True):
             self.size = size
             self.border = border
             self.border_color = border_color
-            super().__init__(page, location, text, font, font_size, color, background)
+            super().__init__(page, location, text, font, font_size, color, background, show)
 
         def set_size(self, value, update=True):
             self.size = value
@@ -107,9 +128,9 @@ class Elements:
 
     class Button(Label):
         def __init__(self, page, size, func=lambda: None, location=(0, 0), border=(0, 0), text="", font=None,
-                     font_size=12, color="black", border_color="black", background=None):
+                     font_size=12, color="black", border_color="black", background=None, show=True):
             self.border_color = border_color
-            super().__init__(page, size, location, border, text, font, font_size, color, background)
+            super().__init__(page, size, location, border, text, font, font_size, color, background, show)
             self.func = func
             self.touch_records = [(_Clicked((location[0], location[0] + size[0], location[1], location[1] + size[1]),
                                             self.func))]
@@ -119,9 +140,9 @@ class Elements:
 
     class MultipleLinesLabel(Label):
         def __init__(self, page, size=(296, 128), location=(0, 0), border=(0, 0), text="", font=None, font_size=12,
-                     color="black", background=None, space=0):
+                     color="black", background=None, space=0, show=True):
             self.space = space
-            super().__init__(page, size, location, border, text, font, font_size, color, background)
+            super().__init__(page, size, location, border, text, font, font_size, color, background, show)
 
         def set_text(self, value, update=True):
             self.text = value.split("\n")
@@ -288,15 +309,16 @@ class ThemeBase(_Base):
         super().__init__(env)
         self._docker_image = self.env.images.docker_image
         self._docker_status = False
+        self._docker_temp = 0
 
         self._inactive_clicked = [_Clicked((0, 296, 0, 30), self.set_docker, True)]
         self._active_clicked = [_Clicked((60, 100, 0, 30), self.open_applist),
                                 _Clicked((0, 296, 30, 128), self.set_docker, False),
                                 _Clicked((195, 235, 0, 30), self.open_setting)]
 
-    def active(self):
+    def active(self, refresh=True):
         self._docker_status = False
-        super().active()
+        super().active(refresh)
 
     def open_applist(self):
         self.env.open_app("应用抽屉")
@@ -307,15 +329,21 @@ class ThemeBase(_Base):
     def set_docker(self, value: bool):
         self._docker_status = value
         self.display()
+        if value:
+            self._docker_temp = _time.time()
+            _time.sleep(2)
+            if _time.time() - self._docker_temp >= 2:
+                self._docker_status = False
+                self.display()
 
-    def display(self):
+    def display(self, refresh="auto"):
         if self._active:
             if self._docker_status:
                 new_image = self.Book.render()
                 new_image.paste(self._docker_image, (60, 0))
-                self.env.display(new_image)
+                self.env.display(new_image, refresh)
             else:
-                self.env.display(self.Book.render())
+                self.env.display(self.Book.render(), refresh)
 
     @property
     def touch_records_clicked(self):
@@ -337,15 +365,16 @@ class AppBase(_Base):
         self._control_bar_image = env.app_control_img
         self._control_bar_mask = env.app_control_alpha
         self._control_bar_status = False
+        self._control_bar_temp = 0
         self._inactive_clicked = [_Clicked((266, 296, 0, 30), self.set_control_bar, True)]
         self._active_clicked = [_Clicked((266, 296, 0, 30), self.env.back_home),
                                 _Clicked((0, 296, 30, 128), self.set_control_bar, False)]
 
-    def active(self):
+    def active(self, refresh=True):
         self._control_bar_status = False
-        super().active()
+        super().active(refresh)
 
-    def display(self):
+    def display(self, refresh="auto"):
         if self._active:
             if self._control_bar_status:
                 new_image = self.Book.render()
@@ -353,15 +382,21 @@ class AppBase(_Base):
                 new_image.paste(self.icon, (6, 6))
                 image_draw = _ImageDraw.ImageDraw(new_image)
                 image_draw.text((30, 7), self.title, fill="black", font=self._control_bar_font)
-                image_draw.text((224, 7), time.strftime("%H:%M", time.localtime()), fill="black",
+                image_draw.text((224, 7), _time.strftime("%H:%M", _time.localtime()), fill="black",
                                 font=self._control_bar_font)
-                self.env.display(new_image)
+                self.env.display(new_image, refresh)
             else:
-                self.env.display(self.Book.render())
+                self.env.display(self.Book.render(), refresh)
 
     def set_control_bar(self, value: bool):
         self._control_bar_status = value
         self.display()
+        if value:
+            self._control_bar_temp = _time.time()
+            _time.sleep(5)
+            if _time.time() - self._control_bar_status >= 2:
+                self._control_bar_status = False
+                self.display()
 
     @property
     def touch_records_clicked(self):
