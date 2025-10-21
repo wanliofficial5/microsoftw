@@ -51,8 +51,29 @@ class GeneralSettingsPage(lib.Pages.ListPage):
         super().__init__(book, "通用",
                          ["主题（未完成）",
                           "导航栏（未完成）",
-                          "更新（未完成）",
-                          "重置（未完成）", ])
+                          "更新",
+                          "恢复", ],
+                         funcs=[
+                             lambda: None,
+                             lambda: None,
+                             self.update_ui,
+                             self.fix_up,
+                         ])
+
+    def update_ui(self):
+        self.book.base.env.Screen.display(Image.open("resources/images/raspberry.jpg"))
+        self.book.base.env.quit()
+        os.popen("git checkout .")
+        os.popen("git pull")
+        os.system("python3 main.py &")
+        os.kill(os.getpid(), signal.SIGKILL)
+
+    def fix_up(self):
+        self.book.base.env.Screen.display(Image.open("resources/images/raspberry.jpg"))
+        self.book.base.env.quit()
+        os.popen("git checkout .")
+        os.system("python3 main.py &")
+        os.kill(os.getpid(), signal.SIGKILL)
 
 
 class SystemSettingsPage(lib.Pages.ListPage):
@@ -72,6 +93,7 @@ class SystemSettingsPage(lib.Pages.ListPage):
     def change_branch(self):
         self.book.base.env.Screen.display(Image.open("resources/images/raspberry.jpg"))
         self.book.base.env.quit()
+        os.popen("git checkout .")
         os.popen("git checkout web")
         os.system("python3 main.py &")
         os.kill(os.getpid(), signal.SIGKILL)
@@ -128,9 +150,9 @@ class Application(lib.AppBase):
         self.add_book("system", SystemSettingsBook(self), False)
         self.add_book("about", AboutBook(self), False)
 
-    def active(self):
+    def active(self, refresh=True):
         self.Books["online"].Page.ip_text.set_text(get_host_ip(), False)
         self.change_book("main", display=False)
         self.Book.Page.go_to(display=False)
-        super().active()
+        super().active(refresh)
 

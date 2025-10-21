@@ -57,10 +57,9 @@ class Page:
     def background(self):
         return self._background
 
-    @background.setter
-    def background(self, value):
+    def set_background(self, value, display=True):
         self._background = value
-        self.update()
+        self.update(display)
 
     @property
     def touch_records(self):
@@ -92,6 +91,7 @@ class Page:
         self._elements.append(element)
         self.resort()
         self._elements_rlock.release()
+        self._update = True
 
     def resort(self):
         self._elements_rlock.acquire()
@@ -260,14 +260,14 @@ class Base:
         else:
             raise KeyError("The targeted book is not found.")
 
-    def display(self) -> None:
+    def display(self, refresh="auto") -> None:
         if self._active:
-            self.env.display(self.Book.render())
+            self.env.display(self.Book.render(), refresh)
 
-    def active(self) -> None:  # This function will be called when this Base is active.
+    def active(self, refresh=True) -> None:  # This function will be called when this Base is active.
         self._active = True
         self.Book.is_active = True
-        self.display()
+        self.display(refresh)
 
     def pause(self) -> None:  # This function will be called when this Base is paused.
         self._active = False
