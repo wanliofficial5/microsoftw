@@ -89,8 +89,15 @@ def main_thread():
         env.TouchHandler.handle(touch_recoder_dev, touch_recoder_old)
 """
 
+
+def dev():
+    time.sleep(1)
+    pass
+
+
 if __name__ == "__main__":
     simulator = enviroment.Simulator()
     env = enviroment.Env(simulator)
     env.Pool.add(main_thread)
+    env.Pool.add(dev)
     simulator.start(env)
