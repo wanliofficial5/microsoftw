@@ -294,7 +294,7 @@ class Base:
                 if self.Book.back():
                     self.back_stack.put(i)
                 else:
-                    self.change_book(i)
+                    self.change_book(i, to_stacks=False)
                 return True
             else:
                 return False
