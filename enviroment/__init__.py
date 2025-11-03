@@ -20,40 +20,61 @@ from framework.struct import Base as _Base
 
 # 模拟器屏幕
 class Simulator:
-    def start(self, env):
-        self.env = env
+    def __init__(self):
+        self.env = None
         self.touch_recoder_dev = _TouchRecoder()
         self.touch_recoder_old = _TouchRecoder()
-        # 创建窗口(296x128)
         self.app = _wx.App()
+        # 创建窗口(296x128)
         self.frame = _wx.Frame(None, title="水墨屏模拟器 v2.0 by xuanzhi33", size=(296, 160))
+
+        self.static_bit = None
+
+        self.touched = False
+
+    def start(self, env):
+        self.env = env
 
         # 背景为黑色图片
         bmp = _wx.Bitmap("resources/images/simplebytes.jpg")
 
-        self.staticbit = _wx.StaticBitmap(self.frame, -1, bmp)
+        self.static_bit = _wx.StaticBitmap(self.frame, -1, bmp)
 
         # 绑定按下鼠标
-        self.frame.Bind(_wx.EVT_LEFT_DOWN, self.mouseDown)
+        self.frame.Bind(_wx.EVT_LEFT_DOWN, self.mouse_down)
         # 绑定松开鼠标
-        self.frame.Bind(_wx.EVT_LEFT_UP, self.mouseUp)
+        self.frame.Bind(_wx.EVT_LEFT_UP, self.mouse_up)
+        # 绑定移动鼠标
+        self.frame.Bind(_wx.EVT_MOTION, self.on_move)
 
         self.frame.Show()
 
         self.app.MainLoop()
 
-    def mouseDown(self, event):
+    def on_move(self, event):
+        if self.touched:
+            x = event.GetX()
+            y = event.GetY()
+            self.touch_recoder_old.Touch = True
+            self.touch_recoder_dev.Touch = True
+            self.touch_recoder_dev.X[0] = x
+            self.touch_recoder_dev.Y[0] = y
+            self.env.TouchHandler.handle(self.touch_recoder_dev, self.touch_recoder_old)
+
+    def mouse_down(self, event):
         x = event.GetX()
         y = event.GetY()
+        self.touched = True
         self.touch_recoder_old.Touch = False
         self.touch_recoder_dev.Touch = True
         self.touch_recoder_dev.X[0] = x
         self.touch_recoder_dev.Y[0] = y
         self.env.TouchHandler.handle(self.touch_recoder_dev, self.touch_recoder_old)
 
-    def mouseUp(self, event):
+    def mouse_up(self, event):
         x = event.GetX()
         y = event.GetY()
+        self.touched = False
         self.touch_recoder_old.Touch = True
         self.touch_recoder_dev.Touch = False
         self.touch_recoder_dev.X[0] = x
@@ -65,7 +86,7 @@ class Simulator:
         def bitmapThreading():
             wximg = _wx.Image(296, 128, image.convert("RGB").tobytes())
             bmp = _wx.Bitmap(wximg)
-            self.staticbit.SetBitmap(bmp)
+            self.static_bit.SetBitmap(bmp)
         _threading.Thread(target=bitmapThreading).start()
 
     def display(self, image: _Image):
