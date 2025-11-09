@@ -367,7 +367,7 @@ class Screen:
         self._last_display = 0
 
         self._partial_time = 0  # times
-        self.refresh_time = 10  # times
+        self.refresh_time = 20  # times
 
         self._status = True
 
@@ -390,6 +390,7 @@ class Screen:
     def display_auto(self, image):
         if self.refresh_time > self._partial_time:
             self.display_partial(image)
+            self._partial_time += 1
         else:
             self.display(image)
 
@@ -406,7 +407,6 @@ class Screen:
             self.display(image)
             return
         self._driver.display_partial(self._driver.get_buffer(image))
-        self._partial_time += 1
         self._last_display = time.time()
 
     def wait_busy(self):
