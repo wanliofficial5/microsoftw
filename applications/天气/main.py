@@ -61,7 +61,7 @@ class WeatherForecast:
 class TodayPage(struct.Page):
     def __init__(self, book):
         super().__init__(book)
-        self.city = book.base.city
+        self.city = book.base.city if book.base.city else "定位中"
         self._background = book.background
         self.title = lib.Elements.TextElement(self, (11, 9), "天气")
         self.add_element(self.title)
@@ -92,9 +92,6 @@ class MainBook(struct.Book):
         self.add_page("today", TodayPage(self))
         self.add_page("more", MorePage(self), False)
 
-    def updating(self):
-        pass
-
     def show_today(self):
         weather = self.base.weather
         now = self.base.now_weather
@@ -104,9 +101,14 @@ class MainBook(struct.Book):
         page.now_temp.set_text(now[1]+"℃", False)
         page.temp_range.set_text(f"{weather[0].temp_min}-{weather[0].temp_max}℃")
 
-
     def show_more(self):
         pass
+
+    def network_error(self):
+        page = self.Pages["today"]
+        page.text.set_text("天气—无网络", False)
+        page.city.set_text("定位失败")
+
 
 class Application(lib.AppBase):
     def __init__(self, env):
@@ -122,8 +124,14 @@ class Application(lib.AppBase):
         self.title = "天气"
 
     def active(self, refresh=True):
-        self.Book.updating()
         super().active(refresh)
+        if not self.forcast.city_name:
+            try:
+                self.forcast.get_city()
+            except:
+                self.Book.network_error()
+                self.title = "天气—无网络"
+                return
         self.now_weather = self.forcast.get_now()
         self.weather = self.forcast.get_weather()
         self.Book.show_today()
