@@ -247,12 +247,12 @@ class Env:
     def back_left(self, show: bool):
         if show != self._show_left_back:
             self._show_left_back = show
-            self.display()
+            self.display(refresh=False)
 
     def back_right(self, show: bool):
         if show != self._show_right_back:
             self._show_right_back = show
-            self.display()
+            self.display(refresh=False)
 
     def home_bar(self):
         if self._home_bar:
