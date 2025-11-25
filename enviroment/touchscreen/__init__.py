@@ -190,7 +190,7 @@ class TouchHandler:
                 if d_x - self.back_left.temp_location[0] > 20:
                     self.pool.add(self.env.back)
                     slided = True
-                if self.back_right.showed:
+                if self.back_left.showed:
                     self.pool.add(self.env.back_left, False)
                 self.back_left.active = False
             elif self.back_right.active:
@@ -248,7 +248,7 @@ class TouchHandler:
                         self.pool.add(self.env.back_left, True)
                         self.back_left.showed = True
                 elif self.back_right.active and not self.back_right.showed:
-                    if d_x - self.back_right.temp_location[0] >= 20:
+                    if  self.back_right.temp_location[0] - d_x >= 20:
                         self.pool.add(self.env.back_right, True)
                         self.back_right.showed = True
 
