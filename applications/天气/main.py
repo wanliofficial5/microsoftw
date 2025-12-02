@@ -106,32 +106,29 @@ class MainBook(struct.Book):
 
     def network_error(self):
         page = self.Pages["today"]
-        page.text.set_text("天气—无网络", False)
-        page.city.set_text("定位失败")
+        page.text.set_text("天气--无网络", False)
+        page.city.set_text("定位失败", False)
 
 
 class Application(lib.AppBase):
     def __init__(self, env):
         super().__init__(env)
         self.forcast = WeatherForecast()
-        self.forcast.get_city()
+        try:
+            self.forcast.get_city()
+            self.title = f"天气--{self.forcast.city_name}"
+        except:
+            self.Book.network_error()
+            self.title = "天气--无网络"
         self.city = self.forcast.city_name
         self.add_book("main", MainBook(self))
         self.now_weather = None
         self.weather = None
         self.icon = Image.open("applications/天气/icon.png")
         self.name = "天气"
-        self.title = "天气"
 
     def active(self, refresh=True):
         super().active(refresh)
-        if not self.forcast.city_name:
-            try:
-                self.forcast.get_city()
-            except:
-                self.Book.network_error()
-                self.title = "天气—无网络"
-                return
         self.now_weather = self.forcast.get_now()
         self.weather = self.forcast.get_weather()
         self.Book.show_today()
