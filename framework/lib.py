@@ -393,7 +393,7 @@ class AppBase(_Base):
         self.display()
         if value:
             self._control_bar_temp = _time.time()
-            _time.sleep(5)
+            _time.sleep(8)
             if _time.time() - self._control_bar_status >= 2:
                 self._control_bar_status = False
                 self.display()
