@@ -190,15 +190,11 @@ class TouchHandler:
                 if d_x - self.back_left.temp_location[0] > 20:
                     self.pool.add(self.env.back)
                     slided = True
-                if self.back_left.showed:
-                    self.pool.add(self.env.back_left, False)
                 self.back_left.active = False
             elif self.back_right.active:
                 if self.back_right.temp_location[0] - d_x > 20:
                     self.pool.add(self.env.back)
                     slided = True
-                if self.back_right.showed:
-                    self.pool.add(self.env.back_right, False)
                 self.back_right.active = False
             elif self.home_bar.active:
                 if self.home_bar.temp_location[1] - d_y > 20 and 100 <= d_x <= 200:
