@@ -7,15 +7,18 @@ from PIL import Image
 
 class ApplicationList(Pages.ListPage):
     def __init__(self, book):
-        super().__init__(book, "应用抽屉", [])
+        self.env = book.base.env
+        super().__init__(book, "应用抽屉", [], func=self.open)
+
+    def open(self, index):
+        self.env.open_app(self.items[index])
 
     def update_app_list(self):
-        for app in self.book.base.env.apps:
-            if app == "应用抽屉":
+        for app in self.env.apps:
+            if app in ["应用抽屉"]:
                 continue
             self.items.append(app)
-            self.icons.append(self.book.base.env.apps[app].icon)
-            self.funcs.append(lambda: self.book.base.env.open_app(app))
+            self.icons.append(self.env.apps[app].icon)
 
 
 class MainBook(Book):
