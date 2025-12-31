@@ -183,7 +183,7 @@ class Elements:
 
 class Pages:
     class ListPage(_Page):
-        def __init__(self, book, title, items: [str], icons=None, funcs=None):
+        def __init__(self, book, title, items: [str], icons=None, funcs=None, func=None):
             super().__init__(book)
             self._background = book.base.env.list_img
             self.more_img = book.base.env.list_more_img
@@ -193,6 +193,7 @@ class Pages:
             self.font = book.base.env.get_font(16)
             self.icons = icons if icons else [None] * len(items)
             self.funcs = funcs if funcs else [lambda: None] * len(items)
+            self.func = func
             self.at = 0
             if not len(items) == len(self.icons) == len(self.funcs):
                 raise ValueError("Quantity asymmetry!")
@@ -251,10 +252,12 @@ class Pages:
             self.update(display)
 
         def _handler(self, index):
-            try:
+            if index >= len(self.items):
+                return
+            if self.func:
+                self.func(index)
+            else:
                 self.funcs[self.at * 3 + index]()
-            except IndexError:
-                pass
 
         def _slide(self, dis):
             if dis < 0:
