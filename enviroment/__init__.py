@@ -171,7 +171,7 @@ class Env:
         self.app_control_img = _Image.open("resources/images/app_control.png")
         self.app_control_alpha = self.app_control_img.split()[3]
 
-    def display(self, image=None, refresh="auto"):
+    def display(self, image=None, refresh="a"):
         if not image:
             self.Now.display()
             return
@@ -186,11 +186,11 @@ class Env:
             if self._home_bar:
                 image.paste(self.bar_img, mask=self.bar_img_alpha)
 
-            if refresh == "auto":
+            if refresh == "a":
                 self.Screen.display_auto(image)
-            elif refresh:
+            elif refresh == "t":
                 self.Screen.display(image)
-            else:
+            elif refresh == "f":
                 self.Screen.display_partial(image)
 
     def get_font(self, size=12):
@@ -249,22 +249,16 @@ class Env:
     def back_left(self, show: bool):
         if show:
             self._show_left_back = True
-            self._left_temp = True
-            self.display(refresh=False)
+            self.display(refresh="f")
         else:
             self._show_left_back = False
-            if self._right_temp:
-                self.display(refresh=False)
 
     def back_right(self, show: bool):
         if show:
             self._show_right_back = True
-            self._right_temp = True
-            self.display(refresh=False)
+            self.display(refresh="f")
         else:
             self._show_right_back = False
-            if self._right_temp:
-                self.display(refresh=False)
 
     def home_bar(self):
         if self._home_bar:
@@ -299,4 +293,3 @@ class Env:
         self.Screen.display(_Image.open("resources/images/raspberry.jpg"))
         self.quit()
         _os.system("sudo reboot")
-

@@ -319,7 +319,7 @@ class ThemeBase(_Base):
                                 _Clicked((0, 296, 30, 128), self.set_docker, False),
                                 _Clicked((195, 235, 0, 30), self.open_setting)]
 
-    def active(self, refresh=True):
+    def active(self, refresh="t"):
         self._docker_status = False
         super().active(refresh)
 
@@ -339,7 +339,7 @@ class ThemeBase(_Base):
                 self._docker_status = False
                 self.display()
 
-    def display(self, refresh="auto"):
+    def display(self, refresh="a"):
         if self._active:
             if self._docker_status:
                 new_image = self.Book.render()
@@ -373,11 +373,11 @@ class AppBase(_Base):
         self._active_clicked = [_Clicked((266, 296, 0, 30), self.env.back_home),
                                 _Clicked((0, 296, 30, 128), self.set_control_bar, False)]
 
-    def active(self, refresh=True):
+    def active(self, refresh="t"):
         self._control_bar_status = False
         super().active(refresh)
 
-    def display(self, refresh="auto"):
+    def display(self, refresh="a"):
         if self._active:
             if self._control_bar_status:
                 new_image = self.Book.render()

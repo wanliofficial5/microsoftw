@@ -56,7 +56,7 @@ class Theme(ThemeBase):
                 return
             time.sleep(2)
 
-    def active(self, refresh=True):
+    def active(self, refresh="t"):
         super().active(refresh)
         self.flag = True
         threading.Thread(target=self.updater, daemon=True).start()

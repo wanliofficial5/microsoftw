@@ -127,7 +127,7 @@ class Application(lib.AppBase):
         self.icon = Image.open("applications/天气/icon.png")
         self.name = "天气"
 
-    def active(self, refresh=True):
+    def active(self, refresh="t"):
         super().active(refresh)
         self.now_weather = self.forcast.get_now()
         self.weather = self.forcast.get_weather()

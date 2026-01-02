@@ -10,9 +10,11 @@ from enviroment.touchscreen import Clicked as _Clicked,\
 
 
 class Element:
-    def __init__(self, page, location=(0, 0)):
-        self.location = location
+    def __init__(self, page, location=(0, 0), position="", layout=""):
         self.page = page
+        self._location = location
+        self._position = position
+        self._layout = layout
         self._layer = 0
         self._touch_records = []
 
@@ -20,10 +22,34 @@ class Element:
     def layer(self):
         return self._layer
 
-    @layer.setter
-    def layer(self, value):
+    def set_layer(self, value, update=True):
         self._layer = value
         self.page.resort()
+        self.page.update(update)
+
+    @property
+    def location(self):
+        return self._location
+
+    def set_location(self, value, update=True):
+        self._location = value
+        self.page.update(update)
+
+    @property
+    def position(self):
+        return self._location
+
+    def set_position(self, value, update=True):
+        self._position = value
+        self.page.update(update)
+
+    @property
+    def layout(self):
+        return self._layer
+
+    def set_layout(self, value, update=True):
+        self._layout = value
+        self.page.update(update)
 
     @property
     def touch_records(self):
@@ -260,11 +286,11 @@ class Base:
         else:
             raise KeyError("The targeted book is not found.")
 
-    def display(self, refresh="auto") -> None:
+    def display(self, refresh="a") -> None:
         if self._active:
             self.env.display(self.Book.render(), refresh)
 
-    def active(self, refresh=True) -> None:  # This function will be called when this Base is active.
+    def active(self, refresh="t") -> None:  # This function will be called when this Base is active.
         self._active = True
         self.Book.is_active = True
         self.display(refresh)

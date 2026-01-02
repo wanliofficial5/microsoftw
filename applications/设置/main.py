@@ -150,7 +150,7 @@ class Application(lib.AppBase):
         self.add_book("system", SystemSettingsBook(self), False)
         self.add_book("about", AboutBook(self), False)
 
-    def active(self, refresh=True):
+    def active(self, refresh="t"):
         self.Books["online"].Page.ip_text.set_text(get_host_ip(), False)
         self.change_book("main", display=False)
         self.back_stack.queue.clear()
