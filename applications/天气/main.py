@@ -114,12 +114,16 @@ class Application(lib.AppBase):
     def __init__(self, env):
         super().__init__(env)
         self.forcast = WeatherForecast()
-        try:
-            self.forcast.get_city()
-            self.title = f"天气--{self.forcast.city_name}"
-        except:
-            self.Book.network_error()
-            self.title = "天气--无网络"
+
+        def get_w():
+            try:
+                self.forcast.get_city()
+                self.title = f"天气--{self.forcast.city_name}"
+            except:
+                self.Book.network_error()
+                self.title = "天气--无网络"
+
+        self.env.Pool.add(get_w)
         self.city = self.forcast.city_name
         self.add_book("main", MainBook(self))
         self.now_weather = None
