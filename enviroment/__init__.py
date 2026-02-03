@@ -155,6 +155,7 @@ class Env:
         # show
         self._show_left_back = False
         self._show_right_back = False
+        self._update_temp = False
         self._home_bar = False
         self._home_bar_temp = 0
 
@@ -178,6 +179,8 @@ class Env:
         if self.display_lock.acquire(blocking=False):
             self.Screen.wait_busy()
             self.display_lock.release()
+
+            self._update_temp = False
 
             if self._show_left_back:
                 image.paste(self.left_img, mask=self.left_img_alpha)
@@ -223,14 +226,19 @@ class Env:
             raise KeyError("The targeted application is not found.")
 
     def back(self) -> bool:
+        self._update_temp = self._show_left_back or self._show_right_back
         self._show_left_back = False
         self._show_right_back = False
         if self.back_stack.empty():
+            if self._update_temp:
+                self.display()
             return self.Now.back()
         else:
             i = self.back_stack.get()
             if callable(i):
                 i()
+                if self._update_temp:
+                    self.display()
                 return True
             elif isinstance(i, _Base):
                 if self.Now.back():
@@ -239,8 +247,12 @@ class Env:
                     self.Now.pause()
                     self.Now = i
                     self.Now.active()
+                if self._update_temp:
+                    self.display()
                 return True
             else:
+                if self._update_temp:
+                    self.display()
                 return False
 
     def add_back(self, item):
