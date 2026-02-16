@@ -63,7 +63,7 @@ class GeneralSettingsPage(lib.Pages.ListPage):
     def update_ui(self):
         self.book.base.env.Screen.display(Image.open("resources/images/raspberry.jpg"))
         self.book.base.env.quit()
-        os.popen("git checkout .")
+        os.popen("git checkout . && git clean -f")
         os.popen("git pull")
         os.system("python3 main.py &")
         os.kill(os.getpid(), signal.SIGTERM)
@@ -71,7 +71,7 @@ class GeneralSettingsPage(lib.Pages.ListPage):
     def fix_up(self):
         self.book.base.env.Screen.display(Image.open("resources/images/raspberry.jpg"))
         self.book.base.env.quit()
-        os.popen("git checkout .")
+        os.popen("git checkout . && git clean -f")
         os.system("python3 main.py &")
         os.kill(os.getpid(), signal.SIGTERM)
 
@@ -93,7 +93,7 @@ class SystemSettingsPage(lib.Pages.ListPage):
     def change_branch(self):
         self.book.base.env.Screen.display(Image.open("resources/images/raspberry.jpg"))
         self.book.base.env.quit()
-        os.popen("git checkout .")
+        os.popen("git checkout . && git clean -f")
         os.popen("git checkout web")
         os.system("python3 main.py &")
         os.kill(os.getpid(), signal.SIGKILL)
