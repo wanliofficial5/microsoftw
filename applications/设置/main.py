@@ -65,14 +65,14 @@ class GeneralSettingsPage(lib.Pages.ListPage):
         self.book.base.env.quit()
         os.popen("git checkout . && git clean -f")
         os.popen("git pull")
-        os.system("python3 main.py &")
+        os.system("sudo python3 restart.py &")
         os.kill(os.getpid(), signal.SIGTERM)
 
     def fix_up(self):
         self.book.base.env.Screen.display(Image.open("resources/images/raspberry.jpg"))
         self.book.base.env.quit()
         os.popen("git checkout . && git clean -f")
-        os.system("python3 main.py &")
+        os.system("sudo python3 restart.py &")
         os.kill(os.getpid(), signal.SIGTERM)
 
 
@@ -95,7 +95,7 @@ class SystemSettingsPage(lib.Pages.ListPage):
         self.book.base.env.quit()
         os.popen("git checkout . && git clean -f")
         os.popen("git checkout web")
-        os.system("python3 main.py &")
+        os.system("sudo python3 restart.py &")
         os.kill(os.getpid(), signal.SIGKILL)
 
 
