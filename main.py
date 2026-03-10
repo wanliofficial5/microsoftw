@@ -60,17 +60,17 @@ def main_thread():
         except:
             print(traceback.format_exc())
 
-    # apps
-    for app_dir in os.listdir("applications"):
-        try:
-            env.apps[app_dir] = importlib.import_module(f"applications.{app_dir}.main").Application(env)
-        except:
-            print(traceback.format_exc())
-
     # themes
     for theme_dir in os.listdir("themes"):
         try:
             env.themes[theme_dir] = importlib.import_module(f"themes.{theme_dir}.main").Theme(env)
+        except:
+            print(traceback.format_exc())
+
+    # apps
+    for app_dir in os.listdir("applications"):
+        try:
+            env.apps[app_dir] = importlib.import_module(f"applications.{app_dir}.main").Application(env)
         except:
             print(traceback.format_exc())
 
