@@ -331,7 +331,7 @@ class Base:
         self.back_stack.put(item)
 
 
-class Plugin:
+class PluginBase:
     def __init__(self, env):
         self.env = env
 
