@@ -116,7 +116,7 @@ class Plugin(PluginBase):
 
     def update_summary(self):
         self._summary.set(json.loads(requests.get(f"https://devapi.qweather.com/v7/minutely/5m?"
-                                                  f"location={self._city_lat},{self._city_lon}&key={KEY}").text))
+                                                  f"location={self._city_lon},{self._city_lat}&key={KEY}").text))
 
     def update_aqi(self):
         self._aqi.set(json.loads(requests.get(f"https://devapi.qweather.com/v7/air/now?"
