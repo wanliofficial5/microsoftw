@@ -13,6 +13,13 @@ KEY = "8d631bd83896441f8592036698471885"
 
 # TODO:未做异常处理
 
+def isonline():
+    try:
+        requests.get("https://www.baidu.com").raise_for_status()
+        return True
+    except:
+        return False
+
 
 class WeatherDay:
     def __init__(self):
@@ -95,24 +102,34 @@ class Plugin(PluginBase):
         self._city_id = None
         self._city_lat = None
         self._city_lon = None
+        self._inited = None
 
         self._summary = Summary()
         self._aqi = Aqi()
         self._weather_more = WeatherMore()
         self._realtime = Realtime()
 
+    def launch(self):
+        super().launch()
+        self.env.add(self.init_city)
+
     @property
     def city(self):
         return self._city_name
 
     def init_city(self):
-        city_name = re.findall('省(.+?)市', requests.get("https://pv.sohu.com/cityjson?ie=utf-8").text)[-1]
-        lookup = json.loads(requests.get(f"https://geoapi.qweather.com/v2/city/lookup?"
-                                         f"location={city_name}&key={KEY}").text)["location"][0]
-        self._city_name = lookup["name"]
-        self._city_id = lookup["id"]
-        self._city_lat = lookup["lat"]
-        self._city_lon = lookup["lon"]
+        if isonline():
+            try:
+                city_name = re.findall('省(.+?)市', requests.get("https://pv.sohu.com/cityjson?ie=utf-8").text)[-1]
+                lookup = json.loads(requests.get(f"https://geoapi.qweather.com/v2/city/lookup?"
+                                                 f"location={city_name}&key={KEY}").text)["location"][0]
+                self._city_name = lookup["name"]
+                self._city_id = lookup["id"]
+                self._city_lat = lookup["lat"]
+                self._city_lon = lookup["lon"]
+                self._inited = True
+            except:
+                pass
 
     def update_summary(self):
         self._summary.set(json.loads(requests.get(f"https://devapi.qweather.com/v7/minutely/5m?"
