@@ -172,6 +172,12 @@ class Env:
         self.app_control_img = _Image.open("resources/images/app_control.png")
         self.app_control_alpha = self.app_control_img.split()[3]
 
+    def __getattr__(self, name):
+        if name in self.plugins:
+            return self.plugins[name]
+        else:
+            raise AttributeError("plugins no found.")
+
     def display(self, image=None, refresh="a"):
         if not image:
             self.Now.display()
