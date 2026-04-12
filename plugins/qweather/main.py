@@ -1,3 +1,4 @@
+import threading
 import time
 
 from framework.struct import PluginBase
@@ -103,15 +104,20 @@ class Plugin(PluginBase):
         self._city_lat = None
         self._city_lon = None
         self._inited = None
+        self._init_event = threading.Event()
+        self._init_event.set()
 
         self._summary = Summary()
         self._aqi = Aqi()
         self._weather_more = WeatherMore()
         self._realtime = Realtime()
 
-    def launch(self):
-        super().launch()
-        self.env.add(self.init_city)
+        self.env.Pool.add(self.init_city)
+
+    def is_inited(self, wait=True):
+        if wait:
+            self._init_event.wait()
+        return self._inited
 
     @property
     def city(self):
@@ -119,6 +125,7 @@ class Plugin(PluginBase):
 
     def init_city(self):
         if isonline():
+            self._init_event.clear()
             try:
                 city_name = re.findall('省(.+?)市', requests.get("https://pv.sohu.com/cityjson?ie=utf-8").text)[-1]
                 lookup = json.loads(requests.get(f"https://geoapi.qweather.com/v2/city/lookup?"
@@ -130,6 +137,7 @@ class Plugin(PluginBase):
                 self._inited = True
             except:
                 pass
+            self._init_event.set()
 
     def update_summary(self):
         self._summary.set(json.loads(requests.get(f"https://devapi.qweather.com/v7/minutely/5m?"

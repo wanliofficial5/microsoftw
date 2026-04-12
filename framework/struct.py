@@ -299,10 +299,6 @@ class Base:
         self._active = False
         self.Book.is_active = False
 
-    def launch(self) -> None:  # This function will be called when the eInkUI is launch.
-        self._active = False
-        self.Book.is_active = False
-
     def shutdown(self) -> None:  # This function will be called when the eInkUI is shutdown.
         # Technically this function should be done within 1s
         self._active = False
@@ -334,9 +330,6 @@ class Base:
 class PluginBase:
     def __init__(self, env):
         self.env = env
-
-    def launch(self) -> None:  # This function will be called when the eInkUI is launch.
-        pass
 
     def shutdown(self) -> None:  # This function will be called when the eInkUI is shutdown.
         # Technically this function should be done in 5s
