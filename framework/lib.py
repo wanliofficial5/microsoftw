@@ -358,6 +358,7 @@ class ThemeBase(_Base):
 
 class AppBase(_Base):
     def __init__(self, env):
+        self.show_in_drawer = True
         self.title = ""
         self.icon = env.images.None20px
         self.name = ""

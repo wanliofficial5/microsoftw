@@ -1,7 +1,3 @@
-import requests
-import json
-import re
-
 from framework import lib
 from framework import struct
 
@@ -11,8 +7,8 @@ from PIL import Image
 class TodayPage(struct.Page):
     def __init__(self, book):
         super().__init__(book)
+        self._background = Image.open("applications/天气/background.png")
         self.forcast = book.base.env.qweather
-        self._background = book.background
         self.title = lib.Elements.TextElement(self, (11, 9), "天气")
         self.add_element(self.title)
         self.weather_icon = lib.Elements.Image(self, (25, 45), Image.open("applications/天气/res/100-44px.png"))
@@ -43,14 +39,11 @@ class TodayPage(struct.Page):
 class MorePage(struct.Page):
     def __init__(self, book):
         super().__init__(book)
-        self._background = book.background
 
 
 class MainBook(struct.Book):
     def __init__(self, base):
         super().__init__(base)
-        self.forcast = base.env.qweather
-        self.background = Image.open("applications/天气/background.png")
         self.add_page("today", TodayPage(self))
         self.add_page("more", MorePage(self), False)
 

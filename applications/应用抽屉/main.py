@@ -14,11 +14,10 @@ class ApplicationList(Pages.ListPage):
         self.env.open_app(self.items[index])
 
     def update_app_list(self):
-        for app in self.env.apps:
-            if app in ["应用抽屉"]:
-                continue
-            self.items.append(app)
-            self.icons.append(self.env.apps[app].icon)
+        for app_name, app in self.env.apps.items():
+            if app.show_in_drawer:
+                self.items.append(app_name)
+                self.icons.append(app.icon)
 
 
 class MainBook(Book):
@@ -34,6 +33,8 @@ class Application(AppBase):
         self.icon = Image.open("applications/应用抽屉/icon.png")
         self.title = self.name
         self.add_book("main", MainBook(self))
+
+        self.show_in_drawer = False
 
     def update_app_list(self):
         self.Book.Page.update_app_list()
