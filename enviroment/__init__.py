@@ -9,6 +9,7 @@ from PIL import Image as _Image, \
     ImageFont as _ImageFont
 
 from system import threadpool as _threadpool
+from system import logger as _logger
 from .touchscreen import Clicked as _Clicked, \
     SlideX as _SlideX, \
     SlideY as _SlideY, \
@@ -124,8 +125,11 @@ class Env:
         # screen
         self.Screen = simulator
 
+        # logger
+        self.Logger = _logger.Logger()
+
         # threadpool
-        self.Pool = _threadpool.ThreadPool(20, print)
+        self.Pool = _threadpool.ThreadPool(20, self.logger.warn)
         self.Pool.start()
 
         """
