@@ -57,22 +57,28 @@ def main_thread():
     for plugin_dir in os.listdir("plugins"):
         try:
             env.plugins[plugin_dir] = importlib.import_module(f"plugins.{plugin_dir}.main").Plugin(env)
+            env.Logger.info(f"插件加载：{plugin_dir}")
         except:
             print(traceback.format_exc())
+            env.Logger.error(traceback.format_exc())
 
     # themes
     for theme_dir in os.listdir("themes"):
         try:
             env.themes[theme_dir] = importlib.import_module(f"themes.{theme_dir}.main").Theme(env)
+            env.Logger.info(f"主题加载: {theme_dir}")
         except:
             print(traceback.format_exc())
+            env.Logger.error(traceback.format_exc())
 
     # apps
     for app_dir in os.listdir("applications"):
         try:
             env.apps[app_dir] = importlib.import_module(f"applications.{app_dir}.main").Application(env)
+            env.Logger.info(f"应用加载: {app_dir}")
         except:
             print(traceback.format_exc())
+            env.Logger.error(traceback.format_exc())
 
     env.apps["应用抽屉"].update_app_list()
 

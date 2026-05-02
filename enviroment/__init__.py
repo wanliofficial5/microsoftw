@@ -126,10 +126,10 @@ class Env:
         self.Screen = simulator
 
         # logger
-        self.Logger = _logger.Logger()
+        self.Logger = _logger.Logger(0)
 
         # threadpool
-        self.Pool = _threadpool.ThreadPool(20, self.logger.warn)
+        self.Pool = _threadpool.ThreadPool(20, self.Logger.warn)
         self.Pool.start()
 
         """
@@ -309,11 +309,13 @@ class Env:
         self.Screen.quit()
 
     def poweroff(self):
+        self.Logger.info("关机")
         self.Screen.display(_Image.open("resources/images/raspberry.jpg"))
         self.quit()
         _os.system("sudo poweroff")
 
     def reboot(self):
+        self.Logger.info("重启")
         self.Screen.display(_Image.open("resources/images/raspberry.jpg"))
         self.quit()
         _os.system("sudo reboot")
