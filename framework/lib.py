@@ -96,13 +96,16 @@ class Elements:
             return self.image
 
     class Label(TextElement):
-        def __init__(self, page, size=(296, 128), location=(0, 0), border=(0, 0), text="", font=None, font_size=12,
-                     color="black",
-                     border_color=None, background=None, show=True):
+        def __init__(self, page, size=(296, 128), location=(0, 0), border=(0, 0), text="", font_size=12, color="black",
+                     border_color=None, background=None, show=True, align="L"):
+            """
+            相较于TextElement，这个模块不支持自定义字体，但是可以实现文本的左对齐和右对齐和添加边界(border)功能
+            """
             self.size = size
             self.border = border
             self.border_color = border_color
-            super().__init__(page, location, text, font, font_size, color, background, show)
+            self.align = align
+            super().__init__(page, location, text, font_size=font_size, color=color, background=background, show=show)
 
         def set_size(self, value, update=True):
             self.size = value
@@ -116,21 +119,46 @@ class Elements:
             self.border_color = value
             self.update(update)
 
+        def set_align(self, value, update=True):
+            self.align = value
+            self.update(update)
+
         def update(self, display=True):
             self.background = _Image.new("RGBA", self.size, self._background) if self._background else \
                 _Image.new("RGBA", self.size, (255, 255, 255, 0))
             self.image = self.background.copy()
             self._image_draw = _ImageDraw.ImageDraw(self.image)
-            self._image_draw.text(self.border, self.text, self.color, self._font)
+            if self.align == "L":
+                x = self.border[0]
+            else:
+                length = 0
+                font_size = self._font.size
+                if font_size % 12 == 0:
+                    add = font_size * 2 / 3
+                else:
+                    add = font_size / 2
+                for i in self.text:
+                    if " " <= i <= "~":
+                        length += add
+                    else:
+                        length += font_size
+                if self.align == "C":
+                    x = _ceil((self.size[0] - 2 * self.border[0] - length) / 2)
+                elif self.align == "R":
+                    x = self.size[0] - 2 * self.border[0] - length
+                else:
+                    raise ValueError
+
+            self._image_draw.text((x, self.border[1]), self.text, self.color, self._font)
             if self.border_color:
                 self._image_draw.rectangle(xy=(0, self.size[0], 0, self.size[1]), fill=None, outline=self.border_color)
             self.page.update(display)
 
     class Button(Label):
-        def __init__(self, page, size, func=lambda: None, location=(0, 0), border=(0, 0), text="", font=None,
-                     font_size=12, color="black", border_color="black", background=None, show=True):
+        def __init__(self, page, size, func=lambda: None, location=(0, 0), border=(0, 0), text="",
+                     font_size=12, color="black", border_color="black", background=None, show=True, align="C"):
             self.border_color = border_color
-            super().__init__(page, size, location, border, text, font, font_size, color, background, show)
+            super().__init__(page, size, location, border, text, font_size, color, background, show, align)
             self.func = func
             self.touch_records = [(_Clicked((location[0], location[0] + size[0], location[1], location[1] + size[1]),
                                             self.func))]
@@ -142,7 +170,7 @@ class Elements:
         def __init__(self, page, size=(296, 128), location=(0, 0), border=(0, 0), text="", font=None, font_size=12,
                      color="black", background=None, space=0, show=True):
             self.space = space
-            super().__init__(page, size, location, border, text, font, font_size, color, background, show)
+            super().__init__(page, size, location, border, text, font_size, color, background, show)
 
         def set_text(self, value, update=True):
             self.text = value.split("\n")
@@ -305,6 +333,14 @@ class Pages:
                 return new_image.copy()
             else:
                 return self.old_render.copy()
+
+    class PageWithTitle(_Page):
+        def __init__(self, book, title):
+            super().__init__(book)
+            self._background = book.base.env.page_with_title
+
+            self.title = Elements.TextElement(self, (7, 7), title, font_size=16)
+            self.add_element(self.title)
 
 
 class ThemeBase(_Base):

@@ -175,6 +175,7 @@ class Env:
         self.list_more_img = _Image.open("resources/images/more_items_dots.jpg")
         self.app_control_img = _Image.open("resources/images/app_control.png")
         self.app_control_alpha = self.app_control_img.split()[3]
+        self.page_with_title = _Image.open("resources/images/page_with_title.png")
 
     def __getattr__(self, name):
         if name in self.plugins:
