@@ -158,7 +158,8 @@ class Elements:
         def __init__(self, page, size, func=lambda: None, location=(0, 0), border=(0, 0), text="",
                      font_size=12, color="black", border_color="black", background=None, show=True, align="C"):
             self.border_color = border_color
-            super().__init__(page, size, location, border, text, font_size, color, background, show, align)
+            super().__init__(page, size, location, border, text, font_size, color, border_color, background, show,
+                             align)
             self.func = func
             self.touch_records = [(_Clicked((location[0], location[0] + size[0], location[1], location[1] + size[1]),
                                             self.func))]
@@ -167,10 +168,10 @@ class Elements:
             self.touch_records[0].func = func
 
     class MultipleLinesLabel(Label):
-        def __init__(self, page, size=(296, 128), location=(0, 0), border=(0, 0), text="", font=None, font_size=12,
+        def __init__(self, page, size=(296, 128), location=(0, 0), border=(0, 0), text="", font_size=12,
                      color="black", background=None, space=0, show=True):
             self.space = space
-            super().__init__(page, size, location, border, text, font_size, color, background, show)
+            super().__init__(page, size, location, border, text, font_size, color, background=background, show=show)
 
         def set_text(self, value, update=True):
             self.text = value.split("\n")
