@@ -97,13 +97,12 @@ class Elements:
 
     class Label(TextElement):
         def __init__(self, page, size=(296, 128), location=(0, 0), border=(0, 0), text="", font_size=12, color="black",
-                     border_color=None, background=None, show=True, align="L"):
+                     background=None, show=True, align="L"):
             """
             相较于TextElement，这个模块不支持自定义字体，但是可以实现文本的左对齐和右对齐和添加边界(border)功能
             """
             self.size = size
             self.border = border
-            self.border_color = border_color
             self.align = align
             super().__init__(page, location, text, font_size=font_size, color=color, background=background, show=show)
 
@@ -113,10 +112,6 @@ class Elements:
 
         def set_border(self, value, update=True):
             self.border = value
-            self.update(update)
-
-        def set_border_color(self, value, update=True):
-            self.border_color = value
             self.update(update)
 
         def set_align(self, value, update=True):
@@ -150,16 +145,36 @@ class Elements:
                     raise ValueError
 
             self._image_draw.text((x, self.border[1]), self.text, self.color, self._font)
-            if self.border_color:
-                self._image_draw.rectangle(xy=(0, self.size[0], 0, self.size[1]), fill=None, outline=self.border_color)
             self.page.update(display)
 
-    class Button(Label):
+    class TextElementButton(TextElement):
+        def __init__(self, page, size, func=lambda: None, location=(0, 0), border=(0, 0), text="", font=None, font_size=12, color="black",
+                     background=None, show=True):
+            self.size = size
+            self.border = border
+            self.func = func
+            super().__init__(page, location, text, font, font_size, color, background, show)
+            self.touch_records = [(_Clicked((location[0], location[0] + size[0], location[1], location[1] + size[1]),
+                                            self.func))]
+
+        def set_func(self, func):
+            self.touch_records[0].func = func
+
+        def update(self, display=True):
+            self.background = _Image.new("RGBA", (296, 128), self._background) if self._background else \
+                _Image.new("RGBA", (296, 128), (255, 255, 255, 0))
+            self.image = self.background.copy()
+            self._image_draw = _ImageDraw.ImageDraw(self.image)
+            self._image_draw.text((self.border[0], self.border[1]), self.text, self.color, self._font)
+            self.page.update(display)
+
+
+
+    class LabelButton(Label):
         def __init__(self, page, size, func=lambda: None, location=(0, 0), border=(0, 0), text="",
                      font_size=12, color="black", border_color="black", background=None, show=True, align="C"):
             self.border_color = border_color
-            super().__init__(page, size, location, border, text, font_size, color, border_color, background, show,
-                             align)
+            super().__init__(page, size, location, border, text, font_size, color, background, show, align)
             self.func = func
             self.touch_records = [(_Clicked((location[0], location[0] + size[0], location[1], location[1] + size[1]),
                                             self.func))]
