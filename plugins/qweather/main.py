@@ -115,8 +115,12 @@ class Plugin(PluginBase):
         self.env.Pool.add(self.init_city)
 
     def is_inited(self, wait=True):
-        if wait:
-            self._init_event.wait()
+        if not wait:
+            return self._inited
+        if not self._inited:
+            if self._init_event.is_set():
+                self.init_city()
+        self._init_event.wait()
         return self._inited
 
     @property
