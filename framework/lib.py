@@ -371,7 +371,7 @@ class ThemeBase(_Base):
                                 _Clicked((0, 296, 30, 128), self.set_docker, False),
                                 _Clicked((195, 235, 0, 30), self.open_setting)]
 
-    def active(self, refresh="t"):
+    def active(self, refresh="a"):
         self._docker_status = False
         super().active(refresh)
 
@@ -426,7 +426,7 @@ class AppBase(_Base):
         self._active_clicked = [_Clicked((266, 296, 0, 30), self.env.back_home),
                                 _Clicked((0, 296, 30, 128), self.set_control_bar, False)]
 
-    def active(self, refresh="t"):
+    def active(self, refresh="a"):
         self._control_bar_status = False
         super().active(refresh)
 

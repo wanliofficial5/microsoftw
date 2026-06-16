@@ -290,7 +290,7 @@ class Base:
         if self._active:
             self.env.display(self.Book.render(), refresh)
 
-    def active(self, refresh="t") -> None:  # This function will be called when this Base is active.
+    def active(self, refresh="a") -> None:  # This function will be called when this Base is active.
         self._active = True
         self.Book.is_active = True
         self.display(refresh)

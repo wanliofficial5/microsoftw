@@ -56,6 +56,6 @@ class Application(lib.AppBase):
         self.title = "天气"
         self.add_book("main", MainBook(self))
 
-    def active(self, refresh="t"):
+    def active(self, refresh="a"):
         super().active(refresh)
         self.env.Pool.add(self.Book.Pages["today"].get_weather)
