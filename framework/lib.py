@@ -14,28 +14,23 @@ class Elements:
         def __init__(self, page, location=(0, 0), image=None, show=True):
             super().__init__(page, location)
             self._image = image
-            self._show = show
+            self.show = show
 
-        @property
-        def show(self):
-            return self._show
-
-        @show.setter
-        def show(self, value):
-            if value != self._show:
-                self._show = value
-                self.page.update()
+        def set_show(self, value, update=True):
+            if value != self.show:
+                self.show = value
+                self.page.update(update)
 
         @property
         def image(self):
             return self._image
 
-        def set_image(self, value, display=True):
+        def set_image(self, value, update=True):
             self._image = value
-            self.page.update(display)
+            self.page.update(update)
 
         def render(self):
-            if self._show:
+            if self.show:
                 return self._image
 
     class TextElement(_Element):
@@ -53,17 +48,12 @@ class Elements:
             self.image = None
             self._image_draw = None
             self.update(False)
-            self._show = show
+            self.show = show
 
-        @property
-        def show(self):
-            return self._show
-
-        @show.setter
-        def show(self, value):
-            if value != self._show:
-                self._show = value
-                self.page.update()
+        def set_show(self, value, update=True):
+            if value != self.show:
+                self.show = value
+                self.page.update(update)
 
         def update(self, display=True):
             self.background = _Image.new("RGBA", (296, 128), self._background) if self._background else \
@@ -147,15 +137,47 @@ class Elements:
             self._image_draw.text((x, self.border[1]), self.text, self.color, self._font)
             self.page.update(display)
 
+    class ImageButton(Image):
+        def __init__(self, page, func, size, location=(0, 0), image=None, show=True):
+            super().__init__(page, location, image, show)
+            self.func = func
+            self.size = size
+            self.clicked = _Clicked((location[0], location[0] + size[0], location[1], location[1] + size[1]),
+                                    self.func)
+            if show:
+                self.touch_records = [self.clicked]
+
+        def set_show(self, value, update=True):
+            if value != self.show:
+                self.show = value
+                if value:
+                    self.touch_records = [self.clicked]
+                else:
+                    self.touch_records = []
+                self.page.create_touch_record()
+                self.page.update(update)
+
     class TextElementButton(TextElement):
-        def __init__(self, page, size, func=lambda: None, location=(0, 0), border=(0, 0), text="", font=None, font_size=12, color="black",
+        def __init__(self, page, size, func=lambda: None, location=(0, 0), border=(0, 0), text="", font=None,
+                     font_size=12, color="black",
                      background=None, show=True):
             self.size = size
             self.border = border
             self.func = func
             super().__init__(page, location, text, font, font_size, color, background, show)
-            self.touch_records = [(_Clicked((location[0], location[0] + size[0], location[1], location[1] + size[1]),
-                                            self.func))]
+            self.clicked = _Clicked((location[0], location[0] + size[0], location[1], location[1] + size[1]), self.func)
+            if show:
+                self.touch_records = [self.clicked]
+
+        def set_show(self, value, update=True):
+            if value != self.show:
+                self.show = value
+                if value:
+                    self.touch_records = [self.clicked]
+                else:
+                    self.touch_records = []
+                self.page.create_touch_record()
+                self.page.update(update)
 
         def set_func(self, func):
             self.touch_records[0].func = func
@@ -168,16 +190,26 @@ class Elements:
             self._image_draw.text((self.border[0], self.border[1]), self.text, self.color, self._font)
             self.page.update(display)
 
-
-
     class LabelButton(Label):
         def __init__(self, page, size, func=lambda: None, location=(0, 0), border=(0, 0), text="",
                      font_size=12, color="black", border_color="black", background=None, show=True, align="C"):
             self.border_color = border_color
-            super().__init__(page, size, location, border, text, font_size, color, background, show, align)
             self.func = func
-            self.touch_records = [(_Clicked((location[0], location[0] + size[0], location[1], location[1] + size[1]),
-                                            self.func))]
+            super().__init__(page, size, location, border, text, font_size, color, background, show, align)
+            self.clicked = _Clicked((location[0], location[0] + size[0], location[1], location[1] + size[1]),
+                                    self.func)
+            if show:
+                self.touch_records = [self.clicked]
+
+        def set_show(self, value, update=True):
+            if value != self.show:
+                self.show = value
+                if value:
+                    self.touch_records = [self.clicked]
+                else:
+                    self.touch_records = []
+                self.page.create_touch_record()
+                self.page.update(update)
 
         def set_func(self, func):
             self.touch_records[0].func = func
