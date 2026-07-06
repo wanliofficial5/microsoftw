@@ -15,6 +15,8 @@ Theme and App
 AppController
 Docker
 更好的错误处理机制
+
+book update函数支持全局刷新
 '''
 
 example_config = {
