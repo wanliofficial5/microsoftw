@@ -1,3 +1,4 @@
+import threading
 import time
 
 from framework import lib
@@ -69,6 +70,8 @@ class MainPage(lib.Pages.PageWithTitle):
         self.timer_flag = False
         self.last = 25
 
+        self.timer = None
+
     def reset(self):
         self.timer_flag = False
         self.status = 0
@@ -83,64 +86,63 @@ class MainPage(lib.Pages.PageWithTitle):
                 self.last_clock = now
                 self.clock.set_text(self.last_clock)
 
-    def timer(self, long):
+    def timer_func(self, long):
         self.last = long
-        while self.timer_flag:
+
+        def timer_func_func():
             if self.last == 0:
-                break
-            self.env.Pool.add(self.time.set_text, str(self.last))
-            time.sleep(1)
-            self.last -= 1
-        if self.timer_flag:
-            self.env.Pool.add(self.time.set_text, str(self.last))
-            if self.status == 1:
-                self.status = 3
-                self.tomato += 1
-                self.status_text.set_text("休息一下", False)
-                self.text_count.set_text(f"共获得{self.tomato}个番茄", False)
-                self.text_total.set_text(f"已专注{self.tomato * self.work_time}分钟", False)
-                self.time.set_text(str(self.break_time))
-                file = open(f"applications/番茄钟/record.txt", "w")
-                file.write(str(self.tomato))
-                file.close()
-            elif self.status == 4:
-                self.status = 0
-                self.status_text.set_text("开始计时", False)
-                self.time.set_text(str(self.work_time))
-            if self.env.Now is not self.book.base:
-                self.env.open_app("番茄钟")
-            time.sleep(0.5)
-            self.env.display(refresh="t")
+                self.time.set_text(str(self.last))
+                if self.status == 1:
+                    self.status = 3
+                    self.tomato += 1
+                    self.status_text.set_text("休息一下", False)
+                    self.text_count.set_text(f"共获得{self.tomato}个番茄", False)
+                    self.text_total.set_text(f"已专注{self.tomato * self.work_time}分钟", False)
+                    self.time.set_text(str(self.break_time))
+                    file = open(f"applications/番茄钟/record.txt", "w")
+                    file.write(str(self.tomato))
+                    file.close()
+                elif self.status == 4:
+                    self.status = 0
+                    self.status_text.set_text("开始计时", False)
+                    self.time.set_text(str(self.work_time))
+                if self.env.Now is not self.book.base:
+                    self.env.open_app("番茄钟")
+                time.sleep(0.5)
+                self.env.display(refresh="t")
+            else:
+                self.timer = threading.Timer(60, timer_func_func)
+                self.timer.start()
+                self.time.set_text(str(self.last))
+                self.last -= 1
+
+        timer_func_func()
 
     def control(self):
         if self.status == 0:
             self.status = 1
             self.status_text.set_text("暂停", False)
-            self.timer_flag = True
-            self.timer(self.work_time)
+            self.timer_func(self.work_time)
         elif self.status == 1:
             self.status = 2
             self.status_text.set_text("继续", True)
-            self.timer_flag = False
+            self.timer.cancel()
         elif self.status == 2:
             self.status = 1
             self.status_text.set_text("暂停", False)
-            self.timer_flag = True
-            self.timer(self.last)
+            self.timer_func(self.last)
         elif self.status == 3:
             self.status = 4
             self.status_text.set_text("暂停", False)
-            self.timer_flag = True
-            self.timer(self.break_time)
+            self.timer_func(self.break_time)
         elif self.status == 4:
             self.status = 5
             self.status_text.set_text("继续", True)
-            self.timer_flag = False
+            self.timer.cancel()
         elif self.status == 5:
             self.status = 4
             self.status_text.set_text("暂停", False)
-            self.timer_flag = True
-            self.timer(self.last)
+            self.timer_func(self.last)
 
     def active(self):
         self.last_clock = time.strftime("%H:%M", time.localtime())
