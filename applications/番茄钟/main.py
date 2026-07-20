@@ -53,13 +53,10 @@ class MainPage(lib.Pages.PageWithTitle):
         self.status_text = lib.Elements.Label(self, (114, 12), (0, 90), text="开始计时", align="C")
         self.add_element(self.status_text)
         self.add_element(lib.Elements.ImageButton(self, self.control, (114, 266), (0, 30)))
-        self.clock = lib.Elements.Label(self, (182, 36), (114, 48), text="00:00", font_size=36, align="C")
+        self.clock = lib.Elements.Label(self, (182, 36), (114, 58), text="00:00", font_size=36, align="C")
         self.add_element(self.clock)
-        self.text_count = lib.Elements.Label(self, (182, 12), (114, 84), text=f"共获得{self.tomato}个番茄", align="C")
+        self.text_count = lib.Elements.Label(self, (182, 12), (114, 112), text=f"共获得{self.tomato}个番茄", align="C")
         self.add_element(self.text_count)
-        self.text_total = lib.Elements.Label(self, (182, 12), (114, 98), text=f"已专注{self.tomato * self.work_time}分钟",
-                                             align="C")
-        self.add_element(self.text_total)
         self.reset_button = lib.Elements.ImageButton(self, self.reset, (182, 84), (114, 30))
         self.add_element(self.reset_button)
 
@@ -97,7 +94,6 @@ class MainPage(lib.Pages.PageWithTitle):
                     self.tomato += 1
                     self.status_text.set_text("休息一下", False)
                     self.text_count.set_text(f"共获得{self.tomato}个番茄", False)
-                    self.text_total.set_text(f"已专注{self.tomato * self.work_time}分钟", False)
                     self.time.set_text(str(self.break_time))
                     file = open(f"applications/番茄钟/record.txt", "w")
                     file.write(str(self.tomato))
@@ -167,6 +163,7 @@ class Application(lib.AppBase):
     def __init__(self, env):
         super().__init__(env)
         self.add_book("main", MainBook(self))
+        self.title = "番茄时钟"
 
     def active(self, refresh="a"):
         self.Book.Page.active()
