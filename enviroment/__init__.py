@@ -11,10 +11,10 @@ from PIL import Image as _Image, \
 from system import threadpool as _threadpool
 from system import logger as _logger
 from .touchscreen import Clicked as _Clicked, \
-    SlideX as _SlideX, \
     SlideY as _SlideY, \
     TouchHandler as _TouchHandler, \
     TouchRecoder as _TouchRecoder
+from .touchscreen.events import SlideX as _SlideX
 import os as _os
 from framework.struct import Base as _Base
 
