@@ -4,9 +4,9 @@ from queue import LifoQueue as _LifoQueue
 
 from PIL import Image as _Image
 
-from enviroment.touchscreen import Clicked as _Clicked,\
-    SlideX as _SlideX, \
+from enviroment.touchscreen.events import Clicked as _Clicked, \
     SlideY as _SlideY
+from enviroment.touchscreen.events import SlideX as _SlideX
 
 
 class Element:
