@@ -108,7 +108,7 @@ class TouchHandler:
                 self.back_left.temp_location = (d_x, d_y)
             elif d_x >= 276:
                 self.back_right.temp_location = (d_x, d_y)
-            elif d_y >= 108 and 100 <= d_x <= 200:
+            elif d_y >= 114 and 100 <= d_x <= 200:
                 self.home_bar.temp_location = (d_x, d_y)
 
             for i in _ReIter(app_slide_x):
