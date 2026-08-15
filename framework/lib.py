@@ -454,9 +454,9 @@ class AppBase(_Base):
         self._control_bar_mask = env.app_control_alpha
         self._control_bar_status = False
         self._control_bar_temp = 0
-        self._inactive_clicked = [_Clicked((266, 296, 0, 30), self.set_control_bar, True)]
-        self._active_clicked = [_Clicked((266, 296, 0, 30), self.env.back_home),
-                                _Clicked((0, 296, 30, 128), self.set_control_bar, False)]
+        self._inactive_records = [_SlideY((0, 296, 0, 20), self.active_control_bar, limit="+")]
+        self._active_records = [_Clicked((266, 296, 0, 30), self.env.back_home),
+                                _Clicked((0, 296, 30, 128), self.close_control_bar)]
 
     def active(self, refresh="a"):
         self._control_bar_status = False
@@ -476,19 +476,29 @@ class AppBase(_Base):
             else:
                 self.env.display(self.Book.render(), refresh)
 
-    def set_control_bar(self, value: bool):
-        self._control_bar_status = value
+    def active_control_bar(self, _):
+        self._control_bar_temp = _time.time()
+        self._control_bar_status = True
         self.display()
-        if value:
-            self._control_bar_temp = _time.time()
-            _time.sleep(8)
-            if _time.time() - self._control_bar_status >= 8:
-                self._control_bar_status = False
-                self.display()
+        _time.sleep(8)
+        if _time.time() - self._control_bar_status >= 8:
+            self._control_bar_status = False
+            self.display()
+
+    def close_control_bar(self):
+        self._control_bar_status = False
+        self.display()
 
     @property
     def touch_records_clicked(self):
         if self._control_bar_status:
-            return self.Book.Page.touch_records_clicked + self._active_clicked
+            return self.Book.Page.touch_records_clicked + self._active_records
         else:
-            return self.Book.Page.touch_records_clicked + self._inactive_clicked
+            return self.Book.Page.touch_records_clicked
+
+    @property
+    def touch_records_slide_y(self):
+        if self._control_bar_status:
+            return self.Book.Page.touch_records_slide_y
+        else:
+            return self.Book.Page.touch_records_slide_y + self._inactive_records
