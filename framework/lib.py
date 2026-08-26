@@ -398,9 +398,9 @@ class ThemeBase(_Base):
         self._docker_status = False
         self._docker_temp = 0
 
-        self._inactive_clicked = [_Clicked((0, 296, 0, 30), self.set_docker, True)]
-        self._active_clicked = [_Clicked((60, 100, 0, 30), self.open_applist),
-                                _Clicked((0, 296, 30, 128), self.set_docker, False),
+        self._inactive_records = [_SlideY((0, 296, 0, 30), self.active_docker, limit="+")]
+        self._active_records = [_Clicked((60, 100, 0, 30), self.open_applist),
+                                _Clicked((0, 296, 30, 128), self.close_docker),
                                 _Clicked((195, 235, 0, 30), self.open_setting)]
 
     def active(self, refresh="a"):
@@ -413,15 +413,18 @@ class ThemeBase(_Base):
     def open_setting(self):
         self.env.open_app("设置")
 
-    def set_docker(self, value: bool):
-        self._docker_status = value
+    def active_docker(self, _):
+        self._docker_status = True
         self.display()
-        if value:
-            self._docker_temp = _time.time()
-            _time.sleep(2)
-            if _time.time() - self._docker_temp >= 2:
-                self._docker_status = False
-                self.display()
+        self._docker_temp = _time.time()
+        _time.sleep(2)
+        if _time.time() - self._docker_temp >= 2:
+            self._docker_status = False
+            self.display()
+
+    def close_docker(self):
+        self._docker_status = False
+        self.display()
 
     def display(self, refresh="a"):
         if self._active:
@@ -435,9 +438,16 @@ class ThemeBase(_Base):
     @property
     def touch_records_clicked(self):
         if self._docker_status:
-            return self.Book.Page.touch_records_clicked + self._active_clicked
+            return self.Book.Page.touch_records_clicked + self._active_records
         else:
-            return self.Book.Page.touch_records_clicked + self._inactive_clicked
+            return self.Book.Page.touch_records_clicked
+
+    @property
+    def touch_records_slide_y(self):
+        if self._docker_status:
+            return self.Book.Page.touch_records_slide_y
+        else:
+            return self.Book.Page.touch_records_slide_y + self._inactive_records
 
 
 class AppBase(_Base):
