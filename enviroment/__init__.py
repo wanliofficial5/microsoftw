@@ -106,14 +106,6 @@ class Simulator:
         pass
 
 
-class Images:
-    def __init__(self):
-        self.app_control = _Image.open("resources/images/app_control.jpg")
-        self.None18px = _Image.open("resources/images/None18px.jpg")
-        self.None20px = _Image.open("resources/images/None20px.jpg")
-        self.docker_image = _Image.open("resources/images/docker.jpg")
-
-
 class Env:
     def __init__(self, simulator):
         # locks
@@ -164,7 +156,9 @@ class Env:
         self._home_bar_temp = 0
 
         # images
-        self.images = Images()
+        self.none18px_img = _Image.open("resources/images/None18px.jpg")
+        self.none20px_img = _Image.open("resources/images/None20px.jpg")
+        self.docker_img = _Image.open("resources/images/docker.jpg")
         self.left_img = _Image.open("resources/images/back_left.png").convert("RGBA")
         self.left_img_alpha = self.left_img.split()[3]
         self.right_img = _Image.open("resources/images/back_right.png").convert("RGBA")
@@ -175,7 +169,7 @@ class Env:
         self.list_more_img = _Image.open("resources/images/more_items_dots.jpg")
         self.app_control_img = _Image.open("resources/images/app_control.png")
         self.app_control_alpha = self.app_control_img.split()[3]
-        self.page_with_title = _Image.open("resources/images/page_with_title.png")
+        self.page_with_title_img = _Image.open("resources/images/page_with_title.png")
 
     def __getattr__(self, name):
         if name in self.plugins:

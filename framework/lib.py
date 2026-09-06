@@ -385,7 +385,7 @@ class Pages:
     class PageWithTitle(_Page):
         def __init__(self, book, title):
             super().__init__(book)
-            self._background = book.base.env.page_with_title
+            self._background = book.base.env.page_with_title_img
 
             self.title = Elements.TextElement(self, (7, 7), title, font_size=16)
             self.add_element(self.title)
@@ -394,7 +394,7 @@ class Pages:
 class ThemeBase(_Base):
     def __init__(self, env):
         super().__init__(env)
-        self._docker_image = self.env.images.docker_image
+        self._docker_image = self.env.docker_img
         self._docker_status = False
         self._docker_temp = 0
 
@@ -454,7 +454,7 @@ class AppBase(_Base):
     def __init__(self, env):
         self.show_in_drawer = True
         self.title = ""
-        self.icon = env.images.None20px
+        self.icon = env.none20px_img
         self.name = ""
 
         super().__init__(env)
