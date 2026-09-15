@@ -111,7 +111,6 @@ class MainPage(lib.Pages.PageWithTitle):
                 self.timer = threading.Timer(60, timer_func_func)
                 self.timer.start()
                 self.time.set_text(str(self.last))
-                self.last -= 1
 
         self.last += 1
         timer_func_func()
