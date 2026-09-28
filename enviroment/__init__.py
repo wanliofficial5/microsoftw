@@ -170,6 +170,8 @@ class Env:
         self.app_control_img = _Image.open("resources/images/app_control.png")
         self.app_control_alpha = self.app_control_img.split()[3]
         self.page_with_title_img = _Image.open("resources/images/page_with_title.png")
+        self.ok_img = _Image.open("resources/images/ok.png")
+        self.ok_alpha = self.ok_img.split()[3]
 
     def __getattr__(self, name):
         if name in self.plugins:
