@@ -259,8 +259,11 @@ class Elements:
 
 class Pages:
     class ListPage(_Page):
-        def __init__(self, book, title, items: [str], icons=None, funcs=None, func=None):
+        def __init__(self, book, title, items: [str], icons=None, styles=None, funcs=None, func=None):
             super().__init__(book)
+            self.styles_img = {
+                "OK": [book.base.env.ok_img, book.base.env.ok_alpha]
+            }
             self._background = book.base.env.list_img
             self.more_img = book.base.env.list_more_img
             self.old_render = self.background
@@ -269,6 +272,7 @@ class Pages:
             self.font = book.base.env.get_font(16)
             self.icons = icons if icons else [None] * len(items)
             self.funcs = funcs if funcs else [lambda: None] * len(items)
+            self.styles = styles if styles else [None] * len(items)
             self.func = func
             self.at = 0
             if not len(items) == len(self.icons) == len(self.funcs):
@@ -279,6 +283,12 @@ class Pages:
                 _Clicked((0, 296, 91, 120), self._handler, 2),
                 _SlideY((0, 296, 0, 128), self._slide)
             ]
+
+        def set_style(self, index, style=None, display=True):
+            if self.styles[index] != style:
+                self.styles[index] = style
+                if index // 3 == self.at:
+                    self.update(display)
 
         def add_element(self, element):
             raise Exception("No support.")
@@ -374,6 +384,9 @@ class Pages:
                         draw.text((35, y + 2), self.items[index], "black", self.font)
                     else:
                         draw.text((8, y + 2), self.items[index], "black", self.font)
+                    if self.styles[index]:
+                        img = self.styles_img[self.styles[index]]
+                        new_image.paste((35, y + 2), img[0], mask=img[1])
                 if self.at * 3 + 3 < len(self.items):
                     new_image.paste(self.more_img, (105, 122))
                 self.old_render = new_image
