@@ -104,14 +104,8 @@ def main_thread():
 """
 
 
-def dev():
-    time.sleep(1)
-    pass
-
-
 if __name__ == "__main__":
     simulator = enviroment.Simulator()
     env = enviroment.Env(simulator)
     env.Pool.add(main_thread)
-    env.Pool.add(dev)
     simulator.start(env)

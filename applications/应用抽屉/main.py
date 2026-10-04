@@ -16,8 +16,7 @@ class ApplicationList(Pages.ListPage):
     def update_app_list(self):
         for app_name, app in self.env.apps.items():
             if app.show_in_drawer:
-                self.items.append(app_name)
-                self.icons.append(app.icon)
+                self.append(app_name, icon=app.icon, display=False)
 
 
 class MainBook(Book):
@@ -38,3 +37,7 @@ class Application(AppBase):
 
     def update_app_list(self):
         self.Book.Page.update_app_list()
+
+    def active(self, refresh="a"):
+        super().active(refresh)
+        self.Book.Page.set_style(0, "OK")

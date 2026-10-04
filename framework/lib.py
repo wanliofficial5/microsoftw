@@ -293,10 +293,11 @@ class Pages:
         def add_element(self, element):
             raise Exception("No support.")
 
-        def append(self, item, icon=None, func=lambda: None, display=True):
+        def append(self, item, icon=None, func=lambda: None, style=None, display=True):
             self.items.append(item)
             self.icons.append(icon)
             self.funcs.append(func)
+            self.styles.append(style)
             self.update(display)
 
         def remove(self, item, display=True):
@@ -386,7 +387,7 @@ class Pages:
                         draw.text((8, y + 2), self.items[index], "black", self.font)
                     if self.styles[index]:
                         img = self.styles_img[self.styles[index]]
-                        new_image.paste((35, y + 2), img[0], mask=img[1])
+                        new_image.paste(img[0], (253, y-2), mask=img[1])
                 if self.at * 3 + 3 < len(self.items):
                     new_image.paste(self.more_img, (105, 122))
                 self.old_render = new_image
