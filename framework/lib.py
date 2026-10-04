@@ -5,8 +5,8 @@ from PIL import ImageDraw as _ImageDraw, \
     Image as _Image
 
 from framework.struct import Page as _Page, Element as _Element, Base as _Base
-from enviroment.touchscreen import Clicked as _Clicked, \
-    SlideY as _SlideY
+from enviroment.touchscreen.events import Clicked as _Clicked, \
+    SlideY as _SlideY, SlideX as _SlideX
 
 
 class Elements:
@@ -277,21 +277,43 @@ class Pages:
             self.at = 0
             if not len(items) == len(self.icons) == len(self.funcs):
                 raise ValueError("Quantity asymmetry!")
-            self.touch_records = [
+            self.list_clicked = [
                 _Clicked((0, 296, 31, 60), self._handler, 0),
                 _Clicked((0, 296, 61, 90), self._handler, 1),
                 _Clicked((0, 296, 91, 120), self._handler, 2),
                 _SlideY((0, 296, 0, 128), self._slide)
             ]
+            self.list_slide_y = [
+                _SlideY((0, 296, 0, 128), self._slide)
+            ]
+
+        def create_touch_record(self):
+            self.touch_records_rlock.acquire()
+            self.touch_records_clicked = self.list_clicked.copy()
+            self.touch_records_slide_x = []
+            self.touch_records_slide_y = self.list_slide_y.copy()
+            for i in self._elements:
+                for j in i.touch_records:
+                    if isinstance(j, _Clicked):
+                        self.touch_records_clicked.append(j)
+                    elif isinstance(j, _SlideX):
+                        self.touch_records_slide_x.append(j)
+                    elif isinstance(j, _SlideY):
+                        self.touch_records_slide_y.append(j)
+            for j in self._touch_records:
+                if isinstance(j, _Clicked):
+                    self.touch_records_clicked.append(j)
+                elif isinstance(j, _SlideX):
+                    self.touch_records_slide_x.append(j)
+                elif isinstance(j, _SlideY):
+                    self.touch_records_slide_y.append(j)
+            self.touch_records_rlock.release()
 
         def set_style(self, index, style=None, display=True):
             if self.styles[index] != style:
                 self.styles[index] = style
                 if index // 3 == self.at:
                     self.update(display)
-
-        def add_element(self, element):
-            raise Exception("No support.")
 
         def append(self, item, icon=None, func=lambda: None, style=None, display=True):
             self.items.append(item)
@@ -387,9 +409,21 @@ class Pages:
                         draw.text((8, y + 2), self.items[index], "black", self.font)
                     if self.styles[index]:
                         img = self.styles_img[self.styles[index]]
-                        new_image.paste(img[0], (253, y-2), mask=img[1])
+                        new_image.paste(img[0], (253, y - 2), mask=img[1])
                 if self.at * 3 + 3 < len(self.items):
                     new_image.paste(self.more_img, (105, 122))
+
+                self._elements_rlock.acquire()
+                for i in self._elements:
+                    j = i.render()
+                    if j:
+                        if j.mode == "RGBA":
+                            _, _, _, a = j.split()
+                            new_image.paste(j, i.location, mask=a)
+                        else:
+                            new_image.paste(j, i.location)
+                self._elements_rlock.release()
+
                 self.old_render = new_image
                 self._update = False
                 return new_image.copy()
