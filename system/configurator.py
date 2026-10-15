@@ -15,7 +15,7 @@ class TargetExists(Exception):
 
 
 class Configurator:  # 没有对多线程进行适配，需要自行加锁
-    def __init__(self, file_path=default_config_path, auto_save=False):
+    def __init__(self, file_path=default_config_path, auto_save=True):
         self.path = file_path
         self.__current_path = "/"
         self.file_path = file_path
