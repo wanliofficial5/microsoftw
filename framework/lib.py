@@ -286,6 +286,7 @@ class Pages:
             self.list_slide_y = [
                 _SlideY((0, 296, 0, 128), self._slide)
             ]
+            self.create_touch_record()
 
         def create_touch_record(self):
             self.touch_records_rlock.acquire()
