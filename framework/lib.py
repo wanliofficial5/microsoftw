@@ -281,7 +281,6 @@ class Pages:
                 _Clicked((0, 296, 31, 60), self._handler, 0),
                 _Clicked((0, 296, 61, 90), self._handler, 1),
                 _Clicked((0, 296, 91, 120), self._handler, 2),
-                _SlideY((0, 296, 0, 128), self._slide)
             ]
             self.list_slide_y = [
                 _SlideY((0, 296, 0, 128), self._slide)
