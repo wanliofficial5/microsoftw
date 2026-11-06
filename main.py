@@ -19,20 +19,12 @@ Docker
 book update函数支持全局刷新
 '''
 
-example_config = {
-    "theme": "default",
-    "update_tdduudf7": 1
-}
-
 
 # 原来的主线程
 
 def main_thread():
     time.sleep(0.5)
     print("Running In Develop Mode")
-
-    configurator_main = configurator.Configurator()
-    configurator_main.check(example_config, True)
 
     load_lock = threading.Barrier(2)
 
@@ -92,9 +84,7 @@ def main_thread():
 
     load_lock.wait()
 
-    env.now_theme = configurator_main.read("theme")
-    env.Now = env.themes[env.now_theme]
-    env.Now.active()
+    env.start()
 
 
 """
