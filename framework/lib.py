@@ -451,8 +451,20 @@ class ThemeBase(_Base):
                                 _Clicked((0, 296, 30, 128), self.close_docker),
                                 _Clicked((195, 235, 0, 30), self.open_setting)]
 
+        self.docker_list = []
+
     def active(self, refresh="a"):
         self._docker_status = False
+
+        self.docker_list = self.env.config.read("docker")
+        flag = False
+        for i in self.docker_list.copy():
+            if i not in self.env.apps:
+                self.docker_list.remove(i)
+                flag = True
+        if flag:
+            self.env.config.set("docker", self.docker_list)
+
         super().active(refresh)
 
     def open_applist(self):
@@ -479,6 +491,10 @@ class ThemeBase(_Base):
             if self._docker_status:
                 new_image = self.Book.render()
                 new_image.paste(self._docker_image, (60, 0))
+                x = 110
+                for i in self.docker_list:
+                    new_image.paste(self.env.apps[i].icon, (x, 5))
+                    x += 35
                 self.env.display(new_image, refresh)
             else:
                 self.env.display(self.Book.render(), refresh)

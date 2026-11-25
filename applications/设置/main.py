@@ -125,6 +125,7 @@ class DockerSettingPage(lib.Pages.ListPage):
                 self.set_style(index, "OK")
 
     def active(self):
+        self.docker_list = self.env.config.read("docker")
         flag = False
         for i in self.docker_list.copy():
             if i not in self.env.apps:
@@ -132,7 +133,6 @@ class DockerSettingPage(lib.Pages.ListPage):
                 flag = True
         if flag:
             self.env.config.set("docker", self.docker_list)
-        self.docker_list = self.env.config.read("docker")
 
         for app_name, app in self.env.apps.items():
             if app.show_in_drawer:
