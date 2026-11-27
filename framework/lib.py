@@ -518,7 +518,7 @@ class AppBase(_Base):
     def __init__(self, env):
         self.show_in_drawer = True
         self.title = ""
-        self.icon = env.none20px_img
+        self.icon = env.none18px_img
         self.name = ""
 
         super().__init__(env)
