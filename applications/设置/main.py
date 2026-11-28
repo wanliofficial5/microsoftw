@@ -91,10 +91,10 @@ class DockerEmulator(struct.Element):
 
     def update(self, docker_list):
         self.img = self._background.copy()
-        x = 50
+        x = 52
         for i in docker_list:
             self.img.paste(self.env.apps[i].icon, (x, 5))
-            x += 35
+            x += 30
 
     def render(self):
         return self.img
@@ -220,7 +220,7 @@ class Application(lib.AppBase):
         self.add_book("system", SystemSettingsBook(self), False)
         self.add_book("about", AboutBook(self), False)
 
-        self.show_in_drawer = False
+        # self.show_in_drawer = False
 
     def active(self, refresh="a"):
         self.Books["online"].Page.ip_text.set_text(get_host_ip(), False)

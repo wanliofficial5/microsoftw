@@ -449,9 +449,19 @@ class ThemeBase(_Base):
         self._inactive_records = [_SlideY((0, 296, 0, 30), self.active_docker, limit="+")]
         self._active_records = [_Clicked((60, 100, 0, 30), self.open_applist),
                                 _Clicked((0, 296, 30, 128), self.close_docker),
-                                _Clicked((195, 235, 0, 30), self.open_setting)]
+                                _Clicked((195, 235, 0, 30), self.open_setting),
+                                _Clicked((112, 142, 0, 30), self.open_app, 0),
+                                _Clicked((142, 172, 0, 30), self.open_app, 1),
+                                _Clicked((172, 202, 0, 30), self.open_app, 1),
+                                ]
 
         self.docker_list = []
+
+    def open_app(self, index):
+        try:
+            self.env.open_app(self.docker_list[index])
+        except IndexError:
+            pass
 
     def active(self, refresh="a"):
         self._docker_status = False
@@ -491,10 +501,10 @@ class ThemeBase(_Base):
             if self._docker_status:
                 new_image = self.Book.render()
                 new_image.paste(self._docker_image, (60, 0))
-                x = 110
+                x = 112
                 for i in self.docker_list:
                     new_image.paste(self.env.apps[i].icon, (x, 5))
-                    x += 35
+                    x += 30
                 self.env.display(new_image, refresh)
             else:
                 self.env.display(self.Book.render(), refresh)
